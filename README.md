@@ -6,7 +6,7 @@ B2.NET is still in early Alpha, so use it in production at your own risk.
 
 ## Features
 
-*  Full implmentation of the B@ REST API.
+*  Full implmentation of the B2 REST API.
 *  Full Async support (Planned)
 
 ## NuGet

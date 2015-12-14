@@ -7,10 +7,11 @@
     <ProjectGuid>{5161362E-59B9-4959-8701-59FEEF469ECA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>B2.NET</RootNamespace>
-    <AssemblyName>B2.NET</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <RootNamespace>B2Net</RootNamespace>
+    <AssemblyName>B2Net</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,6 +31,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -41,8 +46,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="B2Client.cs" />
-    <Compile Include="IClient.cs" />
+    <Compile Include="Http\AuthRequestGenerator.cs" />
+    <Compile Include="Http\BucketsRequestGenerators.cs" />
+    <Compile Include="Http\Constants.cs" />
+    <Compile Include="Http\HttpClientFactory.cs" />
+    <Compile Include="Models\B2AuthResponse.cs" />
+    <Compile Include="Models\B2Bucket.cs" />
+    <Compile Include="Models\B2Options.cs" />
+    <Compile Include="Models\Exceptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
