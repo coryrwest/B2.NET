@@ -24,7 +24,7 @@ allPublic
 ```
 
 ## Examples
-```
+```csharp
 var options = new B2Options() {
 	AccountId = "YOUR ACCOUNT ID",
 	ApplicationKey = "YOUR APPLICATION KEY",
@@ -34,14 +34,14 @@ var client = new B2Client(Options);
 ```
 
 ### Authorize
-```
+```csharp
 // the returned options object will contain the authorizationToken
 // necessary for subsequent calls to the B2 API.
 var options = client.Authorize().Result;
 ```
 
 ### List Buckets
-```
+```csharp
 var client = new B2Client(options);
 options = client.Authorize().Result;
 var bucketList = client.GetBucketList().Result;
@@ -53,7 +53,7 @@ var bucketList = client.GetBucketList().Result;
 ```
 
 ### Create a Bucket
-```
+```csharp
 var client = new B2Client(options);
 options = client.Authorize().Result;
 var bucketList = client.CreateBucket("BUCKETNAME", "OPTIONAL_BUCKET_TYPE").Result;
@@ -65,7 +65,7 @@ var bucketList = client.CreateBucket("BUCKETNAME", "OPTIONAL_BUCKET_TYPE").Resul
 ```
 
 ### Update a Bucket
-```
+```csharp
 var client = new B2Client(options);
 options = client.Authorize().Result;
 var bucketList = client.UpdateBucket("BUCKETID", "BUCKETYPE").Result;
@@ -77,7 +77,7 @@ var bucketList = client.UpdateBucket("BUCKETID", "BUCKETYPE").Result;
 ```
 
 ### Delete a Bucket
-```
+```csharp
 var client = new B2Client(options);
 options = client.Authorize().Result;
 var bucketList = client.DeleteBucket("BUCKETID").Result;
