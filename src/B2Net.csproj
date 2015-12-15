@@ -47,7 +47,8 @@
   <ItemGroup>
     <Compile Include="B2Client.cs" />
     <Compile Include="Http\AuthRequestGenerator.cs" />
-    <Compile Include="Http\BucketsRequestGenerators.cs" />
+    <Compile Include="Http\BucketRequestGenerators.cs" />
+    <Compile Include="Http\BucketTypes.cs" />
     <Compile Include="Http\Constants.cs" />
     <Compile Include="Http\HttpClientFactory.cs" />
     <Compile Include="Models\B2AuthResponse.cs" />
