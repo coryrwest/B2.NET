@@ -40,7 +40,7 @@ namespace B2Net {
 		public async Task<List<B2Bucket>> GetBucketList(CancellationToken cancelToken = default(CancellationToken)) {
 			var client = HttpClientFactory.CreateHttpClient();
 
-			var requestMessage = BucketsRequestGenerators.GetBucketList(_options);
+			var requestMessage = BucketRequestGenerators.GetBucketList(_options);
 			var response = await client.SendAsync(requestMessage, cancelToken);
 
 			var jsonResponse = await response.Content.ReadAsStringAsync();
@@ -50,6 +50,53 @@ namespace B2Net {
 			} else {
 				throw new AuthorizationException(jsonResponse);
 			}
-		} 
+		}
+
+		public async Task<B2Bucket> CreateBucket(string bucketName, BucketTypes bucketType, CancellationToken cancelToken = default(CancellationToken)) {
+			var client = HttpClientFactory.CreateHttpClient();
+
+			var requestMessage = BucketRequestGenerators.CreateBucket(_options, bucketName, bucketType.ToString());
+			var response = await client.SendAsync(requestMessage, cancelToken);
+
+			var jsonResponse = await response.Content.ReadAsStringAsync();
+			if (response.IsSuccessStatusCode) {
+				var bucket = JsonConvert.DeserializeObject<B2Bucket>(jsonResponse);
+				return bucket;
+			} else {
+				throw new AuthorizationException(jsonResponse);
+			}
+		}
+
+		public async Task<B2Bucket> DeleteBucket(string bucketId, CancellationToken cancelToken = default(CancellationToken)) {
+			var client = HttpClientFactory.CreateHttpClient();
+
+			var requestMessage = BucketRequestGenerators.DeleteBucket(_options, bucketId);
+			var response = await client.SendAsync(requestMessage, cancelToken);
+
+			var jsonResponse = await response.Content.ReadAsStringAsync();
+			if (response.IsSuccessStatusCode) {
+				var bucket = JsonConvert.DeserializeObject<B2Bucket>(jsonResponse);
+				return bucket;
+			} else {
+				throw new AuthorizationException(jsonResponse);
+			}
+		}
+
+		public async Task<B2Bucket> UpdateBucket(string bucketId, BucketTypes bucketType, CancellationToken cancelToken = default(CancellationToken)) {
+			var client = HttpClientFactory.CreateHttpClient();
+
+			var requestMessage = BucketRequestGenerators.UpdateBucket(_options, bucketId, bucketType.ToString());
+			var response = await client.SendAsync(requestMessage, cancelToken);
+
+			var jsonResponse = await response.Content.ReadAsStringAsync();
+			if (response.IsSuccessStatusCode) {
+				var bucket = JsonConvert.DeserializeObject<B2Bucket>(jsonResponse);
+				return bucket;
+			} else {
+				throw new AuthorizationException(jsonResponse);
+			}
+		}
+
+
 	}
 }
