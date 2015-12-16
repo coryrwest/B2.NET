@@ -3,11 +3,21 @@
 		public string AccountId { get; set; }
 		public string ApplicationKey { get; set; }
 		public string BucketId { get; set; }
+		/// <summary>
+		/// Setting this to true will use this bucket by default for all
+		/// api calls made from this client. Useful if your app will
+		/// only ever use one bucket. Default: false.
+		/// </summary>
+		public bool PersistBucket { get; set; }
 		
 		// State
 		public string ApiUrl { get; set; }
 		public string DownloadUrl { get; set; }
 		public string AuthorizationToken { get; set; }
+
+		public B2Options() {
+			PersistBucket = false;
+		}
 
 		public void SetState(B2AuthResponse response) {
 			if (response.accountId == AccountId) {
