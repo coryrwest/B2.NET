@@ -46,13 +46,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="B2Client.cs" />
-    <Compile Include="Http\AuthRequestGenerator.cs" />
-    <Compile Include="Http\BucketRequestGenerators.cs" />
+    <Compile Include="Buckets.cs" />
+    <Compile Include="Files.cs" />
+    <Compile Include="Http\RequestGenerators\BaseRequestGenerator.cs" />
+    <Compile Include="Http\RequestGenerators\FileDeleteRequestGenerator.cs" />
+    <Compile Include="Http\RequestGenerators\AuthRequestGenerator.cs" />
+    <Compile Include="Http\RequestGenerators\BucketRequestGenerators.cs" />
     <Compile Include="Http\BucketTypes.cs" />
     <Compile Include="Http\Constants.cs" />
+    <Compile Include="Http\RequestGenerators\FileDownloadRequestGenerators.cs" />
+    <Compile Include="Http\RequestGenerators\FileUploadRequestGenerators.cs" />
+    <Compile Include="Http\RequestGenerators\FileMetaDataRequestGenerators.cs" />
     <Compile Include="Http\HttpClientFactory.cs" />
     <Compile Include="Models\B2AuthResponse.cs" />
     <Compile Include="Models\B2Bucket.cs" />
+    <Compile Include="Models\B2Error.cs" />
+    <Compile Include="Models\B2File.cs" />
+    <Compile Include="Models\B2FileList.cs" />
     <Compile Include="Models\B2Options.cs" />
     <Compile Include="Models\Exceptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

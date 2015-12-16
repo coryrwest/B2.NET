@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using B2Net.Http.RequestGenerators;
 using B2Net.Models;
 
 namespace B2Net.Http {
@@ -17,25 +18,12 @@ namespace B2Net.Http {
 			public const string Update = "b2_update_bucket";
 		}
 
-		private static HttpRequestMessage BucketRequest(string endpoint, string body, B2Options options) {
-			var uri = new Uri(options.ApiUrl + "/b2api/" + Constants.Version + "/" + endpoint);
-			var request = new HttpRequestMessage() {
-				Method = HttpMethod.Post,
-				RequestUri = uri,
-				Content = new StringContent(body)
-			};
-
-			request.Headers.Add("Authorization", options.AuthorizationToken);
-
-			return request;
-		}
-
 		public static HttpRequestMessage GetBucketList(B2Options options) {
-			return BucketRequest(Endpoints.List, "{\"accountId\":\"" + options.AccountId + "\"}", options);
+			return BaseRequestGenerator.PostRequest(Endpoints.List, "{\"accountId\":\"" + options.AccountId + "\"}", options);
 		}
 
 		public static HttpRequestMessage DeleteBucket(B2Options options, string bucketId) {
-			return BucketRequest(Endpoints.Delete, "{\"accountId\":\"" + options.AccountId + "\", \"bucketId\":\"" + bucketId + "\"}", options);
+			return BaseRequestGenerator.PostRequest(Endpoints.Delete, "{\"accountId\":\"" + options.AccountId + "\", \"bucketId\":\"" + bucketId + "\"}", options);
 		}
 
 		/// <summary>
@@ -49,7 +37,7 @@ namespace B2Net.Http {
 			// TODO: Handle naming conventions, check name for invalid characters.
 			var body = "{\"accountId\":\"" + options.AccountId + "\", \"bucketName\":\"" + bucketName +
 						"\", \"bucketType\":\"" + bucketType + "\"}";
-			return BucketRequest(Endpoints.Create, body, options);
+			return BaseRequestGenerator.PostRequest(Endpoints.Create, body, options);
 		}
 
 		/// <summary>
@@ -60,7 +48,7 @@ namespace B2Net.Http {
 		public static HttpRequestMessage UpdateBucket(B2Options options, string bucketId, string bucketType) {
 			var body = "{\"accountId\":\"" + options.AccountId + "\", \"bucketId\":\"" + bucketId + "\", \"bucketType\":\"" +
 						bucketType + "\"}";
-			return BucketRequest(Endpoints.Update, body, options);
+			return BaseRequestGenerator.PostRequest(Endpoints.Update, body, options);
 		} 
 	}
 }
