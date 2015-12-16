@@ -15,20 +15,17 @@ B2.NET will eventually be available as a NuGet package.
 
 ## Install
 
-Use the NuGet package, or just stick the B2.NET.ddl in your project.
-
-## Bucket Types
-```
-allPrivate
-allPublic
-```
+Use the NuGet package, or just stick the B2Net.ddl in your project.
 
 ## Examples
 ```csharp
+// the B2Client will default to the bucketId provided here
+// for all subsequent calls if you set PersistBucket to true.
 var options = new B2Options() {
 	AccountId = "YOUR ACCOUNT ID",
 	ApplicationKey = "YOUR APPLICATION KEY",
-	BucketId = "OPTIONAL BUCKET ID"
+	BucketId = "OPTIONAL BUCKET ID",
+	PersistBucket = true/false
 };
 var client = new B2Client(Options);
 ```
@@ -74,6 +71,12 @@ var bucketList = client.UpdateBucket("BUCKETID", "BUCKETYPE").Result;
 //     BucketName: "",
 //     BucketType: "" }
 // ]
+```
+
+#### Bucket Types
+```
+allPrivate
+allPublic
 ```
 
 ### Delete a Bucket
