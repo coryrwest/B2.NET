@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using System.Text;
 
 namespace B2Net {
@@ -12,13 +13,13 @@ namespace B2Net {
 			return authHeader + credentials;
 		}
 
-		//public static void CheckForErrors(HttpResponseMessage response) {
-		//	var statusCode = response.StatusCode;
-		//	string content = null;
+		public static void CheckForErrors(HttpResponseMessage response) {
+			var statusCode = response.StatusCode;
+			string content = null;
 
-		//	if (!response.IsSuccessStatusCode) {
-		//		// What to do with it.
-		//	}
-		//}
+			if (!response.IsSuccessStatusCode) {
+				// What to do with it.
+			}
+		}
 	}
 }
