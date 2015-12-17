@@ -41,7 +41,7 @@ var options = client.Authorize().Result;
 ```csharp
 var client = new B2Client(options);
 options = client.Authorize().Result;
-var bucketList = client.GetBucketList().Result;
+var bucketList = client.Buckets.GetList().Result;
 // [
 //   { BucketId: "",
 //     BucketName: "",
@@ -53,7 +53,7 @@ var bucketList = client.GetBucketList().Result;
 ```csharp
 var client = new B2Client(options);
 options = client.Authorize().Result;
-var bucketList = client.CreateBucket("BUCKETNAME", "OPTIONAL_BUCKET_TYPE").Result;
+var bucketList = client.Buckets.Create("BUCKETNAME", "OPTIONAL_BUCKET_TYPE").Result;
 // [
 //   { BucketId: "",
 //     BucketName: "",
@@ -65,7 +65,7 @@ var bucketList = client.CreateBucket("BUCKETNAME", "OPTIONAL_BUCKET_TYPE").Resul
 ```csharp
 var client = new B2Client(options);
 options = client.Authorize().Result;
-var bucketList = client.UpdateBucket("BUCKETID", "BUCKETYPE").Result;
+var bucketList = client.Buckets.Update("BUCKETID", "BUCKETYPE").Result;
 // [
 //   { BucketId: "",
 //     BucketName: "",
@@ -83,7 +83,7 @@ allPublic
 ```csharp
 var client = new B2Client(options);
 options = client.Authorize().Result;
-var bucketList = client.DeleteBucket("BUCKETID").Result;
+var bucketList = client.Buckets.Delete("BUCKETID").Result;
 // [
 //   { BucketId: "",
 //     BucketName: "",

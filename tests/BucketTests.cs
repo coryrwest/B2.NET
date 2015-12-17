@@ -11,7 +11,11 @@ namespace B2Net.Tests {
 
 			Options = client.Authorize().Result;
 
-			var list = client.Buckets.GetBucketList().Result;
+			var bucket = client.Buckets.Create("B2NETTestingBucket", BucketTypes.allPrivate).Result;
+
+			var list = client.Buckets.GetList().Result;
+
+			var deletedBucket = client.Buckets.Delete(bucket.BucketId).Result;
 
 			Assert.AreNotEqual(0, list.Count);
 		}
@@ -23,11 +27,11 @@ namespace B2Net.Tests {
 
 			Options = client.Authorize().Result;
 
-			var bucket = client.Buckets.CreateBucket(name, BucketTypes.allPrivate).Result;
+			var bucket = client.Buckets.Create(name, BucketTypes.allPrivate).Result;
 
 			// Clean up
 			if (!string.IsNullOrEmpty(bucket.BucketId)) {
-				client.Buckets.DeleteBucket(bucket.BucketId).Wait();
+				client.Buckets.Delete(bucket.BucketId).Wait();
 			}
 
 			Assert.AreEqual(name, bucket.BucketName);
@@ -41,10 +45,10 @@ namespace B2Net.Tests {
 			Options = client.Authorize().Result;
 
 			//Creat a bucket to delete
-			var bucket = client.Buckets.CreateBucket(name, BucketTypes.allPrivate).Result;
+			var bucket = client.Buckets.Create(name, BucketTypes.allPrivate).Result;
 
 			if (!string.IsNullOrEmpty(bucket.BucketId)) {
-				var deletedBucket = client.Buckets.DeleteBucket(bucket.BucketId).Result;
+				var deletedBucket = client.Buckets.Delete(bucket.BucketId).Result;
 				Assert.AreEqual(name, deletedBucket.BucketName);
 			} else {
 				Assert.Fail("The bucket was not deleted. The response did not contain a bucketid.");
@@ -59,11 +63,11 @@ namespace B2Net.Tests {
 			Options = client.Authorize().Result;
 
 			//Creat a bucket to delete
-			var bucket = client.Buckets.CreateBucket(name, BucketTypes.allPrivate).Result;
+			var bucket = client.Buckets.Create(name, BucketTypes.allPrivate).Result;
 
 			try {
 				if (!string.IsNullOrEmpty(bucket.BucketId)) {
-					var updatedBucket = client.Buckets.UpdateBucket(bucket.BucketId, BucketTypes.allPublic).Result;
+					var updatedBucket = client.Buckets.Update(BucketTypes.allPublic, bucket.BucketId).Result;
 					Assert.AreEqual(BucketTypes.allPublic.ToString(), updatedBucket.BucketType);
 				} else {
 					Assert.Fail("The bucket was not deleted. The response did not contain a bucketid.");
@@ -71,7 +75,7 @@ namespace B2Net.Tests {
 			} catch (Exception ex) {
 				Assert.Fail(ex.Message);
 			} finally {
-				client.Buckets.DeleteBucket(bucket.BucketId).Wait();
+				client.Buckets.Delete(bucket.BucketId).Wait();
 			}
 		}
 	}

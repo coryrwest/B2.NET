@@ -16,7 +16,7 @@ namespace B2Net.Http {
 			public const string Info = "b2_get_file_info";
 		}
 
-		public static HttpRequestMessage ListFiles(B2Options options, string bucketId, string startFileName = "", int maxFileCount = 100) {
+		public static HttpRequestMessage GetList(B2Options options, string bucketId, string startFileName = "", int maxFileCount = 100) {
 			var body = "{\"bucketId\":\"" + bucketId + "\"";
 			if (!string.IsNullOrEmpty(startFileName)) {
 				body += ", \"startFileName\":\"" + startFileName + "\"";
@@ -25,7 +25,7 @@ namespace B2Net.Http {
             return BaseRequestGenerator.PostRequest(Endpoints.List, body, options);
 		}
 
-		public static HttpRequestMessage ListFileVersions(B2Options options, string bucketId, string startFileName = "", string startFileId = "", int maxFileCount = 100) {
+		public static HttpRequestMessage ListVersions(B2Options options, string bucketId, string startFileName = "", string startFileId = "", int maxFileCount = 100) {
 			var body = "{\"bucketId\":\"" + bucketId + "\"";
 			if (!string.IsNullOrEmpty(startFileName)) {
 				body += ", \"startFileName\":\"" + startFileName + "\"";
@@ -41,7 +41,7 @@ namespace B2Net.Http {
 			return BaseRequestGenerator.PostRequest(Endpoints.Info, "{\"bucketId\":\"" + bucketId + "\", \"fileName\":\"" + fileName + "\"}", options);
 		}
 
-		public static HttpRequestMessage GetFileInfo(B2Options options, string fileId) {
+		public static HttpRequestMessage GetInfo(B2Options options, string fileId) {
 			return BaseRequestGenerator.PostRequest(Endpoints.Hide, "{\"fileId\":\"" + fileId + "\"}", options);
 		}
 	}
