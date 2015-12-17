@@ -60,7 +60,6 @@
     <Compile Include="Http\HttpClientFactory.cs" />
     <Compile Include="Models\B2AuthResponse.cs" />
     <Compile Include="Models\B2Bucket.cs" />
-    <Compile Include="Models\B2Error.cs" />
     <Compile Include="Models\B2File.cs" />
     <Compile Include="Models\B2FileList.cs" />
     <Compile Include="Models\B2Options.cs" />
