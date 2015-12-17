@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
 using B2Net.Http;
@@ -21,12 +22,11 @@ namespace B2Net {
 			var response = await client.SendAsync(requestMessage, cancelToken);
 
 			var jsonResponse = await response.Content.ReadAsStringAsync();
-			if (response.IsSuccessStatusCode) {
-				var bucketList = JsonConvert.DeserializeObject<BucketListDeserializeModel>(jsonResponse);
-				return bucketList.Buckets;
-			} else {
-				throw new AuthorizationException(jsonResponse);
-			}
+
+			Utilities.CheckForErrors(response);
+
+			var bucketList = JsonConvert.DeserializeObject<BucketListDeserializeModel>(jsonResponse);
+			return bucketList.Buckets;
 		}
 
 		public async Task<B2Bucket> CreateBucket(string bucketName, BucketTypes bucketType, CancellationToken cancelToken = default(CancellationToken)) {
@@ -36,12 +36,10 @@ namespace B2Net {
 			var response = await client.SendAsync(requestMessage, cancelToken);
 
 			var jsonResponse = await response.Content.ReadAsStringAsync();
-			if (response.IsSuccessStatusCode) {
-				var bucket = JsonConvert.DeserializeObject<B2Bucket>(jsonResponse);
-				return bucket;
-			} else {
-				throw new AuthorizationException(jsonResponse);
-			}
+
+			Utilities.CheckForErrors(response);
+
+			return JsonConvert.DeserializeObject<B2Bucket>(jsonResponse);
 		}
 
 		public async Task<B2Bucket> DeleteBucket(string bucketId, CancellationToken cancelToken = default(CancellationToken)) {
@@ -51,12 +49,10 @@ namespace B2Net {
 			var response = await client.SendAsync(requestMessage, cancelToken);
 
 			var jsonResponse = await response.Content.ReadAsStringAsync();
-			if (response.IsSuccessStatusCode) {
-				var bucket = JsonConvert.DeserializeObject<B2Bucket>(jsonResponse);
-				return bucket;
-			} else {
-				throw new AuthorizationException(jsonResponse);
-			}
+
+			Utilities.CheckForErrors(response);
+
+			return JsonConvert.DeserializeObject<B2Bucket>(jsonResponse);
 		}
 
 		/// <summary>
@@ -81,12 +77,10 @@ namespace B2Net {
 			var response = await client.SendAsync(requestMessage, cancelToken);
 
 			var jsonResponse = await response.Content.ReadAsStringAsync();
-			if (response.IsSuccessStatusCode) {
-				var bucket = JsonConvert.DeserializeObject<B2Bucket>(jsonResponse);
-				return bucket;
-			} else {
-				throw new AuthorizationException(jsonResponse);
-			}
+
+			Utilities.CheckForErrors(response);
+
+			return JsonConvert.DeserializeObject<B2Bucket>(jsonResponse);
 		}
 	}
 }
