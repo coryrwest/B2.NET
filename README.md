@@ -1,13 +1,14 @@
 # B2.NET
 
-B2.NET is a C# client for the Backblaze B2 Cloud Storage service through its REST API.
+B2.NET aims to be a C# client for the Backblaze B2 Cloud Storage service.
 
 B2.NET is still in early Alpha, so use it in production at your own risk.
 
 ## Features
 
-*  Full implmentation of the B2 REST API.
-*  Full Async support (Planned)
+*  99% implmentation of the B2 REST API (fileInfo attributes unsupported).
+*  Full Async support
+*  Full test coverage
 
 ## NuGet
 
@@ -53,24 +54,20 @@ var bucketList = client.Buckets.GetList().Result;
 ```csharp
 var client = new B2Client(options);
 options = client.Authorize().Result;
-var bucketList = client.Buckets.Create("BUCKETNAME", "OPTIONAL_BUCKET_TYPE").Result;
-// [
-//   { BucketId: "",
-//     BucketName: "",
-//     BucketType: "" }
-// ]
+var bucket = client.Buckets.Create("BUCKETNAME", "OPTIONAL_BUCKET_TYPE").Result;
+// { BucketId: "",
+//   BucketName: "",
+//   BucketType: "" }
 ```
 
 ### Update a Bucket
 ```csharp
 var client = new B2Client(options);
 options = client.Authorize().Result;
-var bucketList = client.Buckets.Update("BUCKETID", "BUCKETYPE").Result;
-// [
-//   { BucketId: "",
-//     BucketName: "",
-//     BucketType: "" }
-// ]
+var bucket = client.Buckets.Update("BUCKETID", "BUCKETYPE").Result;
+// { BucketId: "",
+//   BucketName: "",
+//   BucketType: "" }
 ```
 
 #### Bucket Types
@@ -83,12 +80,39 @@ allPublic
 ```csharp
 var client = new B2Client(options);
 options = client.Authorize().Result;
-var bucketList = client.Buckets.Delete("BUCKETID").Result;
-// [
-//   { BucketId: "",
-//     BucketName: "",
-//     BucketType: "" }
-// ]
+var bucket = client.Buckets.Delete("BUCKETID").Result;
+// { BucketId: "",
+//   BucketName: "",
+//   BucketType: "" }
+```
+
+### Get a list of files
+```csharp
+var client = new B2Client(options);
+options = client.Authorize().Result;
+var fileList = client.Files.GetList("BUCKETID", "FILENAME").Result;
+// {
+//   NextFileName: "",
+//   [
+//     { FileId: "",
+//       FileName: "",
+//       ContentLength: "", 
+//       ContentSHA1: "", 
+//       ContentType: "" }
+//   ]
+// }
+```
+
+### Upload a file
+```csharp
+var client = new B2Client(options);
+options = client.Authorize().Result;
+var file = client.Files.Upload("FILEDATABYTES", "FILENAME", "BUCKETID").Result;
+// { FileId: "",
+//   FileName: "",
+//   ContentLength: "", 
+//   ContentSHA1: "", 
+//   ContentType: "" }
 ```
 
 ## Release Notes
