@@ -10,6 +10,26 @@ namespace B2Net.Models {
 		public string FileName { get; set; }
 		public string Action { get; set; }
 		public float Size { get; set; }
-		public DateTime UploadTimestamp { get; set; }
+		public string UploadTimestamp { get; set; }
+		// Uploaded File Response
+		public string ContentLength { get; set; }
+		public string ContentSHA1 { get; set; }
+		public string ContentType { get; set; }
+		// TODO: Eventually support
+		//public string FileInfo { get; set; }
+		// End
+
+		public DateTime UploadTimestampDate
+		{
+			get
+			{
+				if (!string.IsNullOrEmpty(UploadTimestamp)) {
+					var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+					return epoch.AddMilliseconds(double.Parse(UploadTimestamp));
+				} else {
+					return DateTime.Now;
+				}
+			}
+		}
 	}
 }
