@@ -15,7 +15,7 @@ namespace B2Net {
 			_options = options;
 		}
 
-		public async Task<List<B2Bucket>> GetBucketList(CancellationToken cancelToken = default(CancellationToken)) {
+		public async Task<List<B2Bucket>> GetList(CancellationToken cancelToken = default(CancellationToken)) {
 			var client = HttpClientFactory.CreateHttpClient();
 
 			var requestMessage = BucketRequestGenerators.GetBucketList(_options);
@@ -29,7 +29,14 @@ namespace B2Net {
 			return bucketList.Buckets;
 		}
 
-		public async Task<B2Bucket> CreateBucket(string bucketName, BucketTypes bucketType, CancellationToken cancelToken = default(CancellationToken)) {
+		/// <summary>
+		/// Creates a new bucket. A bucket belongs to the account used to create it.
+		/// </summary>
+		/// <param name="bucketName"></param>
+		/// <param name="bucketType"></param>
+		/// <param name="cancelToken"></param>
+		/// <returns></returns>
+		public async Task<B2Bucket> Create(string bucketName, BucketTypes bucketType, CancellationToken cancelToken = default(CancellationToken)) {
 			var client = HttpClientFactory.CreateHttpClient();
 
 			var requestMessage = BucketRequestGenerators.CreateBucket(_options, bucketName, bucketType.ToString());
@@ -42,7 +49,13 @@ namespace B2Net {
 			return JsonConvert.DeserializeObject<B2Bucket>(jsonResponse);
 		}
 
-		public async Task<B2Bucket> DeleteBucket(string bucketId, CancellationToken cancelToken = default(CancellationToken)) {
+		/// <summary>
+		/// Deletes the bucket specified. Only buckets that contain no version of any files can be deleted.
+		/// </summary>
+		/// <param name="bucketId"></param>
+		/// <param name="cancelToken"></param>
+		/// <returns></returns>
+		public async Task<B2Bucket> Delete(string bucketId, CancellationToken cancelToken = default(CancellationToken)) {
 			var client = HttpClientFactory.CreateHttpClient();
 
 			var requestMessage = BucketRequestGenerators.DeleteBucket(_options, bucketId);
@@ -56,13 +69,13 @@ namespace B2Net {
 		}
 
 		/// <summary>
-		/// bucketId is only optional if you are persisting a bucket for this client.
+		/// Update an existing bucket. bucketId is only optional if you are persisting a bucket for this client.
 		/// </summary>
 		/// <param name="bucketType"></param>
 		/// <param name="bucketId"></param>
 		/// <param name="cancelToken"></param>
 		/// <returns></returns>
-		public async Task<B2Bucket> UpdateBucket(BucketTypes bucketType, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
+		public async Task<B2Bucket> Update(BucketTypes bucketType, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
 			// Check for a persistant bucket
 			if (!_options.PersistBucket && string.IsNullOrEmpty(bucketId)) {
 				throw new ArgumentNullException(nameof(bucketId));

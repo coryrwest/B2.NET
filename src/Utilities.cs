@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Text;
 using B2Net.Models;
 using Newtonsoft.Json;
@@ -20,14 +21,31 @@ namespace B2Net {
 			if (!response.IsSuccessStatusCode) {
 				string content = response.Content.ReadAsStringAsync().Result;
 
+				B2Error b2Error;
 				try {
-					var b2Error = JsonConvert.DeserializeObject<B2Error>(content);
-					throw new Exception($"Status: {b2Error.Status}, Code: {b2Error.Code}, Message: {b2Error.Message}");
+					b2Error = JsonConvert.DeserializeObject<B2Error>(content);
 				} catch (Exception ex) {
-					var inner = new Exception("Content: " + content, ex);
-					throw new Exception("Seralization of the response failed. See inner exception for response contents and serialization error.", inner);
+					throw new Exception("Seralization of the response failed. See inner exception for response contents and serialization error.", ex);
+				}
+				if (b2Error != null) {
+					throw new Exception($"Status: {b2Error.Status}, Code: {b2Error.Code}, Message: {b2Error.Message}");
 				}
 			}
+		}
+
+		public static string GetSHA1Hash(byte[] fileData) {
+			using (SHA1CryptoServiceProvider sha1 = new SHA1CryptoServiceProvider()) {
+				return HexStringFromBytes(sha1.ComputeHash(fileData));
+			}
+		}
+
+		private static string HexStringFromBytes(byte[] bytes) {
+			var sb = new StringBuilder();
+			foreach (byte b in bytes) {
+				var hex = b.ToString("x2");
+				sb.Append(hex);
+			}
+			return sb.ToString();
 		}
 
 		internal class B2Error {

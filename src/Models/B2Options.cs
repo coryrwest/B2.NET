@@ -14,6 +14,7 @@
 		public string ApiUrl { get; set; }
 		public string DownloadUrl { get; set; }
 		public string AuthorizationToken { get; set; }
+		public string UploadAuthorizationToken { get; set; }
 
 		public B2Options() {
 			PersistBucket = false;

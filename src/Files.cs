@@ -16,7 +16,15 @@ namespace B2Net {
 			_options = options;
 		}
 
-		public async Task<B2FileList> GetFileList(string bucketId = "", string startFileName = "", int maxFileCount = 100, CancellationToken cancelToken = default(CancellationToken)) {
+		/// <summary>
+		/// Lists the names of all files in a bucket, starting at a given name.
+		/// </summary>
+		/// <param name="bucketId"></param>
+		/// <param name="startFileName"></param>
+		/// <param name="maxFileCount"></param>
+		/// <param name="cancelToken"></param>
+		/// <returns></returns>
+		public async Task<B2FileList> GetList(string bucketId = "", string startFileName = "", int maxFileCount = 100, CancellationToken cancelToken = default(CancellationToken)) {
 			// Check for a persistant bucket
 			if (!_options.PersistBucket && string.IsNullOrEmpty(bucketId)) {
 				throw new ArgumentNullException(nameof(bucketId));
@@ -27,7 +35,7 @@ namespace B2Net {
 			// Are we persisting buckets? If so use the one from settings
 			string operationalBucketId = _options.PersistBucket ? _options.BucketId : bucketId;
 
-			var requestMessage = FileMetaDataRequestGenerators.ListFiles(_options, operationalBucketId, startFileName, maxFileCount);
+			var requestMessage = FileMetaDataRequestGenerators.GetList(_options, operationalBucketId, startFileName, maxFileCount);
 			var response = await client.SendAsync(requestMessage, cancelToken);
 
 			var jsonResponse = await response.Content.ReadAsStringAsync();
