@@ -73,11 +73,32 @@ namespace B2Net {
 			var requestMessage = FileUploadRequestGenerators.Upload(_options, uploadUrlObject.UploadUrl, fileData, fileName);
 			var response = await client.SendAsync(requestMessage, cancelToken);
 
-			var jsonResponse = await response.Content.ReadAsStringAsync();
+			return await ResponseParser.ParseResponse<B2File>(response);
+		}
 
-			Utilities.CheckForErrors(response);
+		/// <summary>
+		/// Deletes the specified file version
+		/// </summary>
+		/// <param name="fileId"></param>
+		/// <param name="fileName"></param>
+		/// <param name="cancelToken"></param>
+		/// <returns></returns>
+		public async Task<B2File> Delete(string fileId, string fileName, CancellationToken cancelToken = default(CancellationToken)) {
+			var client = HttpClientFactory.CreateHttpClient();
 
-			return JsonConvert.DeserializeObject<B2File>(jsonResponse);
+			var requestMessage = FileDeleteRequestGenerator.Delete(_options, fileId, fileName);
+			var response = await client.SendAsync(requestMessage, cancelToken);
+
+			return await ResponseParser.ParseResponse<B2File>(response);
+		}
+
+		public async Task<B2File> Hide(string bucketId, string fileName, CancellationToken cancelToken = default(CancellationToken)) {
+			var client = HttpClientFactory.CreateHttpClient();
+
+			var requestMessage = FileMetaDataRequestGenerators.HideFile(_options, bucketId, fileName);
+			var response = await client.SendAsync(requestMessage, cancelToken);
+
+			return await ResponseParser.ParseResponse<B2File>(response);
 		}
 
 		internal class B2UploadUrl {
