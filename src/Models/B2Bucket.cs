@@ -11,7 +11,7 @@ namespace B2Net.Models {
 		public string BucketType { get; set; }
 	}
 
-	public class BucketListDeserializeModel {
+	public class B2BucketListDeserializeModel {
 		public List<B2Bucket> Buckets { get; set; }
 	}
 }

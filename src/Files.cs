@@ -38,11 +38,7 @@ namespace B2Net {
 			var requestMessage = FileMetaDataRequestGenerators.GetList(_options, operationalBucketId, startFileName, maxFileCount);
 			var response = await client.SendAsync(requestMessage, cancelToken);
 
-			var jsonResponse = await response.Content.ReadAsStringAsync();
-
-			Utilities.CheckForErrors(response);
-
-			return JsonConvert.DeserializeObject<B2FileList>(jsonResponse);
+			return await ResponseParser.ParseResponse<B2FileList>(response);
 		}
 
 		/// <summary>
