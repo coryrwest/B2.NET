@@ -34,7 +34,7 @@ namespace B2Net.Http {
 		}
 
 		public static HttpRequestMessage GetUploadUrl(B2Options options, string bucketId) {
-			return BaseRequestGenerator.PostRequest(FileUploadRequestGenerators.Endpoints.GetUploadUrl, "{\"bucketId\":\"" + bucketId + "\"}", options);
+			return BaseRequestGenerator.PostRequest(Endpoints.GetUploadUrl, "{\"bucketId\":\"" + bucketId + "\"}", options);
 		}
 	}
 }

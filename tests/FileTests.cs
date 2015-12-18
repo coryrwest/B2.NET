@@ -30,7 +30,7 @@ namespace B2Net.Tests {
 			var list = Client.Files.GetList(TestBucket.BucketId).Result.Files;
 
 			// Delete file
-			//var deletedFile = client.Files.Delete().Result;
+			var deletedFile = Client.Files.Delete(file.FileId, file.FileName).Result;
 			
 			Assert.AreEqual(1, list.Count, list.Count + " files found.");
 		}
@@ -49,6 +49,7 @@ namespace B2Net.Tests {
 			Assert.AreEqual(hash, file.ContentSHA1);
 
 			// Clean up. We have to delete the file before we can delete the bucket
+			var deletedFile = Client.Files.Delete(file.FileId, file.FileName).Result;
 		}
 
 		[TestMethod]

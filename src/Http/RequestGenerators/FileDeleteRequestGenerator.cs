@@ -9,16 +9,9 @@ namespace B2Net.Http {
 			public const string Delete = "b2_delete_file_version";
 		}
 
-		public static HttpRequestMessage Authorize(B2Options options) {
-			var uri = new Uri(Constants.ApiBaseUrl + "/" + Constants.Version + "/" + Endpoints.Delete);
-			var request = new HttpRequestMessage() {
-				Method = HttpMethod.Get,
-				RequestUri = uri
-			};
-
-			request.Headers.Add("Authorization", Utilities.CreateAuthorizationHeader(options.AccountId, options.ApplicationKey));
-
-			return request;
+		public static HttpRequestMessage Delete(B2Options options, string fileId, string fileName) {
+			return BaseRequestGenerator.PostRequest(Endpoints.Delete,
+				"{\"fileId\":\"" + fileId + "\", \"fileName\":\"" + fileName + "\"}", options);
 		}
 	}
 }
