@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using B2Net.Http.RequestGenerators;
 using B2Net.Models;
 
 namespace B2Net.Http {
