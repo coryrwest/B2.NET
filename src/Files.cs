@@ -80,10 +80,12 @@ namespace B2Net {
 			return await ResponseParser.ParseResponse<B2File>(response);
 		}
 
-		public async Task<B2File> Hide(string bucketId, string fileName, CancellationToken cancelToken = default(CancellationToken)) {
+		public async Task<B2File> Hide(string fileName, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
+			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
+
 			var client = HttpClientFactory.CreateHttpClient();
 
-			var requestMessage = FileMetaDataRequestGenerators.HideFile(_options, bucketId, fileName);
+			var requestMessage = FileMetaDataRequestGenerators.HideFile(_options, operationalBucketId, fileName);
 			var response = await client.SendAsync(requestMessage, cancelToken);
 
 			return await ResponseParser.ParseResponse<B2File>(response);
