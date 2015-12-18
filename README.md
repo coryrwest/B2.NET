@@ -1,8 +1,10 @@
 # B2.NET
 
-B2.NET aims to be a C# client for the Backblaze B2 Cloud Storage service.
+B2.NET aims to be a C# client for the [Backblaze B2 Cloud Storage](https://secure.backblaze.com/b2/) service.
 
 B2.NET is still in early Alpha, so use it in production at your own risk.
+
+[B2 Documentation](https://www.backblaze.com/b2/docs/)
 
 ## Features
 
@@ -113,6 +115,45 @@ var file = client.Files.Upload("FILEDATABYTES", "FILENAME", "BUCKETID").Result;
 //   ContentLength: "", 
 //   ContentSHA1: "", 
 //   ContentType: "" }
+```
+
+### Get versions for a file
+```csharp
+var client = new B2Client(options);
+options = client.Authorize().Result;
+var file = client.Files.GetVersions("FILENAME", "FILEID").Result;
+// {
+//   NextFileName: "",
+//   NextFileId: "",
+//   [
+//     { FileId: "",
+//       FileName: "",
+//       Action: "", 
+//       Size: "", 
+//       UploadTimestamp: "" }
+//   ]
+// }
+```
+
+### Delete a file version
+```csharp
+var client = new B2Client(options);
+options = client.Authorize().Result;
+var file = client.Files.Delete("FILEID", "FILENAME").Result;
+// { FileId: "",
+//   FileName: ""}
+```
+
+### Hide a file version
+```csharp
+var client = new B2Client(options);
+options = client.Authorize().Result;
+var file = client.Files.Hide("FILEID", "BUCKETID").Result;
+// { FileId: "",
+//   FileName: "",
+//   Action: "",
+//   Size: "",
+//   UploadTimestamp: ""}
 ```
 
 ## Release Notes
