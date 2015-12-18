@@ -38,11 +38,11 @@ namespace B2Net.Http {
 		}
 
 		public static HttpRequestMessage HideFile(B2Options options, string bucketId, string fileName) {
-			return BaseRequestGenerator.PostRequest(Endpoints.Info, "{\"bucketId\":\"" + bucketId + "\", \"fileName\":\"" + fileName + "\"}", options);
+			return BaseRequestGenerator.PostRequest(Endpoints.Hide, "{\"bucketId\":\"" + bucketId + "\", \"fileName\":\"" + fileName + "\"}", options);
 		}
 
 		public static HttpRequestMessage GetInfo(B2Options options, string fileId) {
-			return BaseRequestGenerator.PostRequest(Endpoints.Hide, "{\"fileId\":\"" + fileId + "\"}", options);
+			return BaseRequestGenerator.PostRequest(Endpoints.Info, "{\"fileId\":\"" + fileId + "\"}", options);
 		}
 	}
 }
