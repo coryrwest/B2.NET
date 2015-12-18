@@ -25,16 +25,10 @@ namespace B2Net {
 		/// <param name="cancelToken"></param>
 		/// <returns></returns>
 		public async Task<B2FileList> GetList(string bucketId = "", string startFileName = "", int maxFileCount = 100, CancellationToken cancelToken = default(CancellationToken)) {
-			// Check for a persistant bucket
-			if (!_options.PersistBucket && string.IsNullOrEmpty(bucketId)) {
-				throw new ArgumentNullException(nameof(bucketId));
-			}
+			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
 
 			var client = HttpClientFactory.CreateHttpClient();
-
-			// Are we persisting buckets? If so use the one from settings
-			string operationalBucketId = _options.PersistBucket ? _options.BucketId : bucketId;
-
+			
 			var requestMessage = FileMetaDataRequestGenerators.GetList(_options, operationalBucketId, startFileName, maxFileCount);
 			var response = await client.SendAsync(requestMessage, cancelToken);
 
@@ -50,15 +44,9 @@ namespace B2Net {
 		/// <param name="cancelToken"></param>
 		/// <returns></returns>
 		public async Task<B2File> Upload(byte[] fileData, string fileName, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
-			// Check for a persistant bucket
-			if (!_options.PersistBucket && string.IsNullOrEmpty(bucketId)) {
-				//throw new ArgumentNullException(nameof(bucketId));
-			}
+			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
 
 			var client = HttpClientFactory.CreateHttpClient();
-
-			// Are we persisting buckets? If so use the one from settings
-			string operationalBucketId = _options.PersistBucket ? _options.BucketId : bucketId;
 
 			// Get the upload url for this file
 			// TODO: There must be a better way to do this
