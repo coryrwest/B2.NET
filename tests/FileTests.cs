@@ -27,7 +27,7 @@ namespace B2Net.Tests {
 			var fileData = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
 			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
 
-			var list = Client.Files.GetList(TestBucket.BucketId).Result.Files;
+			var list = Client.Files.GetList(bucketId: TestBucket.BucketId).Result.Files;
 
 			// Delete file
 			var deletedFile = Client.Files.Delete(file.FileId, file.FileName).Result;
