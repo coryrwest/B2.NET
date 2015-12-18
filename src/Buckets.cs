@@ -64,15 +64,9 @@ namespace B2Net {
 		/// <param name="cancelToken"></param>
 		/// <returns></returns>
 		public async Task<B2Bucket> Update(BucketTypes bucketType, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
-			// Check for a persistant bucket
-			if (!_options.PersistBucket && string.IsNullOrEmpty(bucketId)) {
-				throw new ArgumentNullException(nameof(bucketId));
-			}
+			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
 
 			var client = HttpClientFactory.CreateHttpClient();
-
-			// Are we persisting buckets? If so use the one from settings
-			string operationalBucketId = _options.PersistBucket ? _options.BucketId : bucketId;
 
 			var requestMessage = BucketRequestGenerators.UpdateBucket(_options, operationalBucketId, bucketType.ToString());
 			var response = await client.SendAsync(requestMessage, cancelToken);
