@@ -21,11 +21,7 @@ namespace B2Net {
 			var requestMessage = BucketRequestGenerators.GetBucketList(_options);
 			var response = await client.SendAsync(requestMessage, cancelToken);
 
-			var jsonResponse = await response.Content.ReadAsStringAsync();
-
-			Utilities.CheckForErrors(response);
-
-			var bucketList = JsonConvert.DeserializeObject<BucketListDeserializeModel>(jsonResponse);
+			var bucketList = ResponseParser.ParseResponse<B2BucketListDeserializeModel>(response).Result;
 			return bucketList.Buckets;
 		}
 
@@ -42,11 +38,7 @@ namespace B2Net {
 			var requestMessage = BucketRequestGenerators.CreateBucket(_options, bucketName, bucketType.ToString());
 			var response = await client.SendAsync(requestMessage, cancelToken);
 
-			var jsonResponse = await response.Content.ReadAsStringAsync();
-
-			Utilities.CheckForErrors(response);
-
-			return JsonConvert.DeserializeObject<B2Bucket>(jsonResponse);
+			return await ResponseParser.ParseResponse<B2Bucket>(response);
 		}
 
 		/// <summary>
@@ -61,11 +53,7 @@ namespace B2Net {
 			var requestMessage = BucketRequestGenerators.DeleteBucket(_options, bucketId);
 			var response = await client.SendAsync(requestMessage, cancelToken);
 
-			var jsonResponse = await response.Content.ReadAsStringAsync();
-
-			Utilities.CheckForErrors(response);
-
-			return JsonConvert.DeserializeObject<B2Bucket>(jsonResponse);
+			return await ResponseParser.ParseResponse<B2Bucket>(response);
 		}
 
 		/// <summary>
@@ -89,11 +77,7 @@ namespace B2Net {
 			var requestMessage = BucketRequestGenerators.UpdateBucket(_options, operationalBucketId, bucketType.ToString());
 			var response = await client.SendAsync(requestMessage, cancelToken);
 
-			var jsonResponse = await response.Content.ReadAsStringAsync();
-
-			Utilities.CheckForErrors(response);
-
-			return JsonConvert.DeserializeObject<B2Bucket>(jsonResponse);
+			return await ResponseParser.ParseResponse<B2Bucket>(response);
 		}
 	}
 }

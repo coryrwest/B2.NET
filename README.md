@@ -18,7 +18,7 @@ B2.NET will eventually be available as a NuGet package.
 
 Use the NuGet package, or just stick the B2Net.ddl in your project.
 
-## Examples
+## Usage
 ```csharp
 // the B2Client will default to the bucketId provided here
 // for all subsequent calls if you set PersistBucket to true.
