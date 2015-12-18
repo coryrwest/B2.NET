@@ -39,6 +39,16 @@ namespace B2Net {
 			}
 		}
 
+		public static string DetermineBucketId(B2Options options, string bucketId) {
+			// Check for a persistant bucket
+			if (!options.PersistBucket && string.IsNullOrEmpty(bucketId)) {
+				throw new ArgumentNullException(nameof(bucketId));
+			}
+			
+			// Are we persisting buckets? If so use the one from settings
+			return options.PersistBucket ? options.BucketId : bucketId;
+		}
+
 		private static string HexStringFromBytes(byte[] bytes) {
 			var sb = new StringBuilder();
 			foreach (byte b in bytes) {
