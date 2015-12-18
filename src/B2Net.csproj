@@ -58,6 +58,7 @@
     <Compile Include="Http\RequestGenerators\FileUploadRequestGenerators.cs" />
     <Compile Include="Http\RequestGenerators\FileMetaDataRequestGenerators.cs" />
     <Compile Include="Http\HttpClientFactory.cs" />
+    <Compile Include="Http\ResponseParser.cs" />
     <Compile Include="Models\B2AuthResponse.cs" />
     <Compile Include="Models\B2Bucket.cs" />
     <Compile Include="Models\B2File.cs" />
