@@ -47,10 +47,12 @@ namespace B2Net {
 		/// <param name="bucketId"></param>
 		/// <param name="cancelToken"></param>
 		/// <returns></returns>
-		public async Task<B2Bucket> Delete(string bucketId, CancellationToken cancelToken = default(CancellationToken)) {
+		public async Task<B2Bucket> Delete(string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
+			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
+
 			var client = HttpClientFactory.CreateHttpClient();
 
-			var requestMessage = BucketRequestGenerators.DeleteBucket(_options, bucketId);
+			var requestMessage = BucketRequestGenerators.DeleteBucket(_options, operationalBucketId);
 			var response = await client.SendAsync(requestMessage, cancelToken);
 
 			return await ResponseParser.ParseResponse<B2Bucket>(response);
