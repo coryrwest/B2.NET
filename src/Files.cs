@@ -17,19 +17,30 @@ namespace B2Net {
 		}
 
 		/// <summary>
-		/// Lists the names of all files in a bucket, starting at a given name.
+		/// Lists the names of all  non-hidden files in a bucket, starting at a given name.
 		/// </summary>
 		/// <param name="bucketId"></param>
 		/// <param name="startFileName"></param>
 		/// <param name="maxFileCount"></param>
 		/// <param name="cancelToken"></param>
 		/// <returns></returns>
-		public async Task<B2FileList> GetList(string bucketId = "", string startFileName = "", int maxFileCount = 100, CancellationToken cancelToken = default(CancellationToken)) {
+		public async Task<B2FileList> GetList(string startFileName = "", int maxFileCount = 100, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
 			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
 
 			var client = HttpClientFactory.CreateHttpClient();
-			
+
 			var requestMessage = FileMetaDataRequestGenerators.GetList(_options, operationalBucketId, startFileName, maxFileCount);
+			var response = await client.SendAsync(requestMessage, cancelToken);
+
+			return await ResponseParser.ParseResponse<B2FileList>(response);
+		}
+
+		public async Task<B2FileList> GetVersions(string startFileName = "", string startFileId = "", int maxFileCount = 100, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
+			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
+
+			var client = HttpClientFactory.CreateHttpClient();
+
+			var requestMessage = FileMetaDataRequestGenerators.ListVersions(_options, operationalBucketId, startFileName, startFileId, maxFileCount);
 			var response = await client.SendAsync(requestMessage, cancelToken);
 
 			return await ResponseParser.ParseResponse<B2FileList>(response);
