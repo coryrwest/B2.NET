@@ -156,6 +156,19 @@ var file = client.Files.Hide("FILEID", "BUCKETID").Result;
 //   UploadTimestamp: ""}
 ```
 
+### Get info for a file
+```csharp
+var client = new B2Client(options);
+options = client.Authorize().Result;
+var file = client.Files.GetInfo("FILEID").Result;
+// { FileId: "",
+//   FileName: "",
+//   ContentSHA1: "",
+//   BucketId: "",
+//   ContentLength: "",
+//   ContentType: ""}
+```
+
 ## Release Notes
 
 0.1.0 Initial Alpha release.
