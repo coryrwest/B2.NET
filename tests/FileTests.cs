@@ -100,6 +100,19 @@ namespace B2Net.Tests {
 
 		[TestMethod]
 		public void GetInfoTest() {
+			var fileName = "B2Test.txt";
+			var fileData = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
+			string hash = Utilities.GetSHA1Hash(fileData);
+			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+
+			Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
+
+			var info = Client.Files.GetInfo(file.FileId).Result;
+
+			// Clean up. We have to delete the file before we can delete the bucket
+			var deletedFile = Client.Files.Delete(file.FileId, file.FileName).Result;
+
+			Assert.AreEqual(file.UploadTimestamp, info.UploadTimestamp);
 		}
 
 		[TestCleanup]
