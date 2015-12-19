@@ -35,6 +35,17 @@ namespace B2Net {
 			return await ResponseParser.ParseResponse<B2FileList>(response);
 		}
 
+		/// <summary>
+		/// Lists all of the versions of all of the files contained in one bucket, 
+		/// in alphabetical order by file name, and by reverse of date/time uploaded 
+		/// for versions of files with the same name.
+		/// </summary>
+		/// <param name="startFileName"></param>
+		/// <param name="startFileId"></param>
+		/// <param name="maxFileCount"></param>
+		/// <param name="bucketId"></param>
+		/// <param name="cancelToken"></param>
+		/// <returns></returns>
 		public async Task<B2FileList> GetVersions(string startFileName = "", string startFileId = "", int maxFileCount = 100, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
 			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
 
@@ -44,6 +55,21 @@ namespace B2Net {
 			var response = await client.SendAsync(requestMessage, cancelToken);
 
 			return await ResponseParser.ParseResponse<B2FileList>(response);
+		}
+
+		/// <summary>
+		/// Gets information about one file stored in B2.
+		/// </summary>
+		/// <param name="fileId"></param>
+		/// <param name="cancelToken"></param>
+		/// <returns></returns>
+		public async Task<B2File> GetInfo(string fileId, CancellationToken cancelToken = default(CancellationToken)) {
+			var client = HttpClientFactory.CreateHttpClient();
+
+			var requestMessage = FileMetaDataRequestGenerators.GetInfo(_options, fileId);
+			var response = await client.SendAsync(requestMessage, cancelToken);
+
+			return await ResponseParser.ParseResponse<B2File>(response);
 		}
 
 		/// <summary>
@@ -91,6 +117,15 @@ namespace B2Net {
 			return await ResponseParser.ParseResponse<B2File>(response);
 		}
 
+		/// <summary>
+		/// Hides a file so that downloading by name will not find the file, 
+		/// but previous versions of the file are still stored. See File 
+		/// Versions about what it means to hide a file.
+		/// </summary>
+		/// <param name="fileName"></param>
+		/// <param name="bucketId"></param>
+		/// <param name="cancelToken"></param>
+		/// <returns></returns>
 		public async Task<B2File> Hide(string fileName, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
 			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
 
