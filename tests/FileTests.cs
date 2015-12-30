@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Configuration;
 using System.Text;
 using System.Threading.Tasks;
 using B2Net.Http;
@@ -11,8 +12,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace B2Net.Tests {
 	[TestClass]
 	public class FileTests : BaseTest {
-		B2Bucket TestBucket = new B2Bucket();
-		B2Client Client = null;
+		private B2Bucket TestBucket = new B2Bucket();
+		private B2Client Client = null;
+		private List<B2File> FilesToDelete = new List<B2File>();
 
 		[TestInitialize]
 		public void Initialize() {
@@ -26,12 +28,11 @@ namespace B2Net.Tests {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
 			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			// Clean up.
+			FilesToDelete.Add(file);
 
 			var list = Client.Files.GetList(bucketId: TestBucket.BucketId).Result.Files;
 
-			// Delete file
-			var deletedFile = Client.Files.Delete(file.FileId, file.FileName).Result;
-			
 			Assert.AreEqual(1, list.Count, list.Count + " files found.");
 		}
 
@@ -41,16 +42,14 @@ namespace B2Net.Tests {
 			var fileData = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
 			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			// Clean up.
+			FilesToDelete.Add(file);
 
 			Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
-
-			// Clean up. We have to delete the file before we can delete the bucket
+			
 			var hiddenFile = Client.Files.Hide(file.FileName, TestBucket.BucketId).Result;
 
 			Assert.IsTrue(hiddenFile.Action == "hide");
-
-			// Clean up. We have to delete the file before we can delete the bucket
-			var deletedFile = Client.Files.Delete(hiddenFile.FileId, hiddenFile.FileName).Result;
 		}
 
 		[TestMethod]
@@ -62,8 +61,44 @@ namespace B2Net.Tests {
 
 			Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
 
-			// Clean up. We have to delete the file before we can delete the bucket
-			var deletedFile = Client.Files.Delete(file.FileId, file.FileName).Result;
+			// Clean up.
+			FilesToDelete.Add(file);
+		}
+
+		[TestMethod]
+		public void FileDownloadNameTest() {
+			var fileName = "B2Test.txt";
+			var fileData = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
+			string hash = Utilities.GetSHA1Hash(fileData);
+			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			// Clean up.
+			FilesToDelete.Add(file);
+
+			Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
+
+			// Test download
+			var download = Client.Files.DownloadByName(file.FileName, TestBucket.BucketName).Result;
+			var downloadHash = Utilities.GetSHA1Hash(download.FileData);
+
+			Assert.AreEqual(hash, downloadHash);
+		}
+
+		[TestMethod]
+		public void FileDownloadIdTest() {
+			var fileName = "B2Test.txt";
+			var fileData = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
+			string hash = Utilities.GetSHA1Hash(fileData);
+			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			// Clean up.
+			FilesToDelete.Add(file);
+
+			Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
+
+			// Test download
+			var download = Client.Files.DownloadById(file.FileId).Result;
+			var downloadHash = Utilities.GetSHA1Hash(download.FileData);
+
+			Assert.AreEqual(hash, downloadHash);
 		}
 
 		[TestMethod]
@@ -78,7 +113,7 @@ namespace B2Net.Tests {
 			// Clean up. We have to delete the file before we can delete the bucket
 			var deletedFile = Client.Files.Delete(file.FileId, file.FileName).Result;
 
-			Assert.AreEqual(file.FileId, deletedFile.FileId);
+			Assert.AreEqual(file.FileId, deletedFile.FileId, "The deleted file id did not match.");
 		}
 
 		[TestMethod]
@@ -87,13 +122,12 @@ namespace B2Net.Tests {
 			var fileData = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
 			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			// Clean up.
+			FilesToDelete.Add(file);
 
 			Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
 			
 			var versions = Client.Files.GetVersions(file.FileName, file.FileId, bucketId: TestBucket.BucketId).Result;
-
-			// Clean up. We have to delete the file before we can delete the bucket
-			var deletedFile = Client.Files.Delete(file.FileId, file.FileName).Result;
 
 			Assert.AreEqual(1, versions.Files.Count);
 		}
@@ -104,19 +138,21 @@ namespace B2Net.Tests {
 			var fileData = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
 			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			// Clean up.
+			FilesToDelete.Add(file);
 
 			Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
 
 			var info = Client.Files.GetInfo(file.FileId).Result;
-
-			// Clean up. We have to delete the file before we can delete the bucket
-			var deletedFile = Client.Files.Delete(file.FileId, file.FileName).Result;
 
 			Assert.AreEqual(file.UploadTimestamp, info.UploadTimestamp);
 		}
 
 		[TestCleanup]
 		public void Cleanup() {
+			foreach (B2File b2File in FilesToDelete) {
+				var deletedFile = Client.Files.Delete(b2File.FileId, b2File.FileName).Result;
+			}
 			var deletedBucket = Client.Buckets.Delete(TestBucket.BucketId).Result;
 		}
 	}
