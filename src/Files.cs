@@ -92,9 +92,49 @@ namespace B2Net {
 
 			// Now we can upload the file
 			var requestMessage = FileUploadRequestGenerators.Upload(_options, uploadUrlObject.UploadUrl, fileData, fileName);
-			var response = await client.SendAsync(requestMessage, cancelToken);
+			var response = await _client.SendAsync(requestMessage, cancelToken);
 
 			return await ResponseParser.ParseResponse<B2File>(response);
+		}
+
+		/// <summary>
+		/// Downloads one file by providing the name of the bucket and the name of the file.
+		/// </summary>
+		/// <param name="fileId"></param>
+		/// <param name="fileName"></param>
+		/// <param name="bucketId"></param>
+		/// <param name="cancelToken"></param>
+		/// <returns></returns>
+		public async Task<B2File> DownloadByName(string fileName, string bucketName, CancellationToken cancelToken = default(CancellationToken)) {
+			// Are we searching by name or id?
+			HttpRequestMessage request;
+			request = FileDownloadRequestGenerators.DownloadByName(_options, bucketName, fileName);
+
+			// Send the download request
+			var response = await _client.SendAsync(request, cancelToken);
+
+			Utilities.CheckForErrors(response);
+
+			// Create B2File from response
+			return await ParseDownloadResponse(response);
+		}
+
+		/// <summary>
+		/// Downloads one file from B2.
+		/// </summary>
+		/// <param name="fileId"></param>
+		/// <param name="cancelToken"></param>
+		/// <returns></returns>
+		public async Task<B2File> DownloadById(string fileId, CancellationToken cancelToken = default(CancellationToken)) {
+			// Are we searching by name or id?
+			HttpRequestMessage request;
+			request = FileDownloadRequestGenerators.DownloadById(_options, fileId);
+
+			// Send the download request
+			var response = await _client.SendAsync(request, cancelToken);
+
+			// Create B2File from response
+			return await ParseDownloadResponse(response);
 		}
 
 		/// <summary>
@@ -122,13 +162,32 @@ namespace B2Net {
 		/// <returns></returns>
 		public async Task<B2File> Hide(string fileName, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
 			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
-
-			var client = HttpClientFactory.CreateHttpClient();
-
+			
 			var requestMessage = FileMetaDataRequestGenerators.HideFile(_options, operationalBucketId, fileName);
-			var response = await client.SendAsync(requestMessage, cancelToken);
+			var response = await _client.SendAsync(requestMessage, cancelToken);
 
 			return await ResponseParser.ParseResponse<B2File>(response);
+		}
+
+		private async Task<B2File> ParseDownloadResponse(HttpResponseMessage response) {
+			Utilities.CheckForErrors(response);
+
+			var file = new B2File();
+			IEnumerable<string> values;
+			if (response.Headers.TryGetValues("X-Bz-Content-Sha1", out values)) {
+				file.ContentSHA1 = values.First();
+			}
+			if (response.Headers.TryGetValues("X-Bz-File-Name", out values)) {
+				file.FileName = values.First();
+			}
+			if (response.Headers.TryGetValues("X-Bz-File-Id", out values)) {
+				file.FileId = values.First();
+			}
+			// TODO: File Info headers
+
+			file.FileData = await response.Content.ReadAsByteArrayAsync();
+
+			return await Task.FromResult(file);
 		}
 
 		internal class B2UploadUrl {
