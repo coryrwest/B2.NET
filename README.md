@@ -8,7 +8,7 @@ B2.NET is still in early Alpha, so use it in production at your own risk.
 
 ## Features
 
-*  99% implmentation of the B2 REST API (fileInfo attributes unsupported).
+*  99% implementation of the B2 REST API (fileInfo attributes unsupported).
 *  Full Async support
 *  Full test coverage
 
@@ -18,7 +18,7 @@ B2.NET will eventually be available as a NuGet package.
 
 ## Install
 
-Use the NuGet package, or just stick the B2Net.ddl in your project.
+Stick the B2Net.ddl in your project.
 
 ## Usage
 ```csharp
@@ -115,6 +115,32 @@ var file = client.Files.Upload("FILEDATABYTES", "FILENAME", "BUCKETID").Result;
 //   ContentLength: "", 
 //   ContentSHA1: "", 
 //   ContentType: "" }
+```
+
+### Download a file by id
+```csharp
+var client = new B2Client(options);
+options = client.Authorize().Result;
+var file = client.Files.DownloadById("FILEID").Result;
+// { FileId: "",
+//   FileName: "",
+//   ContentLength: "", 
+//   ContentSHA1: "", 
+//   ContentType: "",
+//   FileData: byte[] }
+```
+
+### Download a file by name
+```csharp
+var client = new B2Client(options);
+options = client.Authorize().Result;
+var file = client.Files.DownloadName("FILENAME", "BUCKETNAME").Result;
+// { FileId: "",
+//   FileName: "",
+//   ContentLength: "", 
+//   ContentSHA1: "", 
+//   ContentType: "",
+//   FileData: byte[] }
 ```
 
 ### Get versions for a file
