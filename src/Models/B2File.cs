@@ -11,6 +11,7 @@ namespace B2Net.Models {
 		public string Action { get; set; }
 		public float Size { get; set; }
 		public string UploadTimestamp { get; set; }
+		public byte[] FileData { get; set; }
 		// Uploaded File Response
 		public string ContentLength { get; set; }
 		public string ContentSHA1 { get; set; }
