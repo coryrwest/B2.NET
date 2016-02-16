@@ -9,7 +9,8 @@ B2.NET is still in early Alpha, so use it in production at your own risk.
 
 ## Features
 
-*  99% implementation of the B2 REST API (fileInfo attributes unsupported).
+*  99% implementation of the B2 REST API
+*  Large file upload support (planned)
 *  Full Async support
 *  Full test coverage
 *  Targets .NET 4.5

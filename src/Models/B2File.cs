@@ -16,8 +16,7 @@ namespace B2Net.Models {
 		public string ContentLength { get; set; }
 		public string ContentSHA1 { get; set; }
 		public string ContentType { get; set; }
-		// TODO: Eventually support
-		//public string FileInfo { get; set; }
+		public Dictionary<string,string> FileInfo { get; set; }
 		// End
 
 		public DateTime UploadTimestampDate
