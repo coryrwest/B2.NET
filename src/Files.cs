@@ -38,8 +38,8 @@ namespace B2Net {
 		}
 
 		/// <summary>
-		/// Lists all of the versions of all of the files contained in one bucket, 
-		/// in alphabetical order by file name, and by reverse of date/time uploaded 
+		/// Lists all of the versions of all of the files contained in one bucket,
+		/// in alphabetical order by file name, and by reverse of date/time uploaded
 		/// for versions of files with the same name.
 		/// </summary>
 		/// <param name="startFileName"></param>
@@ -78,9 +78,9 @@ namespace B2Net {
 		/// <param name="bucketId"></param>
 		/// <param name="cancelToken"></param>
 		/// <returns></returns>
-		public async Task<B2File> Upload(byte[] fileData, string fileName, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
+		public async Task<B2File> Upload(byte[] fileData, string fileName, string bucketId = "", Dictionary<string, string> fileInfo = null, CancellationToken cancelToken = default(CancellationToken)) {
 			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
-			
+
 			// Get the upload url for this file
 			// TODO: There must be a better way to do this
 			var uploadUrlRequest = FileUploadRequestGenerators.GetUploadUrl(_options, operationalBucketId);
@@ -91,7 +91,7 @@ namespace B2Net {
 			_options.UploadAuthorizationToken = uploadUrlObject.AuthorizationToken;
 
 			// Now we can upload the file
-			var requestMessage = FileUploadRequestGenerators.Upload(_options, uploadUrlObject.UploadUrl, fileData, fileName);
+			var requestMessage = FileUploadRequestGenerators.Upload(_options, uploadUrlObject.UploadUrl, fileData, fileName, fileInfo);
 			var response = await _client.SendAsync(requestMessage, cancelToken);
 
 			return await ResponseParser.ParseResponse<B2File>(response);
@@ -152,8 +152,8 @@ namespace B2Net {
 		}
 
 		/// <summary>
-		/// Hides a file so that downloading by name will not find the file, 
-		/// but previous versions of the file are still stored. See File 
+		/// Hides a file so that downloading by name will not find the file,
+		/// but previous versions of the file are still stored. See File
 		/// Versions about what it means to hide a file.
 		/// </summary>
 		/// <param name="fileName"></param>
@@ -162,7 +162,7 @@ namespace B2Net {
 		/// <returns></returns>
 		public async Task<B2File> Hide(string fileName, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
 			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
-			
+
 			var requestMessage = FileMetaDataRequestGenerators.HideFile(_options, operationalBucketId, fileName);
 			var response = await _client.SendAsync(requestMessage, cancelToken);
 
@@ -183,9 +183,18 @@ namespace B2Net {
 			if (response.Headers.TryGetValues("X-Bz-File-Id", out values)) {
 				file.FileId = values.First();
 			}
-			// TODO: File Info headers
+            // TODO: File Info headers
+            var fileInfoHeaders = response.Headers.Where(h => h.Key.Contains("X-Bz-Info"));
+            if (fileInfoHeaders.Count() > 0) {
+                var infoData = new Dictionary<string, string>();
+                foreach (var fileInfo in fileInfoHeaders)
+                {
+                    infoData.Add(fileInfo.Key, fileInfo.Value.First());
+                }
+                file.FileInfo = infoData;
+            }
 
-			file.FileData = await response.Content.ReadAsByteArrayAsync();
+            file.FileData = await response.Content.ReadAsByteArrayAsync();
 
 			return await Task.FromResult(file);
 		}
