@@ -76,7 +76,8 @@
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
   -->
+  <Target Name="AfterBuild">
+	<Exec Command=".\nuget.exe pack .\B2NET.csproj -IncludeReferencedProjects -Prop Configuration=Release"></Exec>
+  </Target>
 </Project>

@@ -18,7 +18,9 @@ B2.NET is still in early Alpha, so use it in production at your own risk.
 
 ## NuGet
 
-B2.NET will eventually be available as a NuGet package.
+```
+Install-Package B2Net
+```
 
 ## Install
 
