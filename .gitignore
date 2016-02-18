@@ -195,5 +195,5 @@ FakesAssemblies/
 *.opt
 
 
-*TestConstants*
+**TestConstants.cs
 *.exe
