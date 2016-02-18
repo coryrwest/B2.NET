@@ -11,7 +11,7 @@ namespace B2.Net.Tests {
 		}
 
 		public static string ApplicationKey {
-			get { return "001e9f6cc2237477946d41910650000a72b5f9d388"; }
+			get { return "001a7d054a2f465837a368739f7adf84a8785bcec1"; }
 		}
 
 		public static string BucketId {
