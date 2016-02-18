@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("B2NET")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription(".NET library for Backblaze's B2 Cloud Storage")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Westropp Ventures")]
 [assembly: AssemblyProduct("B2NET")]
