@@ -207,6 +207,6 @@ var file = client.Files.GetInfo("FILEID").Result;
 
 ## Release Notes
 
-0.1.5 File info attributes support.
-0.1.0 Initial Alpha release.
+*  0.1.5 File info attributes support.
+*  0.1.0 Initial Alpha release.
 
