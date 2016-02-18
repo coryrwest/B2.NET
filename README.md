@@ -11,6 +11,7 @@ B2.NET is still in early Alpha, so use it in production at your own risk.
 
 *  99% implementation of the B2 REST API
 *  Large file upload support (planned)
+*  UFT-8 and Url Encoding support (planned)
 *  Full Async support
 *  Full test coverage
 *  Targets .NET 4.5
@@ -112,12 +113,13 @@ var fileList = client.Files.GetList("BUCKETID", "FILENAME").Result;
 ```csharp
 var client = new B2Client(options);
 options = client.Authorize().Result;
-var file = client.Files.Upload("FILEDATABYTES", "FILENAME", "BUCKETID").Result;
+var file = client.Files.Upload("FILEDATABYTES", "FILENAME", "BUCKETID", "FILEINFOATTRS").Result;
 // { FileId: "",
 //   FileName: "",
 //   ContentLength: "", 
 //   ContentSHA1: "", 
-//   ContentType: "" }
+//   ContentType: "",
+//   FileInfo: Dictionary<string,string> }
 ```
 
 ### Download a file by id
@@ -130,7 +132,8 @@ var file = client.Files.DownloadById("FILEID").Result;
 //   ContentLength: "", 
 //   ContentSHA1: "", 
 //   ContentType: "",
-//   FileData: byte[] }
+//   FileData: byte[],
+//   FileInfo: Dictionary<string,string> }
 ```
 
 ### Download a file by name
@@ -143,7 +146,8 @@ var file = client.Files.DownloadName("FILENAME", "BUCKETNAME").Result;
 //   ContentLength: "", 
 //   ContentSHA1: "", 
 //   ContentType: "",
-//   FileData: byte[] }
+//   FileData: byte[],
+//   FileInfo: Dictionary<string,string> }
 ```
 
 ### Get versions for a file
@@ -195,10 +199,12 @@ var file = client.Files.GetInfo("FILEID").Result;
 //   ContentSHA1: "",
 //   BucketId: "",
 //   ContentLength: "",
-//   ContentType: ""}
+//   ContentType: "",
+//   FileInfo: Dictionary<string,string> }
 ```
 
 ## Release Notes
 
+0.1.5 File info attributes support.
 0.1.0 Initial Alpha release.
 

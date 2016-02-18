@@ -152,7 +152,7 @@ namespace B2Net {
 		}
 
 		/// <summary>
-		/// Hides a file so that downloading by name will not find the file,
+		/// Hides or Unhides a file so that downloading by name will not find the file,
 		/// but previous versions of the file are still stored. See File
 		/// Versions about what it means to hide a file.
 		/// </summary>
@@ -160,10 +160,10 @@ namespace B2Net {
 		/// <param name="bucketId"></param>
 		/// <param name="cancelToken"></param>
 		/// <returns></returns>
-		public async Task<B2File> Hide(string fileName, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
+		public async Task<B2File> Hide(string fileName, string bucketId = "", string fileId = "", CancellationToken cancelToken = default(CancellationToken)) {
 			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
 
-			var requestMessage = FileMetaDataRequestGenerators.HideFile(_options, operationalBucketId, fileName);
+			var requestMessage = FileMetaDataRequestGenerators.HideFile(_options, operationalBucketId, fileName, fileId);
 			var response = await _client.SendAsync(requestMessage, cancelToken);
 
 			return await ResponseParser.ParseResponse<B2File>(response);
@@ -184,16 +184,15 @@ namespace B2Net {
 				file.FileId = values.First();
 			}
             // TODO: File Info headers
-            var fileInfoHeaders = response.Headers.Where(h => h.Key.Contains("X-Bz-Info"));
+            var fileInfoHeaders = response.Headers.Where(h => h.Key.ToLower().Contains("x-bz-info"));
+            var infoData = new Dictionary<string, string>();
             if (fileInfoHeaders.Count() > 0) {
-                var infoData = new Dictionary<string, string>();
                 foreach (var fileInfo in fileInfoHeaders)
                 {
                     infoData.Add(fileInfo.Key, fileInfo.Value.First());
                 }
-                file.FileInfo = infoData;
             }
-
+            file.FileInfo = infoData;
             file.FileData = await response.Content.ReadAsByteArrayAsync();
 
 			return await Task.FromResult(file);
