@@ -14,6 +14,9 @@
 		public string ApiUrl { get; set; }
 		public string DownloadUrl { get; set; }
 		public string AuthorizationToken { get; set; }
+		/// <summary>
+		/// This will only be set after a call to the upload API
+		/// </summary>
 		public string UploadAuthorizationToken { get; set; }
 
 		public B2Options() {

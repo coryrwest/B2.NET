@@ -11,7 +11,7 @@ namespace B2Net.Http {
 
 		public static HttpRequestMessage Delete(B2Options options, string fileId, string fileName) {
 			return BaseRequestGenerator.PostRequest(Endpoints.Delete,
-				"{\"fileId\":\"" + fileId + "\", \"fileName\":\"" + fileName + "\"}", options);
+				"{\"fileId\":\"" + fileId + "\", \"fileName\":\"" + fileName.b2UrlEncode() + "\"}", options);
 		}
 	}
 }

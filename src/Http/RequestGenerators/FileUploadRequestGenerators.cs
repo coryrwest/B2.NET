@@ -25,7 +25,7 @@ namespace B2Net.Http {
 
 			// Add headers
 			request.Headers.Add("Authorization", options.UploadAuthorizationToken);
-			request.Headers.Add("X-Bz-File-Name", fileName);
+			request.Headers.Add("X-Bz-File-Name", fileName.b2UrlEncode());
 			request.Headers.Add("X-Bz-Content-Sha1", hash);
             // File Info headers
             if(fileInfo != null && fileInfo.Count > 0)
