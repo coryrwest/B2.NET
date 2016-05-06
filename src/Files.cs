@@ -71,7 +71,7 @@ namespace B2Net {
 		}
 
 		/// <summary>
-		/// Uploads one file to B2, returning its unique file ID.
+		/// Uploads one file to B2, returning its unique file ID. Filename will be URL Encoded.
 		/// </summary>
 		/// <param name="fileData"></param>
 		/// <param name="fileName"></param>
@@ -89,7 +89,7 @@ namespace B2Net {
 			var uploadUrlObject = JsonConvert.DeserializeObject<B2UploadUrl>(uploadUrlData);
 			// Set the upload auth token
 			_options.UploadAuthorizationToken = uploadUrlObject.AuthorizationToken;
-
+			
 			// Now we can upload the file
 			var requestMessage = FileUploadRequestGenerators.Upload(_options, uploadUrlObject.UploadUrl, fileData, fileName, fileInfo);
 			var response = await _client.SendAsync(requestMessage, cancelToken);
@@ -179,6 +179,8 @@ namespace B2Net {
 			}
 			if (response.Headers.TryGetValues("X-Bz-File-Name", out values)) {
 				file.FileName = values.First();
+				// Decode file name
+				file.FileName = file.FileName.b2UrlDecode();
 			}
 			if (response.Headers.TryGetValues("X-Bz-File-Id", out values)) {
 				file.FileId = values.First();

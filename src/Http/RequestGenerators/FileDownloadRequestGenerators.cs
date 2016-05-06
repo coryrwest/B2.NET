@@ -28,7 +28,7 @@ namespace B2Net.Http {
 		}
 
 		public static HttpRequestMessage DownloadByName(B2Options options, string bucketName, string fileName) {
-			var uri = new Uri(options.DownloadUrl + "/" + Endpoints.DownloadByName + "/" + bucketName + "/" + fileName);
+			var uri = new Uri(options.DownloadUrl + "/" + Endpoints.DownloadByName + "/" + bucketName + "/" + fileName.b2UrlEncode());
 			var request = new HttpRequestMessage() {
 				Method = HttpMethod.Get,
 				RequestUri = uri

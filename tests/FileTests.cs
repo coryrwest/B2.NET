@@ -20,7 +20,20 @@ namespace B2Net.Tests {
 		public void Initialize() {
 			Client = new B2Client(Options);
 			Options = Client.Authorize().Result;
-            TestBucket = Client.Buckets.Create("B2NETTestingBucket", BucketTypes.allPrivate).Result;
+
+			var buckets = Client.Buckets.GetList().Result;
+			B2Bucket existingBucket = null;
+			foreach (B2Bucket b2Bucket in buckets) {
+				if (b2Bucket.BucketName == "B2NETTestingBucket") {
+					existingBucket = b2Bucket;
+				}
+			}
+
+			if (existingBucket != null) {
+				TestBucket = existingBucket;
+			} else {
+				TestBucket = Client.Buckets.Create("B2NETTestingBucket", BucketTypes.allPrivate).Result;
+			}
 		}
 
 		[TestMethod]
@@ -37,6 +50,15 @@ namespace B2Net.Tests {
 		}
 
 		//[TestMethod]
+		//public void EmptyBucket() {
+		//	var list = Client.Files.GetList(bucketId: TestBucket.BucketId).Result.Files;
+
+		//	foreach (B2File b2File in list) {
+		//		var deletedFile = Client.Files.Delete(b2File.FileId, b2File.FileName).Result;
+		//	}
+		//}
+
+		//[TestMethod]
 		//public void HideFileTest() {
 		//	var fileName = "B2Test.txt";
 		//	var fileData = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
@@ -47,29 +69,41 @@ namespace B2Net.Tests {
 
 		//	Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
 
-  //          var hiddenFile = Client.Files.Hide(file.FileName, TestBucket.BucketId).Result;
+		//          var hiddenFile = Client.Files.Hide(file.FileName, TestBucket.BucketId).Result;
 
-  //          Assert.IsTrue(hiddenFile.Action == "hide");
+		//          Assert.IsTrue(hiddenFile.Action == "hide");
 
-  //          // Unhide the file so we can delete it later
-  //          hiddenFile = Client.Files.Hide(file.FileName, TestBucket.BucketId).Result;
-  //      }
+		//          // Unhide the file so we can delete it later
+		//          hiddenFile = Client.Files.Hide(file.FileName, TestBucket.BucketId).Result;
+		//      }
 
-        [TestMethod]
-        public void FileUploadTest()
-        {
-            var fileName = "B2Test.txt";
-            var fileData = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
-            string hash = Utilities.GetSHA1Hash(fileData);
-            var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+		[TestMethod]
+		public void FileUploadTest() {
+			var fileName = "B2Test.txt";
+			var fileData = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
+			string hash = Utilities.GetSHA1Hash(fileData);
+			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
 
-            // Clean up.
-            FilesToDelete.Add(file);
+			// Clean up.
+			FilesToDelete.Add(file);
 
-            Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
-        }
+			Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
+		}
 
-        [TestMethod]
+		//[TestMethod]
+		//public void FileUploadEncodingTest() {
+		//	var fileName = "B2 Test File.txt";
+		//	var fileData = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
+		//	string hash = Utilities.GetSHA1Hash(fileData);
+		//	var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+
+		//	// Clean up.
+		//	FilesToDelete.Add(file);
+
+		//	Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
+		//}
+
+		[TestMethod]
         public void FileUploadWithInfoTest()
         {
             var fileName = "B2Test.txt";

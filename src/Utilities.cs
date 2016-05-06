@@ -64,4 +64,20 @@ namespace B2Net {
 				public string Status { get; set; }
 		}
 	}
+
+	public static class B2StringExtension {
+		public static string b2UrlEncode(this string str) {
+			if (str == "/") {
+				return str;
+			}
+			return Uri.EscapeDataString(str);
+		}
+
+		public static string b2UrlDecode(this string str) {
+			if (str == "+") {
+				return " ";
+			}
+			return Uri.UnescapeDataString(str);
+		}
+	}
 }

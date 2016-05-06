@@ -19,7 +19,7 @@ namespace B2Net.Http {
 		public static HttpRequestMessage GetList(B2Options options, string bucketId, string startFileName = "", int maxFileCount = 100) {
 			var body = "{\"bucketId\":\"" + bucketId + "\"";
 			if (!string.IsNullOrEmpty(startFileName)) {
-				body += ", \"startFileName\":\"" + startFileName + "\"";
+				body += ", \"startFileName\":\"" + startFileName.b2UrlEncode() + "\"";
 			}
 			body += "}";
             return BaseRequestGenerator.PostRequest(Endpoints.List, body, options);
@@ -28,7 +28,7 @@ namespace B2Net.Http {
 		public static HttpRequestMessage ListVersions(B2Options options, string bucketId, string startFileName = "", string startFileId = "", int maxFileCount = 100) {
 			var body = "{\"bucketId\":\"" + bucketId + "\"";
 			if (!string.IsNullOrEmpty(startFileName)) {
-				body += ", \"startFileName\":\"" + startFileName + "\"";
+				body += ", \"startFileName\":\"" + startFileName.b2UrlEncode() + "\"";
 			}
 			if (!string.IsNullOrEmpty(startFileId)) {
 				body += ", \"startFileId\":\"" + startFileId + "\"";
@@ -41,11 +41,11 @@ namespace B2Net.Http {
             var body = "{\"bucketId\":\"" + bucketId + "\"";
             if (!string.IsNullOrEmpty(fileName) && string.IsNullOrEmpty(fileId))
             {
-                body += ", \"fileName\":\"" + fileName + "\"";
+                body += ", \"fileName\":\"" + fileName.b2UrlEncode() + "\"";
             }
             if (!string.IsNullOrEmpty(fileId))
             {
-                body += ", \"fileId\":\"" + fileName + "\"";
+                body += ", \"fileId\":\"" + fileId + "\"";
             }
             body += "}";
             return BaseRequestGenerator.PostRequest(Endpoints.Hide, body, options);
