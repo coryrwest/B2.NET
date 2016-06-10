@@ -17,16 +17,19 @@ namespace B2Net.Http {
 			public const string Info = "b2_get_file_info";
 		}
 
-		public static HttpRequestMessage GetList(B2Options options, string bucketId, string startFileName = "", int maxFileCount = 100) {
+		public static HttpRequestMessage GetList(B2Options options, string bucketId, string startFileName = "", int? maxFileCount = null) {
 			var body = "{\"bucketId\":\"" + bucketId + "\"";
 			if (!string.IsNullOrEmpty(startFileName)) {
 				body += ", \"startFileName\":" + JsonConvert.ToString(startFileName);
 			}
+            if (maxFileCount.HasValue) {
+                body += ", \"maxFileCount\":" + maxFileCount.Value.ToString();
+            }
 			body += "}";
             return BaseRequestGenerator.PostRequest(Endpoints.List, body, options);
 		}
 
-		public static HttpRequestMessage ListVersions(B2Options options, string bucketId, string startFileName = "", string startFileId = "", int maxFileCount = 100) {
+		public static HttpRequestMessage ListVersions(B2Options options, string bucketId, string startFileName = "", string startFileId = "", int? maxFileCount = null) {
 			var body = "{\"bucketId\":\"" + bucketId + "\"";
 			if (!string.IsNullOrEmpty(startFileName)) {
 				body += ", \"startFileName\":" + JsonConvert.ToString(startFileName);
@@ -34,6 +37,9 @@ namespace B2Net.Http {
 			if (!string.IsNullOrEmpty(startFileId)) {
 				body += ", \"startFileId\":\"" + startFileId + "\"";
 			}
+            if (maxFileCount.HasValue) {
+                body += ", \"maxFileCount\":" + maxFileCount.Value.ToString();
+            }
 			body += "}";
 			return BaseRequestGenerator.PostRequest(Endpoints.Versions, body, options);
 		}
