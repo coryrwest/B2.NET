@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using B2Net.Http.RequestGenerators;
 using B2Net.Models;
+using Newtonsoft.Json;
 
 namespace B2Net.Http {
 	public static class FileMetaDataRequestGenerators {
@@ -19,7 +20,7 @@ namespace B2Net.Http {
 		public static HttpRequestMessage GetList(B2Options options, string bucketId, string startFileName = "", int maxFileCount = 100) {
 			var body = "{\"bucketId\":\"" + bucketId + "\"";
 			if (!string.IsNullOrEmpty(startFileName)) {
-				body += ", \"startFileName\":\"" + startFileName.b2UrlEncode() + "\"";
+				body += ", \"startFileName\":" + JsonConvert.ToString(startFileName);
 			}
 			body += "}";
             return BaseRequestGenerator.PostRequest(Endpoints.List, body, options);
@@ -28,7 +29,7 @@ namespace B2Net.Http {
 		public static HttpRequestMessage ListVersions(B2Options options, string bucketId, string startFileName = "", string startFileId = "", int maxFileCount = 100) {
 			var body = "{\"bucketId\":\"" + bucketId + "\"";
 			if (!string.IsNullOrEmpty(startFileName)) {
-				body += ", \"startFileName\":\"" + startFileName.b2UrlEncode() + "\"";
+				body += ", \"startFileName\":" + JsonConvert.ToString(startFileName);
 			}
 			if (!string.IsNullOrEmpty(startFileId)) {
 				body += ", \"startFileId\":\"" + startFileId + "\"";
@@ -41,7 +42,7 @@ namespace B2Net.Http {
             var body = "{\"bucketId\":\"" + bucketId + "\"";
             if (!string.IsNullOrEmpty(fileName) && string.IsNullOrEmpty(fileId))
             {
-                body += ", \"fileName\":\"" + fileName.b2UrlEncode() + "\"";
+                body += ", \"fileName\":" + JsonConvert.ToString(fileName);
             }
             if (!string.IsNullOrEmpty(fileId))
             {
