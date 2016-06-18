@@ -28,7 +28,7 @@ namespace B2Net {
 		/// <param name="maxFileCount"></param>
 		/// <param name="cancelToken"></param>
 		/// <returns></returns>
-		public async Task<B2FileList> GetList(string startFileName = "", int maxFileCount = 100, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
+		public async Task<B2FileList> GetList(string startFileName = "", int? maxFileCount = null, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
 			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
 
 			var requestMessage = FileMetaDataRequestGenerators.GetList(_options, operationalBucketId, startFileName, maxFileCount);
@@ -48,7 +48,7 @@ namespace B2Net {
 		/// <param name="bucketId"></param>
 		/// <param name="cancelToken"></param>
 		/// <returns></returns>
-		public async Task<B2FileList> GetVersions(string startFileName = "", string startFileId = "", int maxFileCount = 100, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
+		public async Task<B2FileList> GetVersions(string startFileName = "", string startFileId = "", int? maxFileCount = null, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
 			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
 
 			var requestMessage = FileMetaDataRequestGenerators.ListVersions(_options, operationalBucketId, startFileName, startFileId, maxFileCount);

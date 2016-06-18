@@ -2,6 +2,7 @@
 using System.Net.Http;
 using B2Net.Http.RequestGenerators;
 using B2Net.Models;
+using Newtonsoft.Json;
 
 namespace B2Net.Http {
 	public static class FileDeleteRequestGenerator {
@@ -11,7 +12,7 @@ namespace B2Net.Http {
 
 		public static HttpRequestMessage Delete(B2Options options, string fileId, string fileName) {
 			return BaseRequestGenerator.PostRequest(Endpoints.Delete,
-				"{\"fileId\":\"" + fileId + "\", \"fileName\":\"" + fileName.b2UrlEncode() + "\"}", options);
+				"{\"fileId\":\"" + fileId + "\", \"fileName\":" + JsonConvert.ToString(fileName) + "}", options);
 		}
 	}
 }
