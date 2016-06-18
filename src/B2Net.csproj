@@ -78,7 +78,7 @@
   </Target>
   -->
   <Target Name="AfterBuild">
-    <Exec Command=".\nuget.exe pack .\B2NET.csproj -IncludeReferencedProjects -Prop Configuration=Release">
-    </Exec>
+    <!-- <Exec Command=".\nuget.exe pack .\B2NET.csproj -IncludeReferencedProjects -Prop Configuration=Release"> 
+    </Exec>-->
   </Target>
 </Project>
