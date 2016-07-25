@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Net.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
 using B2Net.Http;
