@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "B2Net", "B2Net.csproj", "{5161362E-59B9-4959-8701-59FEEF469ECA}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "B2Net.Tests", "..\tests\B2Net.Tests.csproj", "{E3B42BC2-086D-4647-8053-9974E8AA900C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "B2Net", "B2Net.csproj", "{9E0A1575-C613-47C1-8F21-CCC194DA9FEE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,15 +13,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5161362E-59B9-4959-8701-59FEEF469ECA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5161362E-59B9-4959-8701-59FEEF469ECA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5161362E-59B9-4959-8701-59FEEF469ECA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5161362E-59B9-4959-8701-59FEEF469ECA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E3B42BC2-086D-4647-8053-9974E8AA900C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E3B42BC2-086D-4647-8053-9974E8AA900C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E3B42BC2-086D-4647-8053-9974E8AA900C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E3B42BC2-086D-4647-8053-9974E8AA900C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E3B42BC2-086D-4647-8053-9974E8AA900C}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{9E0A1575-C613-47C1-8F21-CCC194DA9FEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E0A1575-C613-47C1-8F21-CCC194DA9FEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E0A1575-C613-47C1-8F21-CCC194DA9FEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E0A1575-C613-47C1-8F21-CCC194DA9FEE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
