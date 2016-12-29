@@ -1,11 +1,8 @@
-using System;
 using System.Collections.Generic;
-using System.Net.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
 using B2Net.Http;
 using B2Net.Models;
-using Newtonsoft.Json;
 
 namespace B2Net {
 	public class Buckets {

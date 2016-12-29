@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net.Http;
+﻿using System.Net.Http;
 using B2Net.Http.RequestGenerators;
 using B2Net.Models;
 using Newtonsoft.Json;

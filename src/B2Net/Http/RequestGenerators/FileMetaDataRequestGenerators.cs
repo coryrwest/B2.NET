@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Net.Http;
 using B2Net.Http.RequestGenerators;
 using B2Net.Models;
 using Newtonsoft.Json;
