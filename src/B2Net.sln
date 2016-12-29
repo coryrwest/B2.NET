@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "B2Net", "B2Net\B2Net.csproj", "{E178FF84-E6B4-4C08-8B2F-E190A6BCFE4A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "B2Net.Tests", "..\tests\B2Net.Tests.csproj", "{E3B42BC2-086D-4647-8053-9974E8AA900C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "B2Net", "B2Net.csproj", "{E178FF84-E6B4-4C08-8B2F-E190A6BCFE4A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +15,6 @@ Global
 		{E178FF84-E6B4-4C08-8B2F-E190A6BCFE4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E178FF84-E6B4-4C08-8B2F-E190A6BCFE4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E178FF84-E6B4-4C08-8B2F-E190A6BCFE4A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E3B42BC2-086D-4647-8053-9974E8AA900C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E3B42BC2-086D-4647-8053-9974E8AA900C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E3B42BC2-086D-4647-8053-9974E8AA900C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E3B42BC2-086D-4647-8053-9974E8AA900C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
