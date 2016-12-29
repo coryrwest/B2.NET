@@ -217,8 +217,12 @@ var file = client.Files.GetInfo("FILEID").Result;
 
 ## Running the tests
 From the src directory run
-    dotnet pack -o ..\tests\
+```
+dotnet pack -o ..\tests\
+```
 
 From the tests directory run 
-    dotnet restore
-	dotnet test
+```
+dotnet restore
+dotnet test
+```
