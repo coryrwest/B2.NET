@@ -208,10 +208,11 @@ var file = client.Files.GetInfo("FILEID").Result;
 
 ## Release Notes
 
-*  0.1.7 Merged changes for file name encoding and maxFileCount from tomvoros
-*  0.1.6 Started URL Encoding file names.
-*  0.1.5 File info attributes support.
-*  0.1.0 Initial Alpha release.
+*  0.1.81 Switch targeting to netstandard1.3 and updated B2 endpoint
+*  0.1.7  Merged changes for file name encoding and maxFileCount from tomvoros
+*  0.1.6  Started URL Encoding file names.
+*  0.1.5  File info attributes support.
+*  0.1.0  Initial Alpha release.
 
 
 ## Running the tests
