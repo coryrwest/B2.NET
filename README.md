@@ -212,3 +212,12 @@ var file = client.Files.GetInfo("FILEID").Result;
 *  0.1.6 Started URL Encoding file names.
 *  0.1.5 File info attributes support.
 *  0.1.0 Initial Alpha release.
+
+
+## Running the tests
+From the src directory run
+    dotnet pack -o ..\tests\
+
+From the tests directory run 
+    dotnet restore
+	dotnet test
