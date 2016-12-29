@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Net.Configuration;
-using System.Text;
-using System.Threading.Tasks;
 using B2Net.Http;
 using B2Net.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -39,7 +35,7 @@ namespace B2Net.Tests {
 		[TestMethod]
 		public void GetListTest() {
 			var fileName = "B2Test.txt";
-			var fileData = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
+			var fileData = File.ReadAllBytes(Path.Combine(System.AppContext.BaseDirectory, "../../../", fileName));
 			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
 			// Clean up.
 			FilesToDelete.Add(file);
@@ -80,7 +76,7 @@ namespace B2Net.Tests {
 		[TestMethod]
 		public void FileUploadTest() {
 			var fileName = "B2Test.txt";
-			var fileData = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
+			var fileData = File.ReadAllBytes(Path.Combine(System.AppContext.BaseDirectory, "../../../", fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
 			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
 
@@ -107,7 +103,7 @@ namespace B2Net.Tests {
         public void FileUploadWithInfoTest()
         {
             var fileName = "B2Test.txt";
-            var fileData = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
+            var fileData = File.ReadAllBytes(Path.Combine(System.AppContext.BaseDirectory, "../../../", fileName));
             string hash = Utilities.GetSHA1Hash(fileData);
 
             var fileInfo = new Dictionary<string, string>();
@@ -126,7 +122,7 @@ namespace B2Net.Tests {
         public void FileDownloadNameTest()
         {
             var fileName = "B2Test.txt";
-            var fileData = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
+            var fileData = File.ReadAllBytes(Path.Combine(System.AppContext.BaseDirectory, "../../../", fileName));
             string hash = Utilities.GetSHA1Hash(fileData);
             var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
             // Clean up.
@@ -145,7 +141,7 @@ namespace B2Net.Tests {
         public void FileDownloadWithInfoTest()
         {
             var fileName = "B2Test.txt";
-            var fileData = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
+            var fileData = File.ReadAllBytes(Path.Combine(System.AppContext.BaseDirectory, "../../../", fileName));
             string hash = Utilities.GetSHA1Hash(fileData);
 
             var fileInfo = new Dictionary<string, string>();
@@ -168,7 +164,7 @@ namespace B2Net.Tests {
         [TestMethod]
 		public void FileDownloadIdTest() {
 			var fileName = "B2Test.txt";
-			var fileData = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
+			var fileData = File.ReadAllBytes(Path.Combine(System.AppContext.BaseDirectory, "../../../", fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
 			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
 			// Clean up.
@@ -186,7 +182,7 @@ namespace B2Net.Tests {
 		[TestMethod]
 		public void FileDeleteTest() {
 			var fileName = "B2Test.txt";
-			var fileData = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
+			var fileData = File.ReadAllBytes(Path.Combine(System.AppContext.BaseDirectory, "../../../", fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
 			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
 
@@ -201,7 +197,7 @@ namespace B2Net.Tests {
 		[TestMethod]
 		public void ListVersionsTest() {
 			var fileName = "B2Test.txt";
-			var fileData = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
+			var fileData = File.ReadAllBytes(Path.Combine(System.AppContext.BaseDirectory, "../../../", fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
 			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
 			// Clean up.
@@ -217,7 +213,7 @@ namespace B2Net.Tests {
 		[TestMethod]
 		public void GetInfoTest() {
 			var fileName = "B2Test.txt";
-			var fileData = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
+			var fileData = File.ReadAllBytes(Path.Combine(System.AppContext.BaseDirectory, "../../../", fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
 
             var fileInfo = new Dictionary<string, string>();
