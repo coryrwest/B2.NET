@@ -62,7 +62,7 @@
     <Compile Include="TestContstants.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\B2Net.csproj">
+    <ProjectReference Include="..\src\B2Net\B2Net.csproj">
       <Project>{5161362e-59b9-4959-8701-59feef469eca}</Project>
       <Name>B2Net</Name>
     </ProjectReference>
