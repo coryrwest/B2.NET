@@ -17,6 +17,9 @@ B2.NET is still in Beta, so use it in production at your own risk.
 
 There are currently no plans to implement the Large File API. If you would like to contribute just submit a pull request.
 
+## To do
+ *  Implement bucket info: https://www.backblaze.com/b2/docs/buckets.html
+
 ## NuGet
 
 ```
