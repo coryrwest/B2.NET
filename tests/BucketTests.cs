@@ -37,8 +37,8 @@ namespace B2Net.Tests {
 			}
 
 			Assert.AreEqual(name, bucket.BucketName);
-		}
-        
+        }
+
         [TestMethod]
         public void CreateBucketWithInfoTest()
         {
@@ -47,7 +47,8 @@ namespace B2Net.Tests {
 
             Options = client.Authorize().Result;
 
-            var bucket = client.Buckets.Create(name, new B2BucketOptions() {
+            var bucket = client.Buckets.Create(name, new B2BucketOptions()
+            {
                 CacheControl = 600
             }).Result;
 
@@ -66,6 +67,35 @@ namespace B2Net.Tests {
             Assert.IsNotNull(savedBucket.BucketInfo, "Bucekt info was null");
             Assert.IsTrue(savedBucket.BucketInfo.ContainsKey("Cache-Control"), "Bucket info did not contain Cache-Control");
             Assert.AreEqual("max-age=600", savedBucket.BucketInfo["Cache-Control"], "Cache-Control values were not equal.");
+        }
+
+        [TestMethod]
+        public void UpdateBucketWithInfoTest()
+        {
+            var name = "B2NETTestingBucket";
+            var client = new B2Client(Options);
+
+            Options = client.Authorize().Result;
+
+            var bucket = client.Buckets.Create(name, new B2BucketOptions() { CacheControl = 600 }).Result;
+
+            // Update bucket with new info
+            bucket = client.Buckets.Update(new B2BucketOptions() { CacheControl = 300 }, bucket.BucketId).Result;
+
+            // Get bucket to check for info
+            var bucketList = client.Buckets.GetList().Result;
+
+            // Clean up
+            if (!string.IsNullOrEmpty(bucket.BucketId)) {
+                client.Buckets.Delete(bucket.BucketId).Wait();
+            }
+
+            var savedBucket = bucketList.FirstOrDefault(b => b.BucketName == bucket.BucketName);
+
+            Assert.IsNotNull(savedBucket, "Retreived bucket was null");
+            Assert.IsNotNull(savedBucket.BucketInfo, "Bucekt info was null");
+            Assert.IsTrue(savedBucket.BucketInfo.ContainsKey("Cache-Control"), "Bucket info did not contain Cache-Control");
+            Assert.AreEqual("max-age=300", savedBucket.BucketInfo["Cache-Control"], "Cache-Control values were not equal.");
         }
 
         [TestMethod]

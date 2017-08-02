@@ -77,10 +77,17 @@ namespace B2Net.Http {
         /// <returns></returns>
         public static HttpRequestMessage UpdateBucket(B2Options options, string bucketId, B2BucketOptions bucketOptions)
         {
-            var body = "{\"accountId\":\"" + options.AccountId + "\", \"bucketId\":\"" + bucketId + "\", \"bucketType\":\"" +
-                        bucketOptions.BucketType.ToString() + "\"" +
-                        "\"bucketInfo\": {\"Cache-Control\":\"max-age=" + bucketOptions.CacheControl + "\"}";
-            return BaseRequestGenerator.PostRequest(Endpoints.Update, body, options);
+            var body = new B2BucketUpdateModel()
+            {
+                accountId = options.AccountId,
+                bucketId = bucketId,
+                bucketType = bucketOptions.BucketType.ToString(),
+                bucketInfo = new Dictionary<string, string>() {
+                    { "Cache-Control", "max-age=" + bucketOptions.CacheControl }
+                }
+            };
+            var json = JsonConvert.SerializeObject(body);
+            return BaseRequestGenerator.PostRequest(Endpoints.Update, json, options);
         }
     }
 
@@ -89,6 +96,14 @@ namespace B2Net.Http {
         public string accountId { get; set; }
         public string bucketName { get; set; }
         public string bucketType { get; set; }
-        public Dictionary<string,string> bucketInfo { get; set; }
+        public Dictionary<string, string> bucketInfo { get; set; }
+    }
+
+    internal class B2BucketUpdateModel
+    {
+        public string accountId { get; set; }
+        public string bucketId { get; set; }
+        public string bucketType { get; set; }
+        public Dictionary<string, string> bucketInfo { get; set; }
     }
 }
