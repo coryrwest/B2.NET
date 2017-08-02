@@ -42,7 +42,7 @@
     <Compile Include="B2Client.cs" />
     <Compile Include="Buckets.cs" />
     <Compile Include="Files.cs" />
-    <Compile Include="Http\BucketTypes.cs" />
+    <Compile Include="BucketTypes.cs" />
     <Compile Include="Http\Constants.cs" />
     <Compile Include="Http\HttpClientFactory.cs" />
     <Compile Include="Http\RequestGenerators\AuthRequestGenerator.cs" />
@@ -55,6 +55,7 @@
     <Compile Include="Http\ResponseParser.cs" />
     <Compile Include="Models\B2AuthResponse.cs" />
     <Compile Include="Models\B2Bucket.cs" />
+    <Compile Include="Models\B2BucketOptions.cs" />
     <Compile Include="Models\B2File.cs" />
     <Compile Include="Models\B2FileList.cs" />
     <Compile Include="Models\B2Options.cs" />

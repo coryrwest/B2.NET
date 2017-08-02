@@ -1,4 +1,4 @@
-﻿namespace B2Net.Http {
+﻿namespace B2Net.Models {
 	public enum BucketTypes {
 		allPublic,
 		allPrivate

@@ -1,6 +1,8 @@
 ﻿using System;
 using B2Net.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using B2Net.Models;
+using System.Linq;
 
 namespace B2Net.Tests {
 	[TestClass]
@@ -36,8 +38,37 @@ namespace B2Net.Tests {
 
 			Assert.AreEqual(name, bucket.BucketName);
 		}
+        
+        [TestMethod]
+        public void CreateBucketWithInfoTest()
+        {
+            var name = "B2NETTestingBucket";
+            var client = new B2Client(Options);
 
-		[TestMethod]
+            Options = client.Authorize().Result;
+
+            var bucket = client.Buckets.Create(name, new B2BucketOptions() {
+                CacheControl = 600
+            }).Result;
+
+            // Get bucket to check for info
+            var bucketList = client.Buckets.GetList().Result;
+
+            // Clean up
+            if (!string.IsNullOrEmpty(bucket.BucketId))
+            {
+                client.Buckets.Delete(bucket.BucketId).Wait();
+            }
+
+            var savedBucket = bucketList.FirstOrDefault(b => b.BucketName == bucket.BucketName);
+
+            Assert.IsNotNull(savedBucket, "Retreived bucket was null");
+            Assert.IsNotNull(savedBucket.BucketInfo, "Bucekt info was null");
+            Assert.IsTrue(savedBucket.BucketInfo.ContainsKey("Cache-Control"), "Bucket info did not contain Cache-Control");
+            Assert.AreEqual("max-age=600", savedBucket.BucketInfo["Cache-Control"], "Cache-Control values were not equal.");
+        }
+
+        [TestMethod]
 		public void DeleteBucketTest() {
 			var name = "B2NETDeleteBucket";
 			var client = new B2Client(Options);

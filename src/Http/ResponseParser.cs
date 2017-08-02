@@ -9,7 +9,8 @@ namespace B2Net.Http {
 
 			Utilities.CheckForErrors(response);
 
-			return JsonConvert.DeserializeObject<T>(jsonResponse);
+			var obj = JsonConvert.DeserializeObject<T>(jsonResponse);
+            return obj;
 		}
 	}
 }

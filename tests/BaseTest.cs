@@ -12,9 +12,9 @@ namespace B2Net.Tests {
 
 		public BaseTest() {
 			Options = new B2Options() {
-				AccountId = TestContstants.AccountId,
-				ApplicationKey = TestContstants.ApplicationKey,
-				BucketId = TestContstants.BucketId
+				AccountId = TestConstants.AccountId,
+				ApplicationKey = TestConstants.ApplicationKey,
+				BucketId = TestConstants.BucketId
 			};
 		}
 	}
