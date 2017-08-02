@@ -91,7 +91,7 @@ namespace B2Net {
 			var requestMessage = FileUploadRequestGenerators.Upload(_options, uploadUrlObject.UploadUrl, fileData, fileName, fileInfo);
 			var response = await _client.SendAsync(requestMessage, cancelToken);
 
-			return await ResponseParser.ParseResponse<B2File>(response);
+            return await ResponseParser.ParseResponse<B2File>(response);
 		}
 
 		/// <summary>

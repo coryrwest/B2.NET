@@ -22,29 +22,47 @@ namespace B2Net {
 			return bucketList.Buckets;
 		}
 
-		/// <summary>
-		/// Creates a new bucket. A bucket belongs to the account used to create it.
-		/// </summary>
-		/// <param name="bucketName"></param>
-		/// <param name="bucketType"></param>
-		/// <param name="cancelToken"></param>
-		/// <returns></returns>
-		public async Task<B2Bucket> Create(string bucketName, BucketTypes bucketType, CancellationToken cancelToken = default(CancellationToken)) {
-			var client = HttpClientFactory.CreateHttpClient();
+        /// <summary>
+        /// Creates a new bucket. A bucket belongs to the account used to create it. If BucketType is not set allPrivate will be used by default.
+        /// </summary>
+        /// <param name="bucketName"></param>
+        /// <param name="bucketType"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        public async Task<B2Bucket> Create(string bucketName, BucketTypes bucketType, CancellationToken cancelToken = default(CancellationToken))
+        {
+            var client = HttpClientFactory.CreateHttpClient();
 
-			var requestMessage = BucketRequestGenerators.CreateBucket(_options, bucketName, bucketType.ToString());
-			var response = await client.SendAsync(requestMessage, cancelToken);
+            var requestMessage = BucketRequestGenerators.CreateBucket(_options, bucketName, bucketType.ToString());
+            var response = await client.SendAsync(requestMessage, cancelToken);
 
-			return await ResponseParser.ParseResponse<B2Bucket>(response);
-		}
+            return await ResponseParser.ParseResponse<B2Bucket>(response);
+        }
+        /// <summary>
+        /// Creates a new bucket. A bucket belongs to the account used to create it. If BucketType is not set allPrivate will be used by default.
+        /// Use this method to set Cache-Control.
+        /// </summary>
+        /// <param name="bucketName"></param>
+        /// <param name="bucketType"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        public async Task<B2Bucket> Create(string bucketName, B2BucketOptions options, CancellationToken cancelToken = default(CancellationToken))
+        {
+            var client = HttpClientFactory.CreateHttpClient();
 
-		/// <summary>
-		/// Deletes the bucket specified. Only buckets that contain no version of any files can be deleted.
-		/// </summary>
-		/// <param name="bucketId"></param>
-		/// <param name="cancelToken"></param>
-		/// <returns></returns>
-		public async Task<B2Bucket> Delete(string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
+            var requestMessage = BucketRequestGenerators.CreateBucket(_options, bucketName, options);
+            var response = await client.SendAsync(requestMessage, cancelToken);
+
+            return await ResponseParser.ParseResponse<B2Bucket>(response);
+        }
+
+        /// <summary>
+        /// Deletes the bucket specified. Only buckets that contain no version of any files can be deleted.
+        /// </summary>
+        /// <param name="bucketId"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        public async Task<B2Bucket> Delete(string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
 			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
 
 			var client = HttpClientFactory.CreateHttpClient();
@@ -53,24 +71,45 @@ namespace B2Net {
 			var response = await client.SendAsync(requestMessage, cancelToken);
 
 			return await ResponseParser.ParseResponse<B2Bucket>(response);
-		}
+        }
 
-		/// <summary>
-		/// Update an existing bucket. bucketId is only optional if you are persisting a bucket for this client.
-		/// </summary>
-		/// <param name="bucketType"></param>
-		/// <param name="bucketId"></param>
-		/// <param name="cancelToken"></param>
-		/// <returns></returns>
-		public async Task<B2Bucket> Update(BucketTypes bucketType, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
-			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
+        /// <summary>
+        /// Update an existing bucket. bucketId is only optional if you are persisting a bucket for this client.
+        /// </summary>
+        /// <param name="bucketType"></param>
+        /// <param name="bucketId"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        public async Task<B2Bucket> Update(BucketTypes bucketType, string bucketId = "", CancellationToken cancelToken = default(CancellationToken))
+        {
+            var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
 
-			var client = HttpClientFactory.CreateHttpClient();
+            var client = HttpClientFactory.CreateHttpClient();
 
-			var requestMessage = BucketRequestGenerators.UpdateBucket(_options, operationalBucketId, bucketType.ToString());
-			var response = await client.SendAsync(requestMessage, cancelToken);
+            var requestMessage = BucketRequestGenerators.UpdateBucket(_options, operationalBucketId, bucketType.ToString());
+            var response = await client.SendAsync(requestMessage, cancelToken);
 
-			return await ResponseParser.ParseResponse<B2Bucket>(response);
-		}
-	}
+            return await ResponseParser.ParseResponse<B2Bucket>(response);
+        }
+
+        /// <summary>
+        /// Update an existing bucket. bucketId is only optional if you are persisting a bucket for this client.
+        /// Use this method to set Cache-Control.
+        /// </summary>
+        /// <param name="bucketType"></param>
+        /// <param name="bucketId"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        public async Task<B2Bucket> Update(B2BucketOptions options, string bucketId = "", CancellationToken cancelToken = default(CancellationToken))
+        {
+            var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
+
+            var client = HttpClientFactory.CreateHttpClient();
+
+            var requestMessage = BucketRequestGenerators.UpdateBucket(_options, operationalBucketId, options);
+            var response = await client.SendAsync(requestMessage, cancelToken);
+
+            return await ResponseParser.ParseResponse<B2Bucket>(response);
+        }
+    }
 }
