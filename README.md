@@ -9,7 +9,7 @@ B2.NET is still in Beta, so use it in production at your own risk.
 
 ## Features
 
-*  99% implementation of the B2 REST API
+*  Full implementation of the B2 REST API (excluding the Large File API)
 *  UFT-8 and Url Encoding support
 *  Full Async support
 *  Full test coverage
@@ -18,7 +18,7 @@ B2.NET is still in Beta, so use it in production at your own risk.
 There are currently no plans to implement the Large File API. If you would like to contribute just submit a pull request.
 
 ## To do
- *  Implement bucket info: https://www.backblaze.com/b2/docs/buckets.html
+ *  Update readme to include cache control and lifecycle rules.
 
 ## NuGet
 
@@ -211,6 +211,7 @@ var file = client.Files.GetInfo("FILEID").Result;
 
 ## Release Notes
 
+*  0.1.9 Added Lifecycle Rules and Cache Control to bucket creation and updating.
 *  0.1.81 Switch targeting to netstandard1.3 and updated B2 endpoint
 *  0.1.7  Merged changes for file name encoding and maxFileCount from tomvoros
 *  0.1.6  Started URL Encoding file names.
