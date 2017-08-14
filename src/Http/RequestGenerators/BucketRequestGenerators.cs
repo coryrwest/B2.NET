@@ -3,6 +3,7 @@ using B2Net.Http.RequestGenerators;
 using B2Net.Models;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using Newtonsoft.Json.Serialization;
 
 namespace B2Net.Http {
 	public static class BucketRequestGenerators {
@@ -45,16 +46,34 @@ namespace B2Net.Http {
         /// <returns></returns>
         public static HttpRequestMessage CreateBucket(B2Options options, string bucketName, B2BucketOptions bucketOptions)
         {
+            // Check lifecycle rules
+            var hasLifecycleRules = bucketOptions.LifecycleRules != null && bucketOptions.LifecycleRules.Count > 0;
+            if (hasLifecycleRules) {
+                foreach (var rule in bucketOptions.LifecycleRules) {
+                    if (rule.DaysFromHidingToDeleting < 1 || rule.DaysFromUploadingToHiding < 1) {
+                        throw new System.Exception("The smallest number of days you can set in a lifecycle rule is 1.");
+                    }
+                }
+            }
+
             // TODO: Handle naming conventions, check name for invalid characters.
             var body = new B2BucketCreateModel() {
                 accountId = options.AccountId,
                 bucketName = bucketName,
-                bucketType = bucketOptions.BucketType.ToString(),
-                bucketInfo = new Dictionary<string, string>() {
-                    { "Cache-Control", "max-age=" + bucketOptions.CacheControl }
-                }
+                bucketType = bucketOptions.BucketType.ToString()
             };
-            var json = JsonConvert.SerializeObject(body);
+
+            // Add optional options
+            if (bucketOptions.CacheControl != 0) {
+                body.bucketInfo = new Dictionary<string, string>() {
+                    { "Cache-Control", "max-age=" + bucketOptions.CacheControl }
+                };
+            }
+            if(hasLifecycleRules) {
+                body.lifecycleRules = bucketOptions.LifecycleRules;
+            }
+
+            var json = JsonSerialize(body);
             return BaseRequestGenerator.PostRequest(Endpoints.Create, json, options);
         }
 
@@ -77,17 +96,41 @@ namespace B2Net.Http {
         /// <returns></returns>
         public static HttpRequestMessage UpdateBucket(B2Options options, string bucketId, B2BucketOptions bucketOptions)
         {
+            // Check lifecycle rules
+            var hasLifecycleRules = bucketOptions.LifecycleRules != null && bucketOptions.LifecycleRules.Count > 0;
+            if (hasLifecycleRules) {
+                foreach (var rule in bucketOptions.LifecycleRules) {
+                    if (rule.DaysFromHidingToDeleting < 1 || rule.DaysFromUploadingToHiding < 1) {
+                        throw new System.Exception("The smallest number of days you can set in a lifecycle rule is 1.");
+                    }
+                }
+            }
+
             var body = new B2BucketUpdateModel()
             {
                 accountId = options.AccountId,
                 bucketId = bucketId,
-                bucketType = bucketOptions.BucketType.ToString(),
-                bucketInfo = new Dictionary<string, string>() {
-                    { "Cache-Control", "max-age=" + bucketOptions.CacheControl }
-                }
+                bucketType = bucketOptions.BucketType.ToString()
             };
-            var json = JsonConvert.SerializeObject(body);
+
+            // Add optional options
+            if (bucketOptions.CacheControl != 0) {
+                body.bucketInfo = new Dictionary<string, string>() {
+                    { "Cache-Control", "max-age=" + bucketOptions.CacheControl }
+                };
+            }
+            if (hasLifecycleRules) {
+                body.lifecycleRules = bucketOptions.LifecycleRules;
+            }
+
+            var json = JsonSerialize(body);
             return BaseRequestGenerator.PostRequest(Endpoints.Update, json, options);
+        }
+
+        private static string JsonSerialize(object data){
+            return JsonConvert.SerializeObject(data, Formatting.Indented, new JsonSerializerSettings() {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            });
         }
     }
 
@@ -97,6 +140,7 @@ namespace B2Net.Http {
         public string bucketName { get; set; }
         public string bucketType { get; set; }
         public Dictionary<string, string> bucketInfo { get; set; }
+        public List<B2BucketLifecycleRule> lifecycleRules { get; set; }
     }
 
     internal class B2BucketUpdateModel
@@ -105,5 +149,6 @@ namespace B2Net.Http {
         public string bucketId { get; set; }
         public string bucketType { get; set; }
         public Dictionary<string, string> bucketInfo { get; set; }
+        public List<B2BucketLifecycleRule> lifecycleRules { get; set; }
     }
 }
