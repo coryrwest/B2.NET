@@ -6,10 +6,10 @@ namespace B2Net.Models {
 		public string BucketName { get; set; }
 		public string BucketType { get; set; }
         public Dictionary<string,string> BucketInfo { get; set; }
-        //public B2BucketLifecycleRules[] LifecycleRules { get; set; }
+        public List<B2BucketLifecycleRule> LifecycleRules { get; set; }
     }
 
-    public class B2BucketLifecycleRules
+    public class B2BucketLifecycleRule
     {
         public int DaysFromHidingToDeleting { get; set; }
         public int DaysFromUploadingToHiding { get; set; }

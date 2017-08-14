@@ -40,15 +40,14 @@ namespace B2Net.Tests {
         }
 
         [TestMethod]
-        public void CreateBucketWithInfoTest()
+        public void CreateBucketWithCacheControlTest()
         {
             var name = "B2NETTestingBucket";
             var client = new B2Client(Options);
 
             Options = client.Authorize().Result;
 
-            var bucket = client.Buckets.Create(name, new B2BucketOptions()
-            {
+            var bucket = client.Buckets.Create(name, new B2BucketOptions() {
                 CacheControl = 600
             }).Result;
 
@@ -70,7 +69,7 @@ namespace B2Net.Tests {
         }
 
         [TestMethod]
-        public void UpdateBucketWithInfoTest()
+        public void UpdateBucketWithCacheControlTest()
         {
             var name = "B2NETTestingBucket";
             var client = new B2Client(Options);
@@ -96,6 +95,51 @@ namespace B2Net.Tests {
             Assert.IsNotNull(savedBucket.BucketInfo, "Bucekt info was null");
             Assert.IsTrue(savedBucket.BucketInfo.ContainsKey("Cache-Control"), "Bucket info did not contain Cache-Control");
             Assert.AreEqual("max-age=300", savedBucket.BucketInfo["Cache-Control"], "Cache-Control values were not equal.");
+        }
+
+        [TestMethod]
+        public void UpdateBucketWithLifecycleRulesTest()
+        {
+            var name = "B2NETTestingBucket";
+            var client = new B2Client(Options);
+
+            Options = client.Authorize().Result;
+
+            var bucket = client.Buckets.Create(name, new B2BucketOptions() {
+                LifecycleRules = new System.Collections.Generic.List<B2BucketLifecycleRule>() {
+                    new B2BucketLifecycleRule() {
+                        DaysFromHidingToDeleting = 30,
+                        DaysFromUploadingToHiding = 15,
+                        FileNamePrefix = "testing"
+                    }
+                }
+            }).Result;
+
+            // Update bucket with new info
+            bucket = client.Buckets.Update(new B2BucketOptions() {
+                LifecycleRules = new System.Collections.Generic.List<B2BucketLifecycleRule>() {
+                    new B2BucketLifecycleRule() {
+                        DaysFromHidingToDeleting = 10,
+                        DaysFromUploadingToHiding = 10,
+                        FileNamePrefix = "tested"
+                    }
+                }
+            }, bucket.BucketId).Result;
+
+            // Get bucket to check for info
+            var bucketList = client.Buckets.GetList().Result;
+
+            // Clean up
+            if (!string.IsNullOrEmpty(bucket.BucketId)) {
+                client.Buckets.Delete(bucket.BucketId).Wait();
+            }
+
+            var savedBucket = bucketList.FirstOrDefault(b => b.BucketName == bucket.BucketName);
+
+            Assert.IsNotNull(savedBucket, "Retreived bucket was null");
+            Assert.IsNotNull(savedBucket.BucketInfo, "Bucekt info was null");
+            Assert.AreEqual(savedBucket.LifecycleRules.Count, 1, "Lifecycle rules count was " + savedBucket.LifecycleRules.Count);
+            Assert.AreEqual("tested", savedBucket.LifecycleRules.First().FileNamePrefix, "File name prefixes in the first lifecycle rule were not equal.");
         }
 
         [TestMethod]
