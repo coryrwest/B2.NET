@@ -64,8 +64,8 @@ namespace B2Net.Tests {
 
             Assert.IsNotNull(savedBucket, "Retreived bucket was null");
             Assert.IsNotNull(savedBucket.BucketInfo, "Bucekt info was null");
-            Assert.IsTrue(savedBucket.BucketInfo.ContainsKey("Cache-Control"), "Bucket info did not contain Cache-Control");
-            Assert.AreEqual("max-age=600", savedBucket.BucketInfo["Cache-Control"], "Cache-Control values were not equal.");
+            Assert.IsTrue(savedBucket.BucketInfo.ContainsKey("cache-control"), "Bucket info did not contain Cache-Control");
+            Assert.AreEqual("max-age=600", savedBucket.BucketInfo["cache-control"], "Cache-Control values were not equal.");
         }
 
         [TestMethod]
@@ -128,8 +128,8 @@ namespace B2Net.Tests {
 
             Assert.IsNotNull(savedBucket, "Retreived bucket was null");
             Assert.IsNotNull(savedBucket.BucketInfo, "Bucekt info was null");
-            Assert.IsTrue(savedBucket.BucketInfo.ContainsKey("Cache-Control"), "Bucket info did not contain Cache-Control");
-            Assert.AreEqual("max-age=300", savedBucket.BucketInfo["Cache-Control"], "Cache-Control values were not equal.");
+            Assert.IsTrue(savedBucket.BucketInfo.ContainsKey("cache-control"), "Bucket info did not contain Cache-Control");
+            Assert.AreEqual("max-age=300", savedBucket.BucketInfo["cache-control"], "Cache-Control values were not equal.");
         }
 
         [TestMethod]
