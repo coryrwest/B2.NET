@@ -69,6 +69,41 @@ namespace B2Net.Tests {
         }
 
         [TestMethod]
+        public void CreateBucketWithLifecycleRulesTest() {
+            var name = "B2NETTestingBucket";
+            var client = new B2Client(Options);
+
+            Options = client.Authorize().Result;
+
+            var bucket = client.Buckets.Create(name, new B2BucketOptions() {
+                LifecycleRules = new System.Collections.Generic.List<B2BucketLifecycleRule>() {
+                    new B2BucketLifecycleRule() {
+                        DaysFromHidingToDeleting = 30,
+                        DaysFromUploadingToHiding = null,
+                        FileNamePrefix = "testing"
+                    }
+                }
+            }).Result;
+
+            // Get bucket to check for info
+            var bucketList = client.Buckets.GetList().Result;
+
+            // Clean up
+            if (!string.IsNullOrEmpty(bucket.BucketId)) {
+                client.Buckets.Delete(bucket.BucketId).Wait();
+            }
+
+            var savedBucket = bucketList.FirstOrDefault(b => b.BucketName == bucket.BucketName);
+
+            Assert.IsNotNull(savedBucket, "Retreived bucket was null");
+            Assert.IsNotNull(savedBucket.BucketInfo, "Bucekt info was null");
+            Assert.AreEqual(savedBucket.LifecycleRules.Count, 1, "Lifecycle rules count was " + savedBucket.LifecycleRules.Count);
+            Assert.AreEqual("testing", savedBucket.LifecycleRules.First().FileNamePrefix, "File name prefixes in the first lifecycle rule were not equal.");
+            Assert.AreEqual(null, savedBucket.LifecycleRules.First().DaysFromUploadingToHiding, "The first lifecycle rule DaysFromUploadingToHiding was not null");
+            Assert.AreEqual(30, savedBucket.LifecycleRules.First().DaysFromHidingToDeleting, "The first lifecycle rule DaysFromHidingToDeleting was not 30");
+        }
+
+        [TestMethod]
         public void UpdateBucketWithCacheControlTest()
         {
             var name = "B2NETTestingBucket";

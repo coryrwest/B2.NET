@@ -11,8 +11,8 @@ namespace B2Net.Models {
 
     public class B2BucketLifecycleRule
     {
-        public int DaysFromHidingToDeleting { get; set; }
-        public int DaysFromUploadingToHiding { get; set; }
+        public int? DaysFromHidingToDeleting { get; set; }
+        public int? DaysFromUploadingToHiding { get; set; }
         public string FileNamePrefix { get; set; }
     }
 
