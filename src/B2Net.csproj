@@ -59,6 +59,7 @@
     <Compile Include="Models\B2File.cs" />
     <Compile Include="Models\B2FileList.cs" />
     <Compile Include="Models\B2Options.cs" />
+    <Compile Include="Models\B2UploadUrl.cs" />
     <Compile Include="Models\Exceptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities.cs" />

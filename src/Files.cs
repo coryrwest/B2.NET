@@ -65,44 +65,85 @@ namespace B2Net {
 			var response = await _client.SendAsync(requestMessage, cancelToken);
 
 			return await ResponseParser.ParseResponse<B2File>(response);
-		}
+        }
 
-		/// <summary>
-		/// Uploads one file to B2, returning its unique file ID. Filename will be URL Encoded.
-		/// </summary>
-		/// <param name="fileData"></param>
-		/// <param name="fileName"></param>
-		/// <param name="bucketId"></param>
-		/// <param name="cancelToken"></param>
-		/// <returns></returns>
-		public async Task<B2File> Upload(byte[] fileData, string fileName, string bucketId = "", Dictionary<string, string> fileInfo = null, CancellationToken cancelToken = default(CancellationToken)) {
-			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
+        /// <summary>
+        /// get an upload url for use with one Thread.
+        /// </summary>
+        /// <param name="bucketId"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        public async Task<B2UploadUrl> GetUploadUrl(string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
+            var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
 
-			// Get the upload url for this file
-			// TODO: There must be a better way to do this
-			var uploadUrlRequest = FileUploadRequestGenerators.GetUploadUrl(_options, operationalBucketId);
-			var uploadUrlResponse = _client.SendAsync(uploadUrlRequest, cancelToken).Result;
-			var uploadUrlData = await uploadUrlResponse.Content.ReadAsStringAsync();
-			var uploadUrlObject = JsonConvert.DeserializeObject<B2UploadUrl>(uploadUrlData);
-			// Set the upload auth token
-			_options.UploadAuthorizationToken = uploadUrlObject.AuthorizationToken;
-			
-			// Now we can upload the file
-			var requestMessage = FileUploadRequestGenerators.Upload(_options, uploadUrlObject.UploadUrl, fileData, fileName, fileInfo);
-			var response = await _client.SendAsync(requestMessage, cancelToken);
+            // sent the request.
+            var uploadUrlRequest = FileUploadRequestGenerators.GetUploadUrl(_options, operationalBucketId);
+            var uploadUrlResponse = await _client.SendAsync(uploadUrlRequest, cancelToken);
+
+            // parse response and return it.
+            var uploadUrl = await ResponseParser.ParseResponse<B2UploadUrl>(uploadUrlResponse);
+
+            // Set the upload auth token
+            _options.UploadAuthorizationToken = uploadUrl.AuthorizationToken;
+
+            return uploadUrl;
+        }
+
+        /// <summary>
+        /// DEPRECATED: This method has been deprecated in favor of the Upload that takes an UploadUrl parameter.
+        /// The other Upload method is the preferred, and more efficient way, of uploading to B2.
+        /// </summary>
+        /// <param name="fileData"></param>
+        /// <param name="fileName"></param>
+        /// <param name="bucketId"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        public async Task<B2File> Upload(byte[] fileData, string fileName, string bucketId = "", Dictionary<string, string> fileInfo = null, CancellationToken cancelToken = default(CancellationToken)) {
+            var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
+
+            // Get the upload url for this file
+            // TODO: There must be a better way to do this
+            var uploadUrlRequest = FileUploadRequestGenerators.GetUploadUrl(_options, operationalBucketId);
+            var uploadUrlResponse = _client.SendAsync(uploadUrlRequest, cancelToken).Result;
+            var uploadUrlData = await uploadUrlResponse.Content.ReadAsStringAsync();
+            var uploadUrlObject = JsonConvert.DeserializeObject<B2UploadUrl>(uploadUrlData);
+            // Set the upload auth token
+            _options.UploadAuthorizationToken = uploadUrlObject.AuthorizationToken;
+
+            // Now we can upload the file
+            var requestMessage = FileUploadRequestGenerators.Upload(_options, uploadUrlObject.UploadUrl, fileData, fileName, fileInfo);
+            var response = await _client.SendAsync(requestMessage, cancelToken);
 
             return await ResponseParser.ParseResponse<B2File>(response);
-		}
+        }
 
-		/// <summary>
-		/// Downloads one file by providing the name of the bucket and the name of the file.
-		/// </summary>
-		/// <param name="fileId"></param>
-		/// <param name="fileName"></param>
-		/// <param name="bucketId"></param>
-		/// <param name="cancelToken"></param>
-		/// <returns></returns>
-		public async Task<B2File> DownloadByName(string fileName, string bucketName, CancellationToken cancelToken = default(CancellationToken)) {
+        /// <summary>
+        /// Uploads one file to B2, returning its unique file ID. Filename will be URL Encoded.
+        /// </summary>
+        /// <param name="fileData"></param>
+        /// <param name="fileName"></param>
+        /// <param name="bucketId"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        public async Task<B2File> Upload(byte[] fileData, string fileName, B2UploadUrl uploadUrl, string bucketId = "", Dictionary<string, string> fileInfo = null, CancellationToken cancelToken = default(CancellationToken)) {
+            var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
+            
+            // Now we can upload the file
+            var requestMessage = FileUploadRequestGenerators.Upload(_options, uploadUrl.UploadUrl, fileData, fileName, fileInfo);
+            var response = await _client.SendAsync(requestMessage, cancelToken);
+
+            return await ResponseParser.ParseResponse<B2File>(response);
+        }
+
+        /// <summary>
+        /// Downloads one file by providing the name of the bucket and the name of the file.
+        /// </summary>
+        /// <param name="fileId"></param>
+        /// <param name="fileName"></param>
+        /// <param name="bucketId"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        public async Task<B2File> DownloadByName(string fileName, string bucketName, CancellationToken cancelToken = default(CancellationToken)) {
 			// Are we searching by name or id?
 			HttpRequestMessage request;
 			request = FileDownloadRequestGenerators.DownloadByName(_options, bucketName, fileName);
@@ -182,25 +223,23 @@ namespace B2Net {
 			if (response.Headers.TryGetValues("X-Bz-File-Id", out values)) {
 				file.FileId = values.First();
 			}
-            // TODO: File Info headers
+            // File Info Headers
             var fileInfoHeaders = response.Headers.Where(h => h.Key.ToLower().Contains("x-bz-info"));
             var infoData = new Dictionary<string, string>();
             if (fileInfoHeaders.Count() > 0) {
                 foreach (var fileInfo in fileInfoHeaders)
                 {
-                    infoData.Add(fileInfo.Key, fileInfo.Value.First());
+                    // Substring to parse out the file info prefix.
+                    infoData.Add(fileInfo.Key.Substring(10), fileInfo.Value.First());
                 }
             }
             file.FileInfo = infoData;
+            if (response.Content.Headers.ContentLength.HasValue) {
+                file.Size = response.Content.Headers.ContentLength.Value;
+            }
             file.FileData = await response.Content.ReadAsByteArrayAsync();
 
 			return await Task.FromResult(file);
-		}
-
-		internal class B2UploadUrl {
-			public string BucketId { get; set; }
-			public string UploadUrl { get; set; }
-			public string AuthorizationToken { get; set; }
 		}
 	}
 }

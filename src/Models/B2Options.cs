@@ -9,17 +9,20 @@
 		/// only ever use one bucket. Default: false.
 		/// </summary>
 		public bool PersistBucket { get; set; }
-		
-		// State
-		public string ApiUrl { get; set; }
+
+        // State
+        public string ApiUrl { get; set; }
 		public string DownloadUrl { get; set; }
 		public string AuthorizationToken { get; set; }
 		/// <summary>
 		/// This will only be set after a call to the upload API
 		/// </summary>
 		public string UploadAuthorizationToken { get; set; }
+        public long RecommendedPartSize { get; set; }
+        public long AbsoluteMinimumPartSize { get; set; }
+        public long MinimumPartSize { get; set; }
 
-		public B2Options() {
+        public B2Options() {
 			PersistBucket = false;
 		}
 
@@ -28,7 +31,10 @@
 				ApiUrl = response.apiUrl;
 				DownloadUrl = response.downloadUrl;
 				AuthorizationToken = response.authorizationToken;
-			}
+                RecommendedPartSize = response.recommendedPartSize;
+                AbsoluteMinimumPartSize = response.absoluteMinimumPartSize;
+                MinimumPartSize = response.minimumPartSize;
+            }
 		}
 	}
 }
