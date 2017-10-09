@@ -58,7 +58,8 @@ var bucketList = client.Buckets.GetList().Result;
 // [
 //   { BucketId: "",
 //     BucketName: "",
-//     BucketType: "" }
+//     BucketType: "",
+//     BucketInfo: Dictionary<string,string> }
 // ]
 ```
 
@@ -72,6 +73,27 @@ var bucket = client.Buckets.Create("BUCKETNAME", "OPTIONAL_BUCKET_TYPE").Result;
 //   BucketType: "" }
 ```
 
+### Create a Bucket with options
+```csharp
+var client = new B2Client(options);
+options = client.Authorize().Result;
+var bucket = client.Buckets.Create("BUCKETNAME", new B2BucketOptions() {
+	CacheControl = 300,
+	LifecycleRules = new System.Collections.Generic.List<B2BucketLifecycleRule>() {
+		new B2BucketLifecycleRule() {
+			DaysFromHidingToDeleting = 30,
+			DaysFromUploadingToHiding = null,
+			FileNamePrefix = ""
+		}
+	}
+}).Result;
+// { BucketId: "",
+//   BucketName: "",
+//   BucketType: "",
+//   BucketInfo: Dictionary<string,string>,
+//   LifecycleRules: List<B2BucketLifecycleRule> }
+```
+
 ### Update a Bucket
 ```csharp
 var client = new B2Client(options);
@@ -80,6 +102,27 @@ var bucket = client.Buckets.Update("BUCKETID", "BUCKETYPE").Result;
 // { BucketId: "",
 //   BucketName: "",
 //   BucketType: "" }
+```
+
+### Update a Bucket with options
+```csharp
+var client = new B2Client(options);
+options = client.Authorize().Result;
+var bucket = client.Buckets.Update("BUCKETID", new B2BucketOptions() {
+	CacheControl = 300,
+	LifecycleRules = new System.Collections.Generic.List<B2BucketLifecycleRule>() {
+		new B2BucketLifecycleRule() {
+			DaysFromHidingToDeleting = 30,
+			DaysFromUploadingToHiding = null,
+			FileNamePrefix = ""
+		}
+	}
+}).Result;
+// { BucketId: "",
+//   BucketName: "",
+//   BucketType: "",
+//   BucketInfo: Dictionary<string,string>,
+//   LifecycleRules: List<B2BucketLifecycleRule> }
 ```
 
 #### Bucket Types
@@ -211,7 +254,8 @@ var file = client.Files.GetInfo("FILEID").Result;
 
 ## Release Notes
 
-*  0.1.9 Added Lifecycle Rules and Cache Control to bucket creation and updating.
+*  0.1.92 Fixed Lifecycle Rules null issue.
+*  0.1.9  Added Lifecycle Rules and Cache Control to bucket creation and updating.
 *  0.1.81 Switch targeting to netstandard1.3 and updated B2 endpoint
 *  0.1.7  Merged changes for file name encoding and maxFileCount from tomvoros
 *  0.1.6  Started URL Encoding file names.
