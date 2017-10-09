@@ -53,6 +53,9 @@ namespace B2Net.Http {
                     if (rule.DaysFromHidingToDeleting < 1 || rule.DaysFromUploadingToHiding < 1) {
                         throw new System.Exception("The smallest number of days you can set in a lifecycle rule is 1.");
                     }
+                    if (rule.DaysFromHidingToDeleting == null && rule.DaysFromUploadingToHiding == null) {
+                        throw new System.Exception("You must set either DaysFromHidingToDeleting or DaysFromUploadingToHiding. Both cannot be null.");
+                    }
                 }
             }
 
@@ -102,6 +105,9 @@ namespace B2Net.Http {
                 foreach (var rule in bucketOptions.LifecycleRules) {
                     if (rule.DaysFromHidingToDeleting < 1 || rule.DaysFromUploadingToHiding < 1) {
                         throw new System.Exception("The smallest number of days you can set in a lifecycle rule is 1.");
+                    }
+                    if (rule.DaysFromHidingToDeleting == null && rule.DaysFromUploadingToHiding == null) {
+                        throw new System.Exception("You must set either DaysFromHidingToDeleting or DaysFromUploadingToHiding. Both cannot be null.");
                     }
                 }
             }
