@@ -6,7 +6,7 @@ namespace B2Net.Models {
 		public string FileId { get; set; }
 		public string FileName { get; set; }
 		public string Action { get; set; }
-		public float Size { get; set; }
+		public long Size { get; set; }
 		public string UploadTimestamp { get; set; }
 		public byte[] FileData { get; set; }
 		// Uploaded File Response
