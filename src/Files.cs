@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -126,14 +127,37 @@ namespace B2Net {
         /// <param name="cancelToken"></param>
         /// <returns></returns>
         public async Task<B2File> Upload(byte[] fileData, string fileName, B2UploadUrl uploadUrl, string bucketId = "", Dictionary<string, string> fileInfo = null, CancellationToken cancelToken = default(CancellationToken)) {
-            var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
-            
-            // Now we can upload the file
-            var requestMessage = FileUploadRequestGenerators.Upload(_options, uploadUrl.UploadUrl, fileData, fileName, fileInfo);
-            var response = await _client.SendAsync(requestMessage, cancelToken);
-
-            return await ResponseParser.ParseResponse<B2File>(response);
+            return await Upload(fileData, fileName, uploadUrl, false, bucketId, fileInfo, cancelToken);
         }
+
+        /// <summary>
+        /// Uploads one file to B2, returning its unique file ID. Filename will be URL Encoded. If auto retry
+        /// is set true it will retry a failed upload once after 1 second.
+        /// </summary>
+        /// <param name="fileData"></param>
+        /// <param name="fileName"></param>
+        /// <param name="uploadUrl"></param>
+        /// <param name="bucketId"></param>
+        /// <param name="autoRetry">Retry a failed upload one time after waiting for 1 second.</param>
+        /// <param name="fileInfo"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+	    public async Task<B2File> Upload(byte[] fileData, string fileName, B2UploadUrl uploadUrl, bool autoRetry, string bucketId = "", Dictionary<string, string> fileInfo = null, CancellationToken cancelToken = default(CancellationToken)) {
+	        // Now we can upload the file
+	        var requestMessage = FileUploadRequestGenerators.Upload(_options, uploadUrl.UploadUrl, fileData, fileName, fileInfo);
+
+	        var response = await _client.SendAsync(requestMessage, cancelToken);
+            // Auto retry
+            if (autoRetry && (
+                    response.StatusCode == (HttpStatusCode)429 ||
+                    response.StatusCode == HttpStatusCode.RequestTimeout ||
+                    response.StatusCode == HttpStatusCode.ServiceUnavailable)) {
+                Task.Delay(1000, cancelToken).Wait(cancelToken);
+                response = await _client.SendAsync(requestMessage, cancelToken);
+            }
+
+	        return await ResponseParser.ParseResponse<B2File>(response);
+	    }
 
         /// <summary>
         /// Downloads one file by providing the name of the bucket and the name of the file.
@@ -188,6 +212,25 @@ namespace B2Net {
 
 			return await ResponseParser.ParseResponse<B2File>(response);
 		}
+
+
+        /// <summary>
+        /// EXPERIMENTAL: This functionality is not officially part of the Backblaze B2 API and may change or break at any time.
+        /// This will return a friendly URL that can be shared to download the file. This depends on the Bucket that the file resides 
+        /// be allPublic.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="bucketName"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+	    public string GetFriendlyDownloadUrl(string fileName, string bucketName, CancellationToken cancelToken = default(CancellationToken)) {
+	        var downloadUrl = _options.DownloadUrl;
+	        var friendlyUrl = "";
+            if (!string.IsNullOrEmpty(downloadUrl)) {
+                friendlyUrl = $"{downloadUrl}/file/{bucketName}/{fileName}";
+            }
+	        return friendlyUrl;
+	    }
 
 		/// <summary>
 		/// Hides or Unhides a file so that downloading by name will not find the file,
