@@ -10,15 +10,13 @@ B2.NET is still in Beta, so use it in production at your own risk.
 ## Features
 
 *  Full implementation of the B2 REST API (excluding the Large File API)
+*  Experimental support for file FriendlyURL's
 *  UFT-8 and Url Encoding support
 *  Full Async support
 *  Full test coverage
-*  Targets .NET 4.5
+*  Targets .NET 4.5 and .NET Standard 1.3
 
 There are currently no plans to implement the Large File API. If you would like to contribute just submit a pull request.
-
-## To do
- *  Update readme to include cache control and lifecycle rules.
 
 ## NuGet
 
