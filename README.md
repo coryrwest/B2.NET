@@ -14,7 +14,7 @@ B2.NET is still in Beta, so use it in production at your own risk.
 *  UFT-8 and Url Encoding support
 *  Full Async support
 *  Full test coverage
-*  Targets .NET 4.5 and .NET Standard 1.3
+*  Targets .NET 4.5 and .NET Standard 1.5
 
 There are currently no plans to implement the Large File API. If you would like to contribute just submit a pull request.
 
@@ -252,7 +252,7 @@ var file = client.Files.GetInfo("FILEID").Result;
 
 ## Release Notes
 
-*  0.2.5  Support for .NET 4.5 and .NET Standard 1.3 and FriendlyURL's for files
+*  0.2.5  Support for .NET 4.5 and .NET Standard 1.5 and FriendlyURL's for files
 *  0.1.92 Fixed Lifecycle Rules null issue.
 *  0.1.9  Added Lifecycle Rules and Cache Control to bucket creation and updating.
 *  0.1.81 Switch targeting to netstandard1.3 and updated B2 endpoint
