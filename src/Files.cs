@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using B2Net.Http;
@@ -160,6 +161,31 @@ namespace B2Net {
 	    }
 
         /// <summary>
+        /// Downloads a file part by providing the name of the bucket and the name and byte range of the file.
+        /// For use with the Larg File API.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="bucketName"></param>
+        /// <param name="startBytes"></param>
+        /// <param name="endBytes"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+	    public async Task<B2File> DownloadByName(string fileName, string bucketName, int startByte, int endByte,
+	        CancellationToken cancelToken = default(CancellationToken)) {
+            // Are we searching by name or id?
+            HttpRequestMessage request;
+            request = FileDownloadRequestGenerators.DownloadByName(_options, bucketName, fileName, $"{startByte}-{endByte}");
+
+            // Send the download request
+            var response = await _client.SendAsync(request, cancelToken);
+
+            Utilities.CheckForErrors(response);
+
+            // Create B2File from response
+            return await ParseDownloadResponse(response);
+        }
+
+        /// <summary>
         /// Downloads one file by providing the name of the bucket and the name of the file.
         /// </summary>
         /// <param name="fileId"></param>
@@ -179,34 +205,52 @@ namespace B2Net {
 
 			// Create B2File from response
 			return await ParseDownloadResponse(response);
-		}
+	    }
 
-		/// <summary>
-		/// Downloads one file from B2.
-		/// </summary>
-		/// <param name="fileId"></param>
-		/// <param name="cancelToken"></param>
-		/// <returns></returns>
-		public async Task<B2File> DownloadById(string fileId, CancellationToken cancelToken = default(CancellationToken)) {
-			// Are we searching by name or id?
-			HttpRequestMessage request;
-			request = FileDownloadRequestGenerators.DownloadById(_options, fileId);
+	    /// <summary>
+	    /// Downloads a file from B2 using the byte range specified. For use with the Large File API.
+	    /// </summary>
+	    /// <param name="fileId"></param>
+	    /// <param name="cancelToken"></param>
+	    /// <returns></returns>
+	    public async Task<B2File> DownloadById(string fileId, int startByte, int endByte, CancellationToken cancelToken = default(CancellationToken)) {
+	        // Are we searching by name or id?
+	        HttpRequestMessage request;
+	        request = FileDownloadRequestGenerators.DownloadById(_options, fileId, $"{startByte}-{endByte}");
 
-			// Send the download request
-			var response = await _client.SendAsync(request, cancelToken);
+	        // Send the download request
+	        var response = await _client.SendAsync(request, cancelToken);
 
-			// Create B2File from response
-			return await ParseDownloadResponse(response);
-		}
+	        // Create B2File from response
+	        return await ParseDownloadResponse(response);
+	    }
 
-		/// <summary>
-		/// Deletes the specified file version
-		/// </summary>
-		/// <param name="fileId"></param>
-		/// <param name="fileName"></param>
-		/// <param name="cancelToken"></param>
-		/// <returns></returns>
-		public async Task<B2File> Delete(string fileId, string fileName, CancellationToken cancelToken = default(CancellationToken)) {
+	    /// <summary>
+	    /// Downloads one file from B2.
+	    /// </summary>
+	    /// <param name="fileId"></param>
+	    /// <param name="cancelToken"></param>
+	    /// <returns></returns>
+	    public async Task<B2File> DownloadById(string fileId, CancellationToken cancelToken = default(CancellationToken)) {
+	        // Are we searching by name or id?
+	        HttpRequestMessage request;
+	        request = FileDownloadRequestGenerators.DownloadById(_options, fileId);
+
+	        // Send the download request
+	        var response = await _client.SendAsync(request, cancelToken);
+
+	        // Create B2File from response
+	        return await ParseDownloadResponse(response);
+	    }
+
+        /// <summary>
+        /// Deletes the specified file version
+        /// </summary>
+        /// <param name="fileId"></param>
+        /// <param name="fileName"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        public async Task<B2File> Delete(string fileId, string fileName, CancellationToken cancelToken = default(CancellationToken)) {
 			var requestMessage = FileDeleteRequestGenerator.Delete(_options, fileId, fileName);
 			var response = await _client.SendAsync(requestMessage, cancelToken);
 
