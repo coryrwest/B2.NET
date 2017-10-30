@@ -79,10 +79,7 @@ namespace B2Net.Tests {
 		[TestCleanup]
 		public void Cleanup() {
 			foreach (B2File b2File in FilesToDelete) {
-                // 2 versions are sometimes created with the Large File API
 				var deletedFile = Client.Files.Delete(b2File.FileId, b2File.FileName).Result;
-			    try { deletedFile = Client.Files.Delete(b2File.FileId, b2File.FileName).Result; }
-			    catch (B2Exception e) when (e.Message.Contains("File not present")) {}
             }
 			var deletedBucket = Client.Buckets.Delete(TestBucket.BucketId).Result;
 		}
