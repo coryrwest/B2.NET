@@ -179,8 +179,6 @@ namespace B2Net {
             // Send the download request
             var response = await _client.SendAsync(request, cancelToken);
 
-            Utilities.CheckForErrors(response);
-
             // Create B2File from response
             return await ParseDownloadResponse(response);
         }
@@ -200,8 +198,6 @@ namespace B2Net {
 
 			// Send the download request
 			var response = await _client.SendAsync(request, cancelToken);
-
-			Utilities.CheckForErrors(response);
 
 			// Create B2File from response
 			return await ParseDownloadResponse(response);

@@ -21,9 +21,9 @@ namespace B2Net.Http.RequestGenerators
         }
 
         public static HttpRequestMessage Start(B2Options options, string bucketId, string fileName, string contentType, Dictionary<string, string> fileInfo = null) {
-            var uri = new Uri(Endpoints.Start);
+            var uri = new Uri(options.ApiUrl + "/b2api/" + Constants.Version + "/" + Endpoints.Start);
             var content = "{\"bucketId\":\"" + bucketId + "\",\"fileName\":\"" + fileName +
-                                            "\",\"contentType\":\"" + contentType + "\"}";
+                                            "\",\"contentType\":\"" + (string.IsNullOrEmpty(contentType) ? "b2/x-auto" : contentType) + "\"}";
             var request = new HttpRequestMessage() {
                 Method = HttpMethod.Post,
                 RequestUri = uri,
@@ -37,7 +37,7 @@ namespace B2Net.Http.RequestGenerators
                     request.Headers.Add($"X-Bz-Info-{info.Key}", info.Value);
                 }
             }
-            request.Content.Headers.ContentType = new MediaTypeHeaderValue(string.IsNullOrEmpty(contentType) ? "b2/x-auto" : contentType);
+            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             request.Content.Headers.ContentLength = content.Length;
 
             return request;
@@ -52,8 +52,12 @@ namespace B2Net.Http.RequestGenerators
         /// <param name="fileName"></param>
         /// <param name="fileInfo"></param>
         /// <returns></returns>
-        public static HttpRequestMessage Upload(B2Options options, byte[] fileData, int partNumber) {
-            var uri = new Uri(Endpoints.Upload);
+        public static HttpRequestMessage Upload(B2Options options, byte[] fileData, int partNumber, B2UploadPartUrl uploadPartUrl) {
+            if (partNumber < 1 || partNumber > 10000) {
+                throw new Exception("Part number must be between 1 and 10,000");
+            }
+
+            var uri = new Uri(uploadPartUrl.UploadUrl);
             var request = new HttpRequestMessage() {
                 Method = HttpMethod.Post,
                 RequestUri = uri,
@@ -64,7 +68,7 @@ namespace B2Net.Http.RequestGenerators
             string hash = Utilities.GetSHA1Hash(fileData);
 
             // Add headers
-            request.Headers.Add("Authorization", options.UploadAuthorizationToken);
+            request.Headers.Add("Authorization", uploadPartUrl.AuthorizationToken);
             request.Headers.Add("X-Bz-Part-Number", partNumber.ToString());
             request.Headers.Add("X-Bz-Content-Sha1", hash);
             request.Content.Headers.ContentLength = fileData.Length;
@@ -77,7 +81,7 @@ namespace B2Net.Http.RequestGenerators
         }
 
         public static HttpRequestMessage Finish(B2Options options, string fileId, string[] partSHA1Array) {
-            var uri = new Uri(Endpoints.Finish);
+            var uri = new Uri(options.ApiUrl + "/b2api/" + Constants.Version + "/" + Endpoints.Finish);
             var content = JsonConvert.SerializeObject(new { fileId, partSha1Array  = partSHA1Array });
             var request = new HttpRequestMessage() {
                 Method = HttpMethod.Post,
