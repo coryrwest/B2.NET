@@ -1,7 +1,7 @@
 # B2.NET
 [![ghit.me](https://ghit.me/badge.svg?repo=coryrwest/B2.NET)](https://ghit.me/repo/coryrwest/B2.NET)
 
-B2.NET aims to be a C# client for the [Backblaze B2 Cloud Storage](https://secure.backblaze.com/b2/) service.
+B2.NET is a C# client for the [Backblaze B2 Cloud Storage](https://secure.backblaze.com/b2/) service.
 
 B2.NET is still in Beta, so use it in production at your own risk.
 
@@ -9,14 +9,12 @@ B2.NET is still in Beta, so use it in production at your own risk.
 
 ## Features
 
-*  Full implementation of the B2 REST API (excluding the Large File API)
+*  Full implementation of the B2 REST API (excluding some Large File API's)
 *  Experimental support for file FriendlyURL's
 *  UFT-8 and Url Encoding support
 *  Full Async support
 *  Full test coverage
 *  Targets .NET 4.5 and .NET Standard 1.5
-
-There are currently no plans to implement the Large File API. If you would like to contribute just submit a pull request.
 
 ## NuGet
 
@@ -249,6 +247,9 @@ var file = client.Files.GetInfo("FILEID").Result;
 //   ContentType: "",
 //   FileInfo: Dictionary<string,string> }
 ```
+
+### Large File API
+See the Large File tests for usage details.
 
 ## Release Notes
 

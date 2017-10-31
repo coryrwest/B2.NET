@@ -6,22 +6,24 @@ using Newtonsoft.Json;
 
 namespace B2Net {
 	public class B2Client {
-		private B2Options _options;
+	    private B2Options _options;
 
 		public B2Client(B2Options options) {
 			_options = options;
 			Buckets = new Buckets(options);
 			Files = new Files(options);
+            LargeFiles = new LargeFiles(options);
 		}
 
 		public Buckets Buckets { get; }
-		public Files Files { get; }
+	    public Files Files { get; }
+	    public LargeFiles LargeFiles { get; }
 
-		/// <summary>
-		/// Authorize against the B2 storage service.
-		/// </summary>
-		/// <returns>B2Options containing the download url, new api url, and authorization token.</returns>
-		public async Task<B2Options> Authorize(CancellationToken cancelToken = default(CancellationToken)) {
+        /// <summary>
+        /// Authorize against the B2 storage service.
+        /// </summary>
+        /// <returns>B2Options containing the download url, new api url, and authorization token.</returns>
+        public async Task<B2Options> Authorize(CancellationToken cancelToken = default(CancellationToken)) {
 			var client = HttpClientFactory.CreateHttpClient();
 
 			var requestMessage = AuthRequestGenerator.Authorize(_options);
