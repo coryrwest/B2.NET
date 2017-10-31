@@ -16,9 +16,10 @@
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <Authors>Westropp Ventures</Authors>
-    <Version>0.0.2.5</Version>
+    <Version>0.0.4.0</Version>
     <PackageProjectUrl></PackageProjectUrl>
     <RepositoryUrl>https://github.com/coryrwest/B2.NET</RepositoryUrl>
+    <PackageTags>B2 Backblaze Cloud Storage</PackageTags>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5'">
