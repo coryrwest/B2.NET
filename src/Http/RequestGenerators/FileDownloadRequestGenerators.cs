@@ -9,7 +9,7 @@ namespace B2Net.Http {
 			public const string DownloadByName = "file";
 		}
 
-		public static HttpRequestMessage DownloadById(B2Options options, string fileId) {
+		public static HttpRequestMessage DownloadById(B2Options options, string fileId, string byteRange = "") {
 			var uri = new Uri(options.DownloadUrl + "/b2api/" + Constants.Version + "/" + Endpoints.DownloadById);
 			var request = new HttpRequestMessage() {
 				Method = HttpMethod.Post,
@@ -19,10 +19,15 @@ namespace B2Net.Http {
 
 			request.Headers.Add("Authorization", options.AuthorizationToken);
 
-			return request;
+		    // Add byte range header if we have it
+		    if (!string.IsNullOrEmpty(byteRange)) {
+		        request.Headers.Add("Range", $"bytes={byteRange}");
+		    }
+
+            return request;
 		}
 
-		public static HttpRequestMessage DownloadByName(B2Options options, string bucketName, string fileName) {
+		public static HttpRequestMessage DownloadByName(B2Options options, string bucketName, string fileName, string byteRange = "") {
 			var uri = new Uri(options.DownloadUrl + "/" + Endpoints.DownloadByName + "/" + bucketName + "/" + fileName.b2UrlEncode());
 			var request = new HttpRequestMessage() {
 				Method = HttpMethod.Get,
@@ -30,6 +35,11 @@ namespace B2Net.Http {
 			};
 
 			request.Headers.Add("Authorization", options.AuthorizationToken);
+
+            // Add byte range header if we have it
+		    if (!string.IsNullOrEmpty(byteRange)) {
+		        request.Headers.Add("Range", $"bytes={byteRange}");
+		    }
 
 			return request;
 		}
