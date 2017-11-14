@@ -158,7 +158,8 @@ var fileList = client.Files.GetList("BUCKETID", "FILENAME").Result;
 ```csharp
 var client = new B2Client(options);
 options = client.Authorize().Result;
-var file = client.Files.Upload("FILEDATABYTES", "FILENAME", "BUCKETID", "FILEINFOATTRS").Result;
+var uploadUrl = Client.Files.GetUploadUrl("BUCKETID").Result;
+var file = client.Files.Upload("FILEDATABYTES", "FILENAME", uploadUrl, "AUTORETRY", "BUCKETID", "FILEINFOATTRS").Result;
 // { FileId: "",
 //   FileName: "",
 //   ContentLength: "", 
