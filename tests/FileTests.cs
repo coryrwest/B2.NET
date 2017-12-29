@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using B2Net.Http;
 using B2Net.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -36,50 +37,101 @@ namespace B2Net.Tests {
 			} else {
 				TestBucket = Client.Buckets.Create("B2NETTestingBucket", BucketTypes.allPrivate).Result;
 			}
-		}
+	    }
 
-		[TestMethod]
-		public void GetListTest() {
-			var fileName = "B2Test.txt";
-			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
-			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
-			// Clean up.
-			FilesToDelete.Add(file);
+	    [TestMethod]
+	    public void GetListTest() {
+	        var fileName = "B2Test.txt";
+	        var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
+	        var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+	        // Clean up.
+	        FilesToDelete.Add(file);
 
-			var list = Client.Files.GetList(bucketId: TestBucket.BucketId).Result.Files;
+	        var list = Client.Files.GetList(bucketId: TestBucket.BucketId).Result.Files;
 
-			Assert.AreEqual(1, list.Count, list.Count + " files found.");
-		}
+	        Assert.AreEqual(1, list.Count, list.Count + " files found.");
+	    }
 
-		//[TestMethod]
-		//public void EmptyBucket() {
-		//	var list = Client.Files.GetList(bucketId: TestBucket.BucketId).Result.Files;
+	    [TestMethod]
+	    public void GetListWithPrefixTest() {
+	        var fileName = "B2Test.txt";
+	        var fileNameWithFolder = "test/B2Test.txt";
+	        var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
+	        var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+	        var fileFolder = Client.Files.Upload(fileData, fileNameWithFolder, TestBucket.BucketId).Result;
+	        // Clean up.
+	        FilesToDelete.Add(file);
+	        FilesToDelete.Add(fileFolder);
 
-		//	foreach (B2File b2File in list) {
-		//		var deletedFile = Client.Files.Delete(b2File.FileId, b2File.FileName).Result;
-		//	}
-		//}
+	        var list = Client.Files.GetListWithPrefixOrDemiliter(bucketId: TestBucket.BucketId, prefix: "test").Result.Files;
 
-		//[TestMethod]
-		//public void HideFileTest() {
-		//	var fileName = "B2Test.txt";
-		//	var fileData = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
-		//	string hash = Utilities.GetSHA1Hash(fileData);
-		//	var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
-		//	// Clean up.
-		//	FilesToDelete.Add(file);
+	        Assert.AreEqual(1, list.Count, list.Count + " files found.");
+	    }
 
-		//	Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
+	    [TestMethod]
+	    public void GetListWithPrefixAndDelimiterTest() {
+	        var fileName = "B2Test.txt";
+	        var fileNameWithFolder = "test/B2Test.txt";
+	        var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
+	        var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+	        var fileFolder = Client.Files.Upload(fileData, fileNameWithFolder, TestBucket.BucketId).Result;
+	        // Clean up.
+	        FilesToDelete.Add(file);
+	        FilesToDelete.Add(fileFolder);
 
-		//          var hiddenFile = Client.Files.Hide(file.FileName, TestBucket.BucketId).Result;
+	        var list = Client.Files.GetListWithPrefixOrDemiliter(bucketId: TestBucket.BucketId, prefix: "test", delimiter: "/").Result.Files;
 
-		//          Assert.IsTrue(hiddenFile.Action == "hide");
+	        Assert.AreEqual(1, list.Count, list.Count + " files found.");
+	        Assert.AreEqual("test/", list.First().FileName, "File names to not match.");
+	    }
 
-		//          // Unhide the file so we can delete it later
-		//          hiddenFile = Client.Files.Hide(file.FileName, TestBucket.BucketId).Result;
-		//      }
+	    [TestMethod]
+	    public void GetListWithDelimiterTest() {
+	        var fileName = "B2Test.txt";
+	        var fileNameWithFolder = "test/B2Test.txt";
+	        var fileNameWithFolder2 = "test2/B2Test.txt";
+            var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
+	        var file = Client.Files.Upload(fileData, fileNameWithFolder2, TestBucket.BucketId).Result;
+	        var fileFolder = Client.Files.Upload(fileData, fileNameWithFolder, TestBucket.BucketId).Result;
+	        // Clean up.
+	        FilesToDelete.Add(file);
+	        FilesToDelete.Add(fileFolder);
 
-		[TestMethod]
+	        var list = Client.Files.GetListWithPrefixOrDemiliter(bucketId: TestBucket.BucketId, delimiter: "/").Result.Files;
+
+	        Assert.AreEqual(2, list.Count, list.Count + " files found.");
+	        Assert.IsTrue(list.All(f => f.Action == "folder"), "Not all list items were folders.");
+	    }
+
+        //[TestMethod]
+        //public void EmptyBucket() {
+        //	var list = Client.Files.GetList(bucketId: TestBucket.BucketId).Result.Files;
+
+        //	foreach (B2File b2File in list) {
+        //		var deletedFile = Client.Files.Delete(b2File.FileId, b2File.FileName).Result;
+        //	}
+        //}
+
+        //[TestMethod]
+        //public void HideFileTest() {
+        //	var fileName = "B2Test.txt";
+        //	var fileData = File.ReadAllBytes(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName));
+        //	string hash = Utilities.GetSHA1Hash(fileData);
+        //	var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+        //	// Clean up.
+        //	FilesToDelete.Add(file);
+
+        //	Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
+
+        //          var hiddenFile = Client.Files.Hide(file.FileName, TestBucket.BucketId).Result;
+
+        //          Assert.IsTrue(hiddenFile.Action == "hide");
+
+        //          // Unhide the file so we can delete it later
+        //          hiddenFile = Client.Files.Hide(file.FileName, TestBucket.BucketId).Result;
+        //      }
+
+        [TestMethod]
 		public void FileUploadTest() {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
