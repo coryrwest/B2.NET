@@ -143,6 +143,8 @@ var bucket = client.Buckets.Delete("BUCKETID").Result;
 var client = new B2Client(options);
 options = client.Authorize().Result;
 var fileList = client.Files.GetList("BUCKETID", "FILENAME").Result;
+// Using optional prefix and delimiter
+var fileList = client.Files.GetList("BUCKETID", "FILENAME", prefix: "PREFIX", delimiter: "DELIMITER").Result;
 // {
 //   NextFileName: "",
 //   [

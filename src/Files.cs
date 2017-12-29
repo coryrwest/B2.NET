@@ -20,7 +20,7 @@ namespace B2Net {
 		}
 
 		/// <summary>
-		/// Lists the names of all  non-hidden files in a bucket, starting at a given name.
+		/// Lists the names of all non-hidden files in a bucket, starting at a given name.
 		/// </summary>
 		/// <param name="bucketId"></param>
 		/// <param name="startFileName"></param>
@@ -28,41 +28,74 @@ namespace B2Net {
 		/// <param name="cancelToken"></param>
 		/// <returns></returns>
 		public async Task<B2FileList> GetList(string startFileName = "", int? maxFileCount = null, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
-			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
-
-			var requestMessage = FileMetaDataRequestGenerators.GetList(_options, operationalBucketId, startFileName, maxFileCount);
-			var response = await _client.SendAsync(requestMessage, cancelToken);
-
-			return await ResponseParser.ParseResponse<B2FileList>(response);
+		    return await GetListWithPrefixOrDemiliter(startFileName, "", "", maxFileCount, bucketId, cancelToken);
 		}
 
-		/// <summary>
-		/// Lists all of the versions of all of the files contained in one bucket,
-		/// in alphabetical order by file name, and by reverse of date/time uploaded
-		/// for versions of files with the same name.
-		/// </summary>
-		/// <param name="startFileName"></param>
-		/// <param name="startFileId"></param>
-		/// <param name="maxFileCount"></param>
-		/// <param name="bucketId"></param>
-		/// <param name="cancelToken"></param>
-		/// <returns></returns>
-		public async Task<B2FileList> GetVersions(string startFileName = "", string startFileId = "", int? maxFileCount = null, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
-			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
+        /// <summary>
+        /// BETA: Lists the names of all non-hidden files in a bucket, starting at a given name. With an optional file prefix or delimiter.
+        /// See here for more details: https://www.backblaze.com/b2/docs/b2_list_file_names.html
+        /// </summary>
+        /// <param name="startFileName"></param>
+        /// <param name="prefix"></param>
+        /// <param name="delimiter"></param>
+        /// <param name="maxFileCount"></param>
+        /// <param name="bucketId"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+	    public async Task<B2FileList> GetListWithPrefixOrDemiliter(string startFileName = "", string prefix = "", string delimiter = "", int? maxFileCount = null, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
+	        var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
 
-			var requestMessage = FileMetaDataRequestGenerators.ListVersions(_options, operationalBucketId, startFileName, startFileId, maxFileCount);
-			var response = await _client.SendAsync(requestMessage, cancelToken);
+	        var requestMessage = FileMetaDataRequestGenerators.GetList(_options, operationalBucketId, startFileName, maxFileCount, prefix, delimiter);
+	        var response = await _client.SendAsync(requestMessage, cancelToken);
 
-			return await ResponseParser.ParseResponse<B2FileList>(response);
-		}
+	        return await ResponseParser.ParseResponse<B2FileList>(response);
+	    }
 
-		/// <summary>
-		/// Gets information about one file stored in B2.
-		/// </summary>
-		/// <param name="fileId"></param>
-		/// <param name="cancelToken"></param>
-		/// <returns></returns>
-		public async Task<B2File> GetInfo(string fileId, CancellationToken cancelToken = default(CancellationToken)) {
+        /// <summary>
+        /// Lists all of the versions of all of the files contained in one bucket,
+        /// in alphabetical order by file name, and by reverse of date/time uploaded
+        /// for versions of files with the same name.
+        /// </summary>
+        /// <param name="startFileName"></param>
+        /// <param name="startFileId"></param>
+        /// <param name="maxFileCount"></param>
+        /// <param name="bucketId"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        public async Task<B2FileList> GetVersions(string startFileName = "", string startFileId = "", int? maxFileCount = null, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
+            return await GetVersionsWithPrefixOrDelimiter(startFileName, startFileId, "", "", maxFileCount, bucketId, cancelToken);
+        }
+
+        /// <summary>
+        /// BETA: Lists all of the versions of all of the files contained in one bucket,
+        /// in alphabetical order by file name, and by reverse of date/time uploaded
+        /// for versions of files with the same name. With an optional file prefix or delimiter.
+        /// See here for more details: https://www.backblaze.com/b2/docs/b2_list_file_versions.html
+        /// </summary>
+        /// <param name="startFileName"></param>
+        /// <param name="startFileId"></param>
+        /// <param name="prefix"></param>
+        /// <param name="delimiter"></param>
+        /// <param name="maxFileCount"></param>
+        /// <param name="bucketId"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+	    public async Task<B2FileList> GetVersionsWithPrefixOrDelimiter(string startFileName = "", string startFileId = "", string prefix = "", string delimiter = "", int? maxFileCount = null, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
+	        var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
+
+	        var requestMessage = FileMetaDataRequestGenerators.ListVersions(_options, operationalBucketId, startFileName, startFileId, maxFileCount, prefix, delimiter);
+	        var response = await _client.SendAsync(requestMessage, cancelToken);
+
+	        return await ResponseParser.ParseResponse<B2FileList>(response);
+	    }
+
+        /// <summary>
+        /// Gets information about one file stored in B2.
+        /// </summary>
+        /// <param name="fileId"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        public async Task<B2File> GetInfo(string fileId, CancellationToken cancelToken = default(CancellationToken)) {
 			var requestMessage = FileMetaDataRequestGenerators.GetInfo(_options, fileId);
 			var response = await _client.SendAsync(requestMessage, cancelToken);
 
