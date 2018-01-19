@@ -25,7 +25,7 @@ Install-Package B2Net
 
 ## Install
 
-Stick the B2Net.ddl in your project.
+Stick the B2Net.dll in your project.
 
 ## Usage
 ```csharp
