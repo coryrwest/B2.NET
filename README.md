@@ -257,6 +257,8 @@ See the Large File tests for usage details.
 
 ## Release Notes
 
+*  0.4.6  Configureable HttpClient timeout
+*  0.4.5  File prefix and delimiter support
 *  0.4.0  Added Large File support
 *  0.2.5  Support for .NET 4.5 and .NET Standard 1.5 and FriendlyURL's for files
 *  0.1.92 Fixed Lifecycle Rules null issue.
