@@ -16,7 +16,7 @@ namespace B2Net {
 
 		public LargeFiles(B2Options options) {
 			_options = options;
-			_client = HttpClientFactory.CreateHttpClient();
+			_client = HttpClientFactory.CreateHttpClient(options.RequestTimeout);
 		}
 
 

@@ -61,17 +61,27 @@ namespace B2Net.Tests {
                 shas.Add(hash);
             }
 
-		    var start = Client.LargeFiles.StartLargeFile(fileName, "", TestBucket.BucketId).Result;
+		    B2File start = null;
+		    B2File finish = null;
+            try {
+		        start = Client.LargeFiles.StartLargeFile(fileName, "", TestBucket.BucketId).Result;
 
-		    for (int i = 0; i < parts.Count; i++) {
-		        var uploadUrl = Client.LargeFiles.GetUploadPartUrl(start.FileId).Result;
-		        var part = Client.LargeFiles.UploadPart(parts[i], i + 1, uploadUrl).Result;
+		        for (int i = 0; i < parts.Count; i++) {
+		            var uploadUrl = Client.LargeFiles.GetUploadPartUrl(start.FileId).Result;
+		            var part = Client.LargeFiles.UploadPart(parts[i], i + 1, uploadUrl).Result;
+		        }
+
+		        finish = Client.LargeFiles.FinishLargeFile(start.FileId, shas.ToArray()).Result;
 		    }
+		    catch (Exception e) {
+		        Console.WriteLine(e);
+		        throw;
+		    }
+		    finally {
+		        // Clean up.
+		        FilesToDelete.Add(start);
+            }
 
-		    var finish = Client.LargeFiles.FinishLargeFile(start.FileId, shas.ToArray()).Result;
-
-			// Clean up.
-			FilesToDelete.Add(start);
             
 			Assert.AreEqual(start.FileId, finish.FileId, "File Ids did not match.");
 		}

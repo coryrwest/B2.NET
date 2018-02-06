@@ -22,9 +22,12 @@
         public long AbsoluteMinimumPartSize { get; set; }
         public long MinimumPartSize { get; set; }
 
+	    public int RequestTimeout { get; set; }
+
         public B2Options() {
 			PersistBucket = false;
-		}
+            RequestTimeout = 100;
+        }
 
 		public void SetState(B2AuthResponse response) {
 			if (response.accountId == AccountId) {
