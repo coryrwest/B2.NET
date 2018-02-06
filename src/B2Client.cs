@@ -24,7 +24,7 @@ namespace B2Net {
         /// </summary>
         /// <returns>B2Options containing the download url, new api url, and authorization token.</returns>
         public async Task<B2Options> Authorize(CancellationToken cancelToken = default(CancellationToken)) {
-			var client = HttpClientFactory.CreateHttpClient();
+			var client = HttpClientFactory.CreateHttpClient(_options.RequestTimeout);
 
 			var requestMessage = AuthRequestGenerator.Authorize(_options);
 			var response = await client.SendAsync(requestMessage, cancelToken);

@@ -5,7 +5,6 @@
     <AssemblyTitle>B2.Net</AssemblyTitle>
     <TargetFrameworks>netstandard1.5;net45</TargetFrameworks>
     <AssemblyName>B2.Net</AssemblyName>
-    <PackageId>B2Net</PackageId>
     <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
@@ -16,8 +15,11 @@
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <Authors>Westropp Ventures</Authors>
-    <Version>0.0.4.0</Version>
-    <PackageProjectUrl></PackageProjectUrl>
+    <Version>0.0.4.6</Version>
+	
+    <PackageId>B2Net</PackageId>
+    <PackageVersion>0.0.4.5</PackageVersion>
+    <PackageProjectUrl>https://github.com/coryrwest/B2.NET</PackageProjectUrl>
     <RepositoryUrl>https://github.com/coryrwest/B2.NET</RepositoryUrl>
     <PackageTags>B2 Backblaze Cloud Storage</PackageTags>
   </PropertyGroup>
