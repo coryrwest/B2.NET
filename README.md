@@ -261,6 +261,8 @@ See the Large File tests for usage details.
 
 ## Release Notes
 
+*  0.5.0  Large file management apis (version mix up as well)
+*  0.4.9  static Authorize
 *  0.4.6  Configureable HttpClient timeout
 *  0.4.5  File prefix and delimiter support
 *  0.4.0  Added Large File support
