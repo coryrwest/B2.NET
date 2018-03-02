@@ -90,5 +90,35 @@ namespace B2Net {
 	        // Create B2File from response
 	        return await ResponseParser.ParseResponse<B2File>(response);
         }
-	}
+
+	    public async Task<B2LargeFileParts> ListPartsForIncompleteFile(string fileId, int startPartNumber, int maxPartCount, CancellationToken cancelToken = default(CancellationToken)) {
+	        var request = LargeFileRequestGenerators.ListParts(_options, fileId, startPartNumber, maxPartCount);
+
+	        // Send the download request
+	        var response = await _client.SendAsync(request, cancelToken);
+
+	        // Create B2File from response
+	        return await ResponseParser.ParseResponse<B2LargeFileParts>(response);
+	    }
+
+	    public async Task<B2CancelledFile> CancelLargeFile(string fileId, CancellationToken cancelToken = default(CancellationToken)) {
+	        var request = LargeFileRequestGenerators.Cancel(_options, fileId);
+
+	        // Send the download request
+	        var response = await _client.SendAsync(request, cancelToken);
+
+	        // Create B2File from response
+	        return await ResponseParser.ParseResponse<B2CancelledFile>(response);
+	    }
+
+	    public async Task<B2IncompleteLargeFiles> ListIncompleteFiles(string bucketId, string startFileId = "", string maxFileCount = "", CancellationToken cancelToken = default(CancellationToken)) {
+	        var request = LargeFileRequestGenerators.IncompleteFiles(_options, bucketId, startFileId, maxFileCount);
+
+	        // Send the download request
+	        var response = await _client.SendAsync(request, cancelToken);
+
+	        // Create B2File from response
+	        return await ResponseParser.ParseResponse<B2IncompleteLargeFiles>(response);
+	    }
+    }
 }

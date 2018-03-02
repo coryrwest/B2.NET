@@ -18,6 +18,9 @@ namespace B2Net.Http.RequestGenerators
             public const string GetPartUrl = "b2_get_upload_part_url";
             public const string Upload = "b2_upload_part";
             public const string Finish = "b2_finish_large_file";
+            public const string ListParts = "b2_list_parts";
+            public const string Cancel = "b2_cancel_large_file";
+            public const string IncompleteFiles = "b2_list_unfinished_large_files";
         }
 
         public static HttpRequestMessage Start(B2Options options, string bucketId, string fileName, string contentType, Dictionary<string, string> fileInfo = null) {
@@ -77,22 +80,41 @@ namespace B2Net.Http.RequestGenerators
         }
 
         public static HttpRequestMessage GetUploadPartUrl(B2Options options, string fileId) {
-            return BaseRequestGenerator.PostRequest(Endpoints.GetPartUrl, "{\"fileId\":\"" + fileId + "\"}", options);
+            return BaseRequestGenerator.PostRequest(Endpoints.GetPartUrl, JsonConvert.SerializeObject(new { fileId }), options);
         }
 
         public static HttpRequestMessage Finish(B2Options options, string fileId, string[] partSHA1Array) {
-            var uri = new Uri(options.ApiUrl + "/b2api/" + Constants.Version + "/" + Endpoints.Finish);
-            var content = JsonConvert.SerializeObject(new { fileId, partSha1Array  = partSHA1Array });
-            var request = new HttpRequestMessage() {
-                Method = HttpMethod.Post,
-                RequestUri = uri,
-                Content = new StringContent(content),
-            };
+            var content = JsonConvert.SerializeObject(new { fileId, partSha1Array = partSHA1Array });
+            var request = BaseRequestGenerator.PostRequestJson(Endpoints.Finish, content, options);
+            return request;
+        }
 
-            request.Headers.Add("Authorization", options.AuthorizationToken);
-            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            request.Content.Headers.ContentLength = content.Length;
+        public static HttpRequestMessage ListParts(B2Options options, string fileId, int startPartNumber, int maxPartCount) {
+            if (startPartNumber < 1 || startPartNumber > 10000) {
+                throw new Exception("Start part number must be between 1 and 10,000");
+            }
+            
+            var content = JsonConvert.SerializeObject(new { fileId, startPartNumber, maxPartCount });
+            var request = BaseRequestGenerator.PostRequestJson(Endpoints.ListParts, content, options);
+            return request;
+        }
 
+        public static HttpRequestMessage Cancel(B2Options options, string fileId) {
+            var content = JsonConvert.SerializeObject(new { fileId });
+            var request = BaseRequestGenerator.PostRequestJson(Endpoints.Cancel, content, options);
+            return request;
+        }
+
+        public static HttpRequestMessage IncompleteFiles(B2Options options, string bucketId, string startFileId = "", string maxFileCount = "") {
+            var body = "{\"bucketId\":\"" + bucketId + "\"";
+            if (!string.IsNullOrEmpty(startFileId)) {
+                body += ", \"startFileId\":" + JsonConvert.ToString(startFileId);
+            }
+            if (!string.IsNullOrEmpty(maxFileCount)) {
+                body += ", \"maxFileCount\":" + JsonConvert.ToString(maxFileCount);
+            }
+            body += "}";
+            var request = BaseRequestGenerator.PostRequestJson(Endpoints.IncompleteFiles, body, options);
             return request;
         }
     }
