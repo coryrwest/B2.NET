@@ -20,7 +20,7 @@ namespace B2Net {
 	    public LargeFiles LargeFiles { get; }
 
         /// <summary>
-        /// Authorize against the B2 storage service.
+        /// Authorize against the B2 storage service. Requires that AccountId and ApplicationKey on the options object be set.
         /// </summary>
         /// <returns>B2Options containing the download url, new api url, and authorization token.</returns>
         public async Task<B2Options> Authorize(CancellationToken cancelToken = default(CancellationToken)) {
@@ -40,5 +40,32 @@ namespace B2Net {
 				throw new AuthorizationException(jsonResponse);
 			}
 		}
+
+	    public static B2Options Authorize(string accountId, string applicationkey) {
+	        return Authorize(new B2Options() {AccountId = accountId, ApplicationKey = applicationkey});
+	    }
+
+        /// <summary>
+        /// Requires that AccountId and ApplicationKey on the options object be set.
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
+	    public static B2Options Authorize(B2Options options) {
+            var client = HttpClientFactory.CreateHttpClient(options.RequestTimeout);
+
+            var requestMessage = AuthRequestGenerator.Authorize(options);
+            var response = client.SendAsync(requestMessage).Result;
+
+            var jsonResponse = response.Content.ReadAsStringAsync().Result;
+            if (response.IsSuccessStatusCode) {
+                var authResponse = JsonConvert.DeserializeObject<B2AuthResponse>(jsonResponse);
+
+                options.SetState(authResponse);
+            } else {
+                throw new AuthorizationException(jsonResponse);
+            }
+
+	        return options;
+        }
 	}
 }
