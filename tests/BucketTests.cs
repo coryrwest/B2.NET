@@ -7,17 +7,20 @@ using System.Linq;
 namespace B2Net.Tests {
 	[TestClass]
 	public class BucketTests : BaseTest {
-		[TestMethod]
+	    private B2Client Client = null;
+
+        [TestInitialize]
+	    public void Initialize() {
+	        Client = new B2Client(B2Client.Authorize(Options));
+	    }
+
+        [TestMethod]
 		public void GetBucketListTest() {
-			var client = new B2Client(Options);
+			var bucket = Client.Buckets.Create("B2NETTestingBucket", BucketTypes.allPrivate).Result;
 
-			Options = client.Authorize().Result;
+			var list = Client.Buckets.GetList().Result;
 
-			var bucket = client.Buckets.Create("B2NETTestingBucket", BucketTypes.allPrivate).Result;
-
-			var list = client.Buckets.GetList().Result;
-
-			var deletedBucket = client.Buckets.Delete(bucket.BucketId).Result;
+			var deletedBucket = Client.Buckets.Delete(bucket.BucketId).Result;
 
 			Assert.AreNotEqual(0, list.Count);
 		}
@@ -25,15 +28,12 @@ namespace B2Net.Tests {
 		[TestMethod]
 		public void CreateBucketTest() {
 			var name = "B2NETTestingBucket";
-			var client = new B2Client(Options);
 
-			Options = client.Authorize().Result;
-
-			var bucket = client.Buckets.Create(name, BucketTypes.allPrivate).Result;
+			var bucket = Client.Buckets.Create(name, BucketTypes.allPrivate).Result;
 
 			// Clean up
 			if (!string.IsNullOrEmpty(bucket.BucketId)) {
-				client.Buckets.Delete(bucket.BucketId).Wait();
+			    Client.Buckets.Delete(bucket.BucketId).Wait();
 			}
 
 			Assert.AreEqual(name, bucket.BucketName);
@@ -43,24 +43,21 @@ namespace B2Net.Tests {
         public void CreateBucketWithCacheControlTest()
         {
             var name = "B2NETTestingBucket";
-            var client = new B2Client(Options);
 
-            Options = client.Authorize().Result;
-
-            var bucket = client.Buckets.Create(name, new B2BucketOptions() {
+            var bucket = Client.Buckets.Create(name, new B2BucketOptions() {
                 CacheControl = 600
             }).Result;
 
             // Get bucket to check for info
-            var bucketList = client.Buckets.GetList().Result;
+            var bucketList = Client.Buckets.GetList().Result;
 
             // Clean up
             if (!string.IsNullOrEmpty(bucket.BucketId))
             {
-                client.Buckets.Delete(bucket.BucketId).Wait();
+                Client.Buckets.Delete(bucket.BucketId).Wait();
             }
 
-            var savedBucket = bucketList.FirstOrDefault(b => b.BucketName == bucket.BucketName);
+            B2Bucket savedBucket = bucketList.FirstOrDefault(b => b.BucketName == bucket.BucketName);
 
             Assert.IsNotNull(savedBucket, "Retreived bucket was null");
             Assert.IsNotNull(savedBucket.BucketInfo, "Bucekt info was null");
@@ -71,11 +68,8 @@ namespace B2Net.Tests {
         [TestMethod]
         public void CreateBucketWithLifecycleRulesTest() {
             var name = "B2NETTestingBucket";
-            var client = new B2Client(Options);
 
-            Options = client.Authorize().Result;
-
-            var bucket = client.Buckets.Create(name, new B2BucketOptions() {
+            var bucket = Client.Buckets.Create(name, new B2BucketOptions() {
                 LifecycleRules = new System.Collections.Generic.List<B2BucketLifecycleRule>() {
                     new B2BucketLifecycleRule() {
                         DaysFromHidingToDeleting = 30,
@@ -86,11 +80,11 @@ namespace B2Net.Tests {
             }).Result;
 
             // Get bucket to check for info
-            var bucketList = client.Buckets.GetList().Result;
+            var bucketList = Client.Buckets.GetList().Result;
 
             // Clean up
             if (!string.IsNullOrEmpty(bucket.BucketId)) {
-                client.Buckets.Delete(bucket.BucketId).Wait();
+                Client.Buckets.Delete(bucket.BucketId).Wait();
             }
 
             var savedBucket = bucketList.FirstOrDefault(b => b.BucketName == bucket.BucketName);
@@ -107,21 +101,18 @@ namespace B2Net.Tests {
         public void UpdateBucketWithCacheControlTest()
         {
             var name = "B2NETTestingBucket";
-            var client = new B2Client(Options);
 
-            Options = client.Authorize().Result;
-
-            var bucket = client.Buckets.Create(name, new B2BucketOptions() { CacheControl = 600 }).Result;
+            var bucket = Client.Buckets.Create(name, new B2BucketOptions() { CacheControl = 600 }).Result;
 
             // Update bucket with new info
-            bucket = client.Buckets.Update(new B2BucketOptions() { CacheControl = 300 }, bucket.BucketId).Result;
+            bucket = Client.Buckets.Update(new B2BucketOptions() { CacheControl = 300 }, bucket.BucketId).Result;
 
             // Get bucket to check for info
-            var bucketList = client.Buckets.GetList().Result;
+            var bucketList = Client.Buckets.GetList().Result;
 
             // Clean up
             if (!string.IsNullOrEmpty(bucket.BucketId)) {
-                client.Buckets.Delete(bucket.BucketId).Wait();
+                Client.Buckets.Delete(bucket.BucketId).Wait();
             }
 
             var savedBucket = bucketList.FirstOrDefault(b => b.BucketName == bucket.BucketName);
@@ -136,11 +127,8 @@ namespace B2Net.Tests {
         public void UpdateBucketWithLifecycleRulesTest()
         {
             var name = "B2NETTestingBucket";
-            var client = new B2Client(Options);
 
-            Options = client.Authorize().Result;
-
-            var bucket = client.Buckets.Create(name, new B2BucketOptions() {
+            var bucket = Client.Buckets.Create(name, new B2BucketOptions() {
                 LifecycleRules = new System.Collections.Generic.List<B2BucketLifecycleRule>() {
                     new B2BucketLifecycleRule() {
                         DaysFromHidingToDeleting = 30,
@@ -151,7 +139,7 @@ namespace B2Net.Tests {
             }).Result;
 
             // Update bucket with new info
-            bucket = client.Buckets.Update(new B2BucketOptions() {
+            bucket = Client.Buckets.Update(new B2BucketOptions() {
                 LifecycleRules = new System.Collections.Generic.List<B2BucketLifecycleRule>() {
                     new B2BucketLifecycleRule() {
                         DaysFromHidingToDeleting = 10,
@@ -162,11 +150,11 @@ namespace B2Net.Tests {
             }, bucket.BucketId).Result;
 
             // Get bucket to check for info
-            var bucketList = client.Buckets.GetList().Result;
+            var bucketList = Client.Buckets.GetList().Result;
 
             // Clean up
             if (!string.IsNullOrEmpty(bucket.BucketId)) {
-                client.Buckets.Delete(bucket.BucketId).Wait();
+                Client.Buckets.Delete(bucket.BucketId).Wait();
             }
 
             var savedBucket = bucketList.FirstOrDefault(b => b.BucketName == bucket.BucketName);
@@ -180,15 +168,12 @@ namespace B2Net.Tests {
         [TestMethod]
 		public void DeleteBucketTest() {
 			var name = "B2NETDeleteBucket";
-			var client = new B2Client(Options);
-
-			Options = client.Authorize().Result;
 
 			//Creat a bucket to delete
-			var bucket = client.Buckets.Create(name, BucketTypes.allPrivate).Result;
+			var bucket = Client.Buckets.Create(name, BucketTypes.allPrivate).Result;
 
 			if (!string.IsNullOrEmpty(bucket.BucketId)) {
-				var deletedBucket = client.Buckets.Delete(bucket.BucketId).Result;
+				var deletedBucket = Client.Buckets.Delete(bucket.BucketId).Result;
 				Assert.AreEqual(name, deletedBucket.BucketName);
 			} else {
 				Assert.Fail("The bucket was not deleted. The response did not contain a bucketid.");
@@ -198,16 +183,13 @@ namespace B2Net.Tests {
 		[TestMethod]
 		public void UpdateBucketTest() {
 			var name = "B2NETUpdateBucket";
-			var client = new B2Client(Options);
-
-			Options = client.Authorize().Result;
 
 			//Creat a bucket to delete
-			var bucket = client.Buckets.Create(name, BucketTypes.allPrivate).Result;
+			var bucket = Client.Buckets.Create(name, BucketTypes.allPrivate).Result;
 
 			try {
 				if (!string.IsNullOrEmpty(bucket.BucketId)) {
-					var updatedBucket = client.Buckets.Update(BucketTypes.allPublic, bucket.BucketId).Result;
+					var updatedBucket = Client.Buckets.Update(BucketTypes.allPublic, bucket.BucketId).Result;
 					Assert.AreEqual(BucketTypes.allPublic.ToString(), updatedBucket.BucketType);
 				} else {
 					Assert.Fail("The bucket was not deleted. The response did not contain a bucketid.");
@@ -215,7 +197,7 @@ namespace B2Net.Tests {
 			} catch (Exception ex) {
 				Assert.Fail(ex.Message);
 			} finally {
-				client.Buckets.Delete(bucket.BucketId).Wait();
+			    Client.Buckets.Delete(bucket.BucketId).Wait();
 			}
 		}
 	}
