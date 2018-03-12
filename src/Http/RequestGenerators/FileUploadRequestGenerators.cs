@@ -5,6 +5,7 @@ using B2Net.Http.RequestGenerators;
 using B2Net.Models;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace B2Net.Http {
 	public static class FileUploadRequestGenerators {
@@ -56,7 +57,8 @@ namespace B2Net.Http {
         }
 
         public static HttpRequestMessage GetUploadUrl(B2Options options, string bucketId) {
-			return BaseRequestGenerator.PostRequest(Endpoints.GetUploadUrl, "{\"bucketId\":\"" + bucketId + "\"}", options);
+            var json = JsonConvert.SerializeObject(new { bucketId });
+            return BaseRequestGenerator.PostRequest(Endpoints.GetUploadUrl, json, options);
 		}
 	}
 }

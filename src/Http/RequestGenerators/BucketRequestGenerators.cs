@@ -1,8 +1,10 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using B2Net.Http.RequestGenerators;
 using B2Net.Models;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json.Serialization;
 
 namespace B2Net.Http {
@@ -15,11 +17,13 @@ namespace B2Net.Http {
 		}
 
 		public static HttpRequestMessage GetBucketList(B2Options options) {
-			return BaseRequestGenerator.PostRequest(Endpoints.List, "{\"accountId\":\"" + options.AccountId + "\"}", options);
+		    var json = JsonConvert.SerializeObject(new { accountId = options.AccountId });
+            return BaseRequestGenerator.PostRequest(Endpoints.List, json, options);
 		}
 
 		public static HttpRequestMessage DeleteBucket(B2Options options, string bucketId) {
-			return BaseRequestGenerator.PostRequest(Endpoints.Delete, "{\"accountId\":\"" + options.AccountId + "\", \"bucketId\":\"" + bucketId + "\"}", options);
+		    var json = JsonConvert.SerializeObject(new { accountId = options.AccountId, bucketId });
+            return BaseRequestGenerator.PostRequest(Endpoints.Delete, json, options);
         }
 
         /// <summary>
@@ -29,12 +33,16 @@ namespace B2Net.Http {
         /// <param name="bucketName"></param>
         /// <param name="bucketType"></param>
         /// <returns></returns>
-        public static HttpRequestMessage CreateBucket(B2Options options, string bucketName, string bucketType = "allPrivate")
-        {
-            // TODO: Handle naming conventions, check name for invalid characters.
-            var body = "{\"accountId\":\"" + options.AccountId + "\", \"bucketName\":\"" + bucketName +
-                        "\", \"bucketType\":\"" + bucketType + "\"}";
-            return BaseRequestGenerator.PostRequest(Endpoints.Create, body, options);
+        public static HttpRequestMessage CreateBucket(B2Options options, string bucketName, string bucketType = "allPrivate") {
+            var allowed = new Regex("^[a-zA-Z0-9-]+$");
+            if (bucketName.Length < 6 || bucketName.Length > 50 || !allowed.IsMatch(bucketName) || bucketName.StartsWith("b2-")) {
+                throw new Exception(@"The bucket name specified does not match the requirements. 
+                            Bucket Name can consist of upper-case letters, lower-case letters, numbers, and "" - "", 
+                            must be at least 6 characters long, and can be at most 50 characters long");
+            }
+
+            var json = JsonConvert.SerializeObject(new { accountId = options.AccountId, bucketName, bucketType });
+            return BaseRequestGenerator.PostRequest(Endpoints.Create, json, options);
         }
 
         /// <summary>
@@ -59,7 +67,13 @@ namespace B2Net.Http {
                 }
             }
 
-            // TODO: Handle naming conventions, check name for invalid characters.
+            var allowed = new Regex("^[a-zA-Z0-9-]+$");
+            if (bucketName.Length < 6 || bucketName.Length > 50 || !allowed.IsMatch(bucketName) || bucketName.StartsWith("b2-")) {
+                throw new Exception(@"The bucket name specified does not match the requirements. 
+                            Bucket Name can consist of upper-case letters, lower-case letters, numbers, and "" - "", 
+                            must be at least 6 characters long, and can be at most 50 characters long");
+            }
+
             var body = new B2BucketCreateModel() {
                 accountId = options.AccountId,
                 bucketName = bucketName,
@@ -85,11 +99,9 @@ namespace B2Net.Http {
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
-        public static HttpRequestMessage UpdateBucket(B2Options options, string bucketId, string bucketType)
-        {
-            var body = "{\"accountId\":\"" + options.AccountId + "\", \"bucketId\":\"" + bucketId + "\", \"bucketType\":\"" +
-                        bucketType + "\"}";
-            return BaseRequestGenerator.PostRequest(Endpoints.Update, body, options);
+        public static HttpRequestMessage UpdateBucket(B2Options options, string bucketId, string bucketType) {
+            var json = JsonConvert.SerializeObject(new { accountId = options.AccountId, bucketId, bucketType });
+            return BaseRequestGenerator.PostRequest(Endpoints.Update, json, options);
         }
 
         /// <summary>

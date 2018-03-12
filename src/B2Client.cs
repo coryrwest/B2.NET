@@ -15,6 +15,25 @@ namespace B2Net {
             LargeFiles = new LargeFiles(options);
 		}
 
+        /// <summary>
+        /// Simple method for instantiating the B2Client. Does auth for you.
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <param name="applicationkey"></param>
+        /// <param name="requestTimeout"></param>
+	    public B2Client(string accountId, string applicationkey, int requestTimeout = 100) {
+	        _options = new B2Options() {
+	            AccountId = accountId,
+                ApplicationKey = applicationkey,
+                RequestTimeout = requestTimeout
+	        };
+            _options = Authorize(_options);
+
+            Buckets = new Buckets(_options);
+	        Files = new Files(_options);
+	        LargeFiles = new LargeFiles(_options);
+        }
+
 		public Buckets Buckets { get; }
 	    public Files Files { get; }
 	    public LargeFiles LargeFiles { get; }

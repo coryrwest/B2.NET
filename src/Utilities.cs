@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
@@ -18,7 +19,12 @@ namespace B2Net {
 		
 		public static void CheckForErrors(HttpResponseMessage response) {
 			if (!response.IsSuccessStatusCode) {
-				string content = response.Content.ReadAsStringAsync().Result;
+                // Should retry
+			    bool retry = response.StatusCode == (HttpStatusCode) 429 ||
+			        response.StatusCode == HttpStatusCode.RequestTimeout ||
+			        response.StatusCode == HttpStatusCode.ServiceUnavailable;
+
+                string content = response.Content.ReadAsStringAsync().Result;
 
 				B2Error b2Error;
 				try {
@@ -27,7 +33,7 @@ namespace B2Net {
 					throw new Exception("Seralization of the response failed. See inner exception for response contents and serialization error.", ex);
 				}
 				if (b2Error != null) {
-					throw new B2Exception(b2Error.Code, b2Error.Status, b2Error.Message);
+					throw new B2Exception(b2Error.Code, b2Error.Status, b2Error.Message, retry);
 				}
 			}
 		}
@@ -58,9 +64,9 @@ namespace B2Net {
 		}
 
 		internal class B2Error {
-				public string Code { get; set; }
-				public string Message { get; set; }
-				public string Status { get; set; }
+			public string Code { get; set; }
+			public string Message { get; set; }
+			public string Status { get; set; }
 		}
 	}
 

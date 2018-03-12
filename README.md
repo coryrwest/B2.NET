@@ -41,26 +41,29 @@ var options = new B2Options() {
 var client = new B2Client(Options);
 ```
 
-#### Note: The following examples alternate between the old and new way to Authorize. They can be used interchangably.
-
 ### Authorize
+There are two ways to Authorize a B2Client. The old way is slightly more verbose and there is no clear benefit to using it over the 
+static method. The `options` object returned from the Authorize method will contain the authorizationToken necessary for subsequent 
+calls to the B2 API. This will automatically be handled by the library when necessary. You do not have to keep this object around.
+The `options` object requires AccountID and ApplicationKey to authorize.
 ```csharp
-// the returned options object will contain the authorizationToken
-// necessary for subsequent calls to the B2 API. This will automatically
-// be handled by the library when necessary. You do not have to keep this
-// object around. The `options` object requires AccountID and ApplicationKey
-// to authorize.
-var client = new B2Client(options);
-var options = await client.Authorize();
 // New, cleaner way to Authorize using the static `Authorize` method.
 var client = new B2Client(B2Client.Authorize(options));
 // OR
 var client = new B2Client(B2Client.Authorize("ACCOUNTID", "APPLICATIONKEY"));
+// OR
+var client = new B2Client("ACCOUNTID", "APPLICATIONKEY", "REQUESTTIMEOUT");
+```
+
+The old way:
+```csharp
+var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
+var options = await client.Authorize();
 ```
 
 ### List Buckets
 ```csharp
-var client = new B2Client(B2Client.Authorize(options));
+var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
 var bucketList = await client.Buckets.GetList();
 // [
 //   { BucketId: "",
@@ -72,9 +75,8 @@ var bucketList = await client.Buckets.GetList();
 
 ### Create a Bucket
 ```csharp
-var client = new B2Client(options);
-await client.Authorize();
-var bucket = client.Buckets.Create("BUCKETNAME", "OPTIONAL_BUCKET_TYPE").Result;
+var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
+var bucket = await client.Buckets.Create("BUCKETNAME", "OPTIONAL_BUCKET_TYPE");
 // { BucketId: "",
 //   BucketName: "",
 //   BucketType: "" }
@@ -82,8 +84,8 @@ var bucket = client.Buckets.Create("BUCKETNAME", "OPTIONAL_BUCKET_TYPE").Result;
 
 ### Create a Bucket with options
 ```csharp
-var client = new B2Client(B2Client.Authorize(options));
-var bucket = client.Buckets.Create("BUCKETNAME", new B2BucketOptions() {
+var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
+var bucket = await client.Buckets.Create("BUCKETNAME", new B2BucketOptions() {
 	CacheControl = 300,
 	LifecycleRules = new System.Collections.Generic.List<B2BucketLifecycleRule>() {
 		new B2BucketLifecycleRule() {
@@ -92,7 +94,7 @@ var bucket = client.Buckets.Create("BUCKETNAME", new B2BucketOptions() {
 			FileNamePrefix = ""
 		}
 	}
-}).Result;
+});
 // { BucketId: "",
 //   BucketName: "",
 //   BucketType: "",
@@ -102,9 +104,8 @@ var bucket = client.Buckets.Create("BUCKETNAME", new B2BucketOptions() {
 
 ### Update a Bucket
 ```csharp
-var client = new B2Client(options);
-await client.Authorize();
-var bucket = client.Buckets.Update("BUCKETID", "BUCKETYPE").Result;
+var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
+var bucket = await client.Buckets.Update("BUCKETID", "BUCKETYPE");
 // { BucketId: "",
 //   BucketName: "",
 //   BucketType: "" }
@@ -112,8 +113,8 @@ var bucket = client.Buckets.Update("BUCKETID", "BUCKETYPE").Result;
 
 ### Update a Bucket with options
 ```csharp
-var client = new B2Client(B2Client.Authorize(options));
-var bucket = client.Buckets.Update("BUCKETID", new B2BucketOptions() {
+var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
+var bucket = await client.Buckets.Update("BUCKETID", new B2BucketOptions() {
 	CacheControl = 300,
 	LifecycleRules = new System.Collections.Generic.List<B2BucketLifecycleRule>() {
 		new B2BucketLifecycleRule() {
@@ -122,7 +123,7 @@ var bucket = client.Buckets.Update("BUCKETID", new B2BucketOptions() {
 			FileNamePrefix = ""
 		}
 	}
-}).Result;
+});
 // { BucketId: "",
 //   BucketName: "",
 //   BucketType: "",
@@ -138,9 +139,8 @@ allPublic
 
 ### Delete a Bucket
 ```csharp
-var client = new B2Client(options);
-await client.Authorize();
-var bucket = client.Buckets.Delete("BUCKETID").Result;
+var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
+var bucket = await client.Buckets.Delete("BUCKETID");
 // { BucketId: "",
 //   BucketName: "",
 //   BucketType: "" }
@@ -148,10 +148,10 @@ var bucket = client.Buckets.Delete("BUCKETID").Result;
 
 ### Get a list of files
 ```csharp
-var client = new B2Client(B2Client.Authorize(options));
-var fileList = client.Files.GetList("BUCKETID", "FILENAME").Result;
+var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
+var fileList = await client.Files.GetList("BUCKETID", "FILENAME");
 // Using optional prefix and delimiter
-var fileList = client.Files.GetList("BUCKETID", "FILENAME", prefix: "PREFIX", delimiter: "DELIMITER").Result;
+var fileList = await client.Files.GetList("BUCKETID", "FILENAME", prefix: "PREFIX", delimiter: "DELIMITER");
 // {
 //   NextFileName: "",
 //   [

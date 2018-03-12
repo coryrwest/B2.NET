@@ -8,6 +8,12 @@ namespace B2Net.Models {
     public class B2Exception : Exception {
         public string Status { get; set; }
         public string Code { get; set; }
-        public B2Exception(string code, string status, string message) : base(message) { Status = status; Code = Code; }
+        public bool ShouldRetryRequest { get; set; }
+
+        public B2Exception(string code, string status, string message, bool shouldRetry) : base(message) {
+            Status = status;
+            Code = code;
+            ShouldRetryRequest = shouldRetry;
+        }
     }
 }

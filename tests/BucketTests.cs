@@ -23,21 +23,29 @@ namespace B2Net.Tests {
 			var deletedBucket = Client.Buckets.Delete(bucket.BucketId).Result;
 
 			Assert.AreNotEqual(0, list.Count);
-		}
+	    }
 
-		[TestMethod]
-		public void CreateBucketTest() {
-			var name = "B2NETTestingBucket";
+	    [TestMethod]
+	    public void CreateBucketTest() {
+	        var name = "B2NETTestingBucket";
 
-			var bucket = Client.Buckets.Create(name, BucketTypes.allPrivate).Result;
+	        var bucket = Client.Buckets.Create(name, BucketTypes.allPrivate).Result;
 
-			// Clean up
-			if (!string.IsNullOrEmpty(bucket.BucketId)) {
-			    Client.Buckets.Delete(bucket.BucketId).Wait();
-			}
+	        // Clean up
+	        if (!string.IsNullOrEmpty(bucket.BucketId)) {
+	            Client.Buckets.Delete(bucket.BucketId).Wait();
+	        }
 
-			Assert.AreEqual(name, bucket.BucketName);
-        }
+	        Assert.AreEqual(name, bucket.BucketName);
+	    }
+
+	    [TestMethod]
+        [ExpectedException(typeof(AggregateException))]
+	    public void CreateBucketInvalidNameTest() {
+	        var name = "B2net-testing-bucket-%$";
+
+	        var bucket = Client.Buckets.Create(name, BucketTypes.allPrivate).Result;
+	    }
 
         [TestMethod]
         public void CreateBucketWithCacheControlTest()
