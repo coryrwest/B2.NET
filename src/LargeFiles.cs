@@ -19,7 +19,6 @@ namespace B2Net {
 			_client = HttpClientFactory.CreateHttpClient(options.RequestTimeout);
 		}
 
-
         /// <summary>
         /// Starts a large file upload.
         /// </summary>
@@ -30,8 +29,8 @@ namespace B2Net {
         /// <returns></returns>
         public async Task<B2File> StartLargeFile(string fileName, string contentType = "", string bucketId = "", Dictionary<string, string> fileInfo = null, CancellationToken cancelToken = default(CancellationToken)) {
             var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
-            HttpRequestMessage request;
-            request = LargeFileRequestGenerators.Start(_options, operationalBucketId, fileName, contentType, fileInfo);
+
+            var request = LargeFileRequestGenerators.Start(_options, operationalBucketId, fileName, contentType, fileInfo);
 
             // Send the download request
             var response = await _client.SendAsync(request, cancelToken);
@@ -41,7 +40,7 @@ namespace B2Net {
         }
 
         /// <summary>
-        /// get an upload url for use with one Thread.
+        /// Get an upload url for use with one Thread.
         /// </summary>
         /// <param name="bucketId"></param>
         /// <param name="cancelToken"></param>
@@ -57,8 +56,7 @@ namespace B2Net {
         }
 
         /// <summary>
-        /// DEPRECATED: This method has been deprecated in favor of the Upload that takes an UploadUrl parameter.
-        /// The other Upload method is the preferred, and more efficient way, of uploading to B2.
+        /// Upload one part of an already started large file upload.
         /// </summary>
         /// <param name="fileData"></param>
         /// <param name="fileName"></param>
@@ -84,37 +82,59 @@ namespace B2Net {
 	    public async Task<B2File> FinishLargeFile(string fileId, string[] partSHA1Array, CancellationToken cancelToken = default(CancellationToken)) {
 	        var request = LargeFileRequestGenerators.Finish(_options, fileId, partSHA1Array);
 
-	        // Send the download request
+	        // Send the request
 	        var response = await _client.SendAsync(request, cancelToken);
 
 	        // Create B2File from response
 	        return await ResponseParser.ParseResponse<B2File>(response);
         }
 
+        /// <summary>
+        /// List the parts of an incomplete large file upload.
+        /// </summary>
+        /// <param name="fileId"></param>
+        /// <param name="startPartNumber"></param>
+        /// <param name="maxPartCount"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
 	    public async Task<B2LargeFileParts> ListPartsForIncompleteFile(string fileId, int startPartNumber, int maxPartCount, CancellationToken cancelToken = default(CancellationToken)) {
 	        var request = LargeFileRequestGenerators.ListParts(_options, fileId, startPartNumber, maxPartCount);
 
-	        // Send the download request
+	        // Send the request
 	        var response = await _client.SendAsync(request, cancelToken);
 
 	        // Create B2File from response
 	        return await ResponseParser.ParseResponse<B2LargeFileParts>(response);
 	    }
-
+        
+        /// <summary>
+        /// Cancel a large file upload
+        /// </summary>
+        /// <param name="fileId"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
 	    public async Task<B2CancelledFile> CancelLargeFile(string fileId, CancellationToken cancelToken = default(CancellationToken)) {
 	        var request = LargeFileRequestGenerators.Cancel(_options, fileId);
 
-	        // Send the download request
+	        // Send the request
 	        var response = await _client.SendAsync(request, cancelToken);
 
 	        // Create B2File from response
 	        return await ResponseParser.ParseResponse<B2CancelledFile>(response);
 	    }
 
+        /// <summary>
+        /// List all the incomplete large file uploads for the supplied bucket
+        /// </summary>
+        /// <param name="bucketId"></param>
+        /// <param name="startFileId"></param>
+        /// <param name="maxFileCount"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
 	    public async Task<B2IncompleteLargeFiles> ListIncompleteFiles(string bucketId, string startFileId = "", string maxFileCount = "", CancellationToken cancelToken = default(CancellationToken)) {
 	        var request = LargeFileRequestGenerators.IncompleteFiles(_options, bucketId, startFileId, maxFileCount);
 
-	        // Send the download request
+	        // Send the request
 	        var response = await _client.SendAsync(request, cancelToken);
 
 	        // Create B2File from response

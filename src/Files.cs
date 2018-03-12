@@ -111,7 +111,7 @@ namespace B2Net {
         public async Task<B2UploadUrl> GetUploadUrl(string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
             var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
 
-            // sent the request.
+            // send the request.
             var uploadUrlRequest = FileUploadRequestGenerators.GetUploadUrl(_options, operationalBucketId);
             var uploadUrlResponse = await _client.SendAsync(uploadUrlRequest, cancelToken);
 
@@ -137,7 +137,6 @@ namespace B2Net {
             var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
 
             // Get the upload url for this file
-            // TODO: There must be a better way to do this
             var uploadUrlRequest = FileUploadRequestGenerators.GetUploadUrl(_options, operationalBucketId);
             var uploadUrlResponse = _client.SendAsync(uploadUrlRequest, cancelToken).Result;
             var uploadUrlData = await uploadUrlResponse.Content.ReadAsStringAsync();
@@ -290,7 +289,7 @@ namespace B2Net {
         /// <summary>
         /// EXPERIMENTAL: This functionality is not officially part of the Backblaze B2 API and may change or break at any time.
         /// This will return a friendly URL that can be shared to download the file. This depends on the Bucket that the file resides 
-        /// be allPublic.
+        /// in to be allPublic.
         /// </summary>
         /// <param name="fileName"></param>
         /// <param name="bucketName"></param>

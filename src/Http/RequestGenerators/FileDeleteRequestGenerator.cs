@@ -10,8 +10,8 @@ namespace B2Net.Http {
 		}
 
 		public static HttpRequestMessage Delete(B2Options options, string fileId, string fileName) {
-			return BaseRequestGenerator.PostRequest(Endpoints.Delete,
-				"{\"fileId\":\"" + fileId + "\", \"fileName\":" + JsonConvert.ToString(fileName) + "}", options);
+		    var json = JsonConvert.SerializeObject(new { fileId, fileName });
+            return BaseRequestGenerator.PostRequest(Endpoints.Delete, json, options);
 		}
 	}
 }

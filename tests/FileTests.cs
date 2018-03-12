@@ -21,8 +21,7 @@ namespace B2Net.Tests {
 
         [TestInitialize]
 		public void Initialize() {
-			Client = new B2Client(Options);
-			Options = Client.Authorize().Result;
+			Client = new B2Client(Options.AccountId, Options.ApplicationKey);
 
 			var buckets = Client.Buckets.GetList().Result;
 			B2Bucket existingBucket = null;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using B2Net.Models;
+using Newtonsoft.Json;
 
 namespace B2Net.Http {
 	public static class FileDownloadRequestGenerators {
@@ -11,10 +12,12 @@ namespace B2Net.Http {
 
 		public static HttpRequestMessage DownloadById(B2Options options, string fileId, string byteRange = "") {
 			var uri = new Uri(options.DownloadUrl + "/b2api/" + Constants.Version + "/" + Endpoints.DownloadById);
-			var request = new HttpRequestMessage() {
+
+		    var json = JsonConvert.SerializeObject(new { fileId });
+            var request = new HttpRequestMessage() {
 				Method = HttpMethod.Post,
 				RequestUri = uri,
-				Content = new StringContent("{\"fileId\":\"" + fileId + "\"}")
+				Content = new StringContent(json)
 			};
 
 			request.Headers.Add("Authorization", options.AuthorizationToken);

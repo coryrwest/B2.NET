@@ -11,20 +11,25 @@ using Newtonsoft.Json;
 namespace B2.Net.Tests {
 	[TestClass]
 	public class AuthorizeTest : BaseTest {
-        [TestMethod]
-        public void CanWeAuthorize() {
-            var client = new B2Client(Options);
+	    [TestMethod]
+	    public void CanWeAuthorize() {
+	        var client = new B2Client(Options);
 
-            var result = client.Authorize().Result;
+	        var result = client.Authorize().Result;
 
-            Assert.IsFalse(string.IsNullOrEmpty(result.AuthorizationToken));
+	        Assert.IsFalse(string.IsNullOrEmpty(result.AuthorizationToken));
         }
+
+	    [TestMethod]
+	    public void CanWeAuthorizeStatic() {
+	        var result = B2Client.Authorize(Options);
+
+	        Assert.IsFalse(string.IsNullOrEmpty(result.AuthorizationToken));
+	    }
 
         [TestMethod]
         public void DoWeGetOptionsBack() {
-            var client = new B2Client(Options);
-
-            var result = client.Authorize().Result;
+            var result = B2Client.Authorize(Options);
 
             Assert.AreNotEqual("0", result.AbsoluteMinimumPartSize);
             Assert.AreNotEqual("0", result.MinimumPartSize);

@@ -66,7 +66,8 @@ namespace B2Net.Http {
 		}
 
 		public static HttpRequestMessage GetInfo(B2Options options, string fileId) {
-			return BaseRequestGenerator.PostRequest(Endpoints.Info, "{\"fileId\":\"" + fileId + "\"}", options);
+		    var json = JsonConvert.SerializeObject(new {fileId});
+			return BaseRequestGenerator.PostRequest(Endpoints.Info, json, options);
 		}
 	}
 }

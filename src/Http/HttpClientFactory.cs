@@ -4,17 +4,20 @@ using System.Net.Http.Headers;
 
 namespace B2Net.Http {
 	public static class HttpClientFactory {
-		public static HttpClient CreateHttpClient(int timeout) {
-			var handler = new HttpClientHandler() {AllowAutoRedirect = true};
+	    private static HttpClient _client;
 
-			var httpClient = new HttpClient(handler);
+        public static HttpClient CreateHttpClient(int timeout) {
+            if (_client == null) {
+                var handler = new HttpClientHandler() { AllowAutoRedirect = true };
 
-            httpClient.Timeout = TimeSpan.FromSeconds(timeout);
+                _client = new HttpClient(handler);
 
-			httpClient.DefaultRequestHeaders.Accept.Clear();
-			httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                _client.Timeout = TimeSpan.FromSeconds(timeout);
 
-			return httpClient;
-		}
+                _client.DefaultRequestHeaders.Accept.Clear();
+                _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            }
+            return _client;
+        }
 	}
 }
