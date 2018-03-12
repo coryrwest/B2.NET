@@ -28,6 +28,12 @@ Install-Package B2Net
 
 Stick the B2Net.dll in your project.
 
+## Guide
+*  [#buckets](Buckets)
+*  [#files](Files)
+*  [#large-file](Large Files)
+*  [#errors](Errors)
+
 ## Usage
 ```csharp
 // the B2Client will default to the bucketId provided here
@@ -61,7 +67,8 @@ var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
 var options = await client.Authorize();
 ```
 
-### List Buckets
+### <a name="buckets"></a>Buckets
+#### List Buckets
 ```csharp
 var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
 var bucketList = await client.Buckets.GetList();
@@ -73,7 +80,7 @@ var bucketList = await client.Buckets.GetList();
 // ]
 ```
 
-### Create a Bucket
+#### Create a Bucket
 ```csharp
 var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
 var bucket = await client.Buckets.Create("BUCKETNAME", "OPTIONAL_BUCKET_TYPE");
@@ -82,7 +89,7 @@ var bucket = await client.Buckets.Create("BUCKETNAME", "OPTIONAL_BUCKET_TYPE");
 //   BucketType: "" }
 ```
 
-### Create a Bucket with options
+#### Create a Bucket with options
 ```csharp
 var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
 var bucket = await client.Buckets.Create("BUCKETNAME", new B2BucketOptions() {
@@ -102,7 +109,7 @@ var bucket = await client.Buckets.Create("BUCKETNAME", new B2BucketOptions() {
 //   LifecycleRules: List<B2BucketLifecycleRule> }
 ```
 
-### Update a Bucket
+#### Update a Bucket
 ```csharp
 var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
 var bucket = await client.Buckets.Update("BUCKETID", "BUCKETYPE");
@@ -111,7 +118,7 @@ var bucket = await client.Buckets.Update("BUCKETID", "BUCKETYPE");
 //   BucketType: "" }
 ```
 
-### Update a Bucket with options
+#### Update a Bucket with options
 ```csharp
 var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
 var bucket = await client.Buckets.Update("BUCKETID", new B2BucketOptions() {
@@ -131,13 +138,13 @@ var bucket = await client.Buckets.Update("BUCKETID", new B2BucketOptions() {
 //   LifecycleRules: List<B2BucketLifecycleRule> }
 ```
 
-#### Bucket Types
+##### Bucket Types
 ```
 allPrivate
 allPublic
 ```
 
-### Delete a Bucket
+#### Delete a Bucket
 ```csharp
 var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
 var bucket = await client.Buckets.Delete("BUCKETID");
@@ -146,7 +153,8 @@ var bucket = await client.Buckets.Delete("BUCKETID");
 //   BucketType: "" }
 ```
 
-### Get a list of files
+### <a name="files"></a>Files
+#### Get a list of files
 ```csharp
 var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
 var fileList = await client.Files.GetList("BUCKETID", "FILENAME");
@@ -164,12 +172,11 @@ var fileList = await client.Files.GetList("BUCKETID", "FILENAME", prefix: "PREFI
 // }
 ```
 
-### Upload a file
+#### Upload a file
 ```csharp
-var client = new B2Client(options);
-await client.Authorize();
-var uploadUrl = Client.Files.GetUploadUrl("BUCKETID").Result;
-var file = client.Files.Upload("FILEDATABYTES", "FILENAME", uploadUrl, "AUTORETRY", "BUCKETID", "FILEINFOATTRS").Result;
+var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
+var uploadUrl = await client.Files.GetUploadUrl("BUCKETID");
+var file = await client.Files.Upload("FILEDATABYTES", "FILENAME", uploadUrl, "AUTORETRY", "BUCKETID", "FILEINFOATTRS");
 // { FileId: "",
 //   FileName: "",
 //   ContentLength: "", 
@@ -178,24 +185,10 @@ var file = client.Files.Upload("FILEDATABYTES", "FILENAME", uploadUrl, "AUTORETR
 //   FileInfo: Dictionary<string,string> }
 ```
 
-### Download a file by id
+#### Download a file by id
 ```csharp
-var client = new B2Client(B2Client.Authorize(options));
-var file = client.Files.DownloadById("FILEID").Result;
-// { FileId: "",
-//   FileName: "",
-//   ContentLength: "", 
-//   ContentSHA1: "", 
-//   ContentType: "",
-//   FileData: byte[],
-//   FileInfo: Dictionary<string,string> }
-```
-
-### Download a file by name
-```csharp
-var client = new B2Client(options);
-await client.Authorize();
-var file = client.Files.DownloadName("FILENAME", "BUCKETNAME").Result;
+var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
+var file = await client.Files.DownloadById("FILEID");
 // { FileId: "",
 //   FileName: "",
 //   ContentLength: "", 
@@ -205,10 +198,23 @@ var file = client.Files.DownloadName("FILENAME", "BUCKETNAME").Result;
 //   FileInfo: Dictionary<string,string> }
 ```
 
-### Get versions for a file
+#### Download a file by name
 ```csharp
-var client = new B2Client(B2Client.Authorize(options));
-var file = client.Files.GetVersions("FILENAME", "FILEID").Result;
+var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
+var file = await client.Files.DownloadName("FILENAME", "BUCKETNAME");
+// { FileId: "",
+//   FileName: "",
+//   ContentLength: "", 
+//   ContentSHA1: "", 
+//   ContentType: "",
+//   FileData: byte[],
+//   FileInfo: Dictionary<string,string> }
+```
+
+#### Get versions for a file
+```csharp
+var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
+var file = await client.Files.GetVersions("FILENAME", "FILEID");
 // {
 //   NextFileName: "",
 //   NextFileId: "",
@@ -222,19 +228,18 @@ var file = client.Files.GetVersions("FILENAME", "FILEID").Result;
 // }
 ```
 
-### Delete a file version
+#### Delete a file version
 ```csharp
-var client = new B2Client(options);
-await client.Authorize();
-var file = client.Files.Delete("FILEID", "FILENAME").Result;
+var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
+var file = await client.Files.Delete("FILEID", "FILENAME");
 // { FileId: "",
 //   FileName: ""}
 ```
 
-### Hide a file version
+#### Hide a file version
 ```csharp
-var client = new B2Client(B2Client.Authorize(options));
-var file = client.Files.Hide("FILEID", "BUCKETID").Result;
+var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
+var file = await client.Files.Hide("FILEID", "BUCKETID");
 // { FileId: "",
 //   FileName: "",
 //   Action: "",
@@ -242,7 +247,7 @@ var file = client.Files.Hide("FILEID", "BUCKETID").Result;
 //   UploadTimestamp: ""}
 ```
 
-### Get info for a file
+#### Get info for a file
 ```csharp
 var client = new B2Client(options);
 await client.Authorize();
@@ -256,8 +261,15 @@ var file = client.Files.GetInfo("FILEID").Result;
 //   FileInfo: Dictionary<string,string> }
 ```
 
-### Large File API
+### <a name="large-file"></a>Large File API
 See the Large File tests for usage details.
+
+
+### <a name="errors"></a>Errors
+Certain errors returned by B2 point to a temporary error with the upload or download of a file.
+If one of these errors are encountered during an upload or download then the B2Exception that 
+is returned will have the `ShouldRetryRequest` flag marked true. This is an indication that you 
+should retry the request if you are so inclined.
 
 ## Release Notes
 
