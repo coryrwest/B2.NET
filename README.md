@@ -29,10 +29,10 @@ Install-Package B2Net
 Stick the B2Net.dll in your project.
 
 ## Guide
-*  [#buckets](Buckets)
-*  [#files](Files)
-*  [#large-file](Large Files)
-*  [#errors](Errors)
+*  [Buckets](#buckets)
+*  [Files](#files)
+*  [Large Files](#largefile)
+*  [Errors](#errors)
 
 ## Usage
 ```csharp
@@ -261,7 +261,7 @@ var file = client.Files.GetInfo("FILEID").Result;
 //   FileInfo: Dictionary<string,string> }
 ```
 
-### <a name="large-file"></a>Large File API
+### <a name="largefile"></a>Large File API
 See the Large File tests for usage details.
 
 
