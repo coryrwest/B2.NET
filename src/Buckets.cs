@@ -6,7 +6,8 @@ using B2Net.Http;
 using B2Net.Models;
 
 namespace B2Net {
-	public class Buckets {
+	public class Buckets : IBuckets
+  {
 		private B2Options _options;
 	    private HttpClient _client;
 
