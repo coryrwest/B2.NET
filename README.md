@@ -273,7 +273,7 @@ should retry the request if you are so inclined.
 
 ## Release Notes
 
-*  0.5.1  Implemented Interfaces for easier testing (from @mattdewn) and fixed tests
+*  0.5.2  Implemented Interfaces for easier testing (from @mattdewn) and fixed tests
 *  0.5.0  Large file management apis (version mix up as well)
 *  0.4.9  static Authorize
 *  0.4.6  Configureable HttpClient timeout
