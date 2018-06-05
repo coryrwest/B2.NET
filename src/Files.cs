@@ -1,16 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using B2Net.Http;
+using B2Net.Models;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using B2Net.Http;
-using B2Net.Models;
-using Newtonsoft.Json;
 
-namespace B2Net {
-	public class Files : IFiles
+namespace B2Net
+{
+  public class Files : IFiles
   {
 		private B2Options _options;
 		private HttpClient _client;
