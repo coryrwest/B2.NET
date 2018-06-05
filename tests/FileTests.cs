@@ -12,6 +12,7 @@ namespace B2Net.Tests {
 		private B2Bucket TestBucket = new B2Bucket();
 		private B2Client Client = null;
 		private List<B2File> FilesToDelete = new List<B2File>();
+	    private string BucketName = "";
 
 #if NETFULL
 	    private string FilePath => Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "../../../");
@@ -22,11 +23,12 @@ namespace B2Net.Tests {
         [TestInitialize]
 		public void Initialize() {
 			Client = new B2Client(Options.AccountId, Options.ApplicationKey);
+            BucketName = $"B2NETTestingBucket-{Path.GetRandomFileName().Replace(".", "").Substring(0, 6)}";
 
-			var buckets = Client.Buckets.GetList().Result;
+            var buckets = Client.Buckets.GetList().Result;
 			B2Bucket existingBucket = null;
 			foreach (B2Bucket b2Bucket in buckets) {
-				if (b2Bucket.BucketName == "B2NETTestingBucket") {
+				if (b2Bucket.BucketName == BucketName) {
 					existingBucket = b2Bucket;
 				}
 			}
@@ -34,7 +36,7 @@ namespace B2Net.Tests {
 			if (existingBucket != null) {
 				TestBucket = existingBucket;
 			} else {
-				TestBucket = Client.Buckets.Create("B2NETTestingBucket", BucketTypes.allPrivate).Result;
+				TestBucket = Client.Buckets.Create(BucketName, BucketTypes.allPrivate).Result;
 			}
 	    }
 
