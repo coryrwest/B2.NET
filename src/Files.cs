@@ -10,7 +10,8 @@ using B2Net.Models;
 using Newtonsoft.Json;
 
 namespace B2Net {
-	public class Files {
+	public class Files : IFiles
+  {
 		private B2Options _options;
 		private HttpClient _client;
 
