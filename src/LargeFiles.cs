@@ -1,16 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using B2Net.Http;
+using B2Net.Http.RequestGenerators;
+using B2Net.Models;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using B2Net.Http;
-using B2Net.Http.RequestGenerators;
-using B2Net.Models;
-using Newtonsoft.Json;
 
-namespace B2Net {
-	public class LargeFiles {
+namespace B2Net
+{
+  public class LargeFiles : ILargeFiles
+  {
 		private B2Options _options;
 		private HttpClient _client;
 

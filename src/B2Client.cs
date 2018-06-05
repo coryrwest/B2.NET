@@ -5,7 +5,8 @@ using B2Net.Models;
 using Newtonsoft.Json;
 
 namespace B2Net {
-	public class B2Client {
+	public class B2Client : IB2Client
+  {
 	    private B2Options _options;
 
 		public B2Client(B2Options options) {
@@ -34,9 +35,9 @@ namespace B2Net {
 	        LargeFiles = new LargeFiles(_options);
         }
 
-		public Buckets Buckets { get; }
-	    public Files Files { get; }
-	    public LargeFiles LargeFiles { get; }
+		public IBuckets Buckets { get; }
+	    public IFiles Files { get; }
+	    public ILargeFiles LargeFiles { get; }
 
         /// <summary>
         /// Authorize against the B2 storage service. Requires that AccountId and ApplicationKey on the options object be set.
