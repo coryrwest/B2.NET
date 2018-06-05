@@ -5,7 +5,8 @@ using B2Net.Models;
 using Newtonsoft.Json;
 
 namespace B2Net {
-	public class B2Client {
+	public class B2Client : IB2Client
+  {
 	    private B2Options _options;
 
 		public B2Client(B2Options options) {
