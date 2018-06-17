@@ -33,7 +33,7 @@ namespace B2Net.Http.RequestGenerators
                 Content = new StringContent(content),
             };
 
-            request.Headers.Add("Authorization", options.AuthorizationToken);
+            request.Headers.TryAddWithoutValidation("Authorization", options.AuthorizationToken);
             // File Info headers
             if (fileInfo != null && fileInfo.Count > 0) {
                 foreach (var info in fileInfo.Take(10)) {
@@ -71,7 +71,7 @@ namespace B2Net.Http.RequestGenerators
             string hash = Utilities.GetSHA1Hash(fileData);
 
             // Add headers
-            request.Headers.Add("Authorization", uploadPartUrl.AuthorizationToken);
+            request.Headers.TryAddWithoutValidation("Authorization", options.AuthorizationToken);
             request.Headers.Add("X-Bz-Part-Number", partNumber.ToString());
             request.Headers.Add("X-Bz-Content-Sha1", hash);
             request.Content.Headers.ContentLength = fileData.Length;

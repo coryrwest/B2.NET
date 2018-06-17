@@ -20,7 +20,7 @@ namespace B2Net.Http {
 				Content = new StringContent(json)
 			};
 
-			request.Headers.Add("Authorization", options.AuthorizationToken);
+			request.Headers.TryAddWithoutValidation("Authorization", options.AuthorizationToken);
 
 		    // Add byte range header if we have it
 		    if (!string.IsNullOrEmpty(byteRange)) {
@@ -37,7 +37,7 @@ namespace B2Net.Http {
 				RequestUri = uri
 			};
 
-			request.Headers.Add("Authorization", options.AuthorizationToken);
+		    request.Headers.TryAddWithoutValidation("Authorization", options.AuthorizationToken);
 
             // Add byte range header if we have it
 		    if (!string.IsNullOrEmpty(byteRange)) {

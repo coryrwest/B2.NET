@@ -12,8 +12,8 @@ namespace B2Net.Http.RequestGenerators {
 	            RequestUri = uri,
 	            Content = new StringContent(body)
 	        };
-
-	        request.Headers.Add("Authorization", options.AuthorizationToken);
+            
+            request.Headers.TryAddWithoutValidation("Authorization", options.AuthorizationToken);
 
 	        return request;
 	    }
@@ -26,7 +26,7 @@ namespace B2Net.Http.RequestGenerators {
 	            Content = new StringContent(body)
 	        };
 
-	        request.Headers.Add("Authorization", options.AuthorizationToken);
+	        request.Headers.TryAddWithoutValidation("Authorization", options.AuthorizationToken);
 
 	        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 	        request.Content.Headers.ContentLength = body.Length;
