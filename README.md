@@ -261,6 +261,16 @@ var file = client.Files.GetInfo("FILEID").Result;
 //   FileInfo: Dictionary<string,string> }
 ```
 
+
+#### Get a download authorization token
+```csharp
+var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
+var downloadAuth = await client.Files.GetDownloadAuthorization("FILENAMEPREFIX", "VALIDDURATION", "BUCKETNAME", "CONTENTDISPOSITION");
+// { FileNamePrefix: "",
+//   BucketId: "",
+//   AuthorizationToken: "" }
+```
+
 ### <a name="largefile"></a>Large File API
 See the Large File tests for usage details.
 
@@ -273,6 +283,8 @@ should retry the request if you are so inclined.
 
 ## Release Notes
 
+*  0.5.3  Fixed incorrect property names for B2UploadPart and added GetDownloadAuthorization
+*  0.5.21 Fixed bug with formatting POST requests
 *  0.5.2  Implemented Interfaces for easier testing (from @mattdewn) and fixed tests
 *  0.5.0  Large file management apis (version mix up as well)
 *  0.4.9  static Authorize

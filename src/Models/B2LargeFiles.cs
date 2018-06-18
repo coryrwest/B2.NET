@@ -13,8 +13,10 @@ namespace B2Net.Models
     public class B2UploadPart {
         public string FileId { get; set; }
         public int PartNumber { get; set; }
-        public int Length { get; set; }
-        public string SHA1 { get; set; }
+        public int Length => ContentLength;
+        public string SHA1 => ContentSHA1;
+        public int ContentLength { get; set; }
+        public string ContentSHA1 { get; set; }
     }
 
     public class B2LargeFileParts {

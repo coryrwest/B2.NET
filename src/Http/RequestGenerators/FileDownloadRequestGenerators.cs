@@ -7,6 +7,7 @@ namespace B2Net.Http {
 	public static class FileDownloadRequestGenerators {
 		private static class Endpoints {
 			public const string DownloadById = "b2_download_file_by_id";
+			public const string GetDownloadAuthorization = "b2_get_download_authorization";
 			public const string DownloadByName = "file";
 		}
 
@@ -40,9 +41,31 @@ namespace B2Net.Http {
 		    request.Headers.TryAddWithoutValidation("Authorization", options.AuthorizationToken);
 
             // Add byte range header if we have it
-		    if (!string.IsNullOrEmpty(byteRange)) {
+            if (!string.IsNullOrEmpty(byteRange)) {
 		        request.Headers.Add("Range", $"bytes={byteRange}");
 		    }
+
+			return request;
+		}
+
+		public static HttpRequestMessage GetDownloadAuthorization(B2Options options, string fileNamePrefix, int validDurationInSeconds, string bucketId, string b2ContentDisposition = "") {
+			var uri = new Uri(options.ApiUrl + "/b2api/" + Constants.Version + "/" + Endpoints.GetDownloadAuthorization);
+
+			var body = "{\"bucketId\":" + JsonConvert.ToString(bucketId) + ", \"fileNamePrefix\":" +
+			           JsonConvert.ToString(fileNamePrefix) + ", \"validDurationInSeconds\":" +
+			           JsonConvert.ToString(validDurationInSeconds);
+			if (!string.IsNullOrEmpty(b2ContentDisposition)) {
+				body += ", \"maxFileCount\":" + JsonConvert.ToString(b2ContentDisposition);
+			}
+			body += "}";
+			
+			var request = new HttpRequestMessage() {
+				Method = HttpMethod.Post,
+				RequestUri = uri,
+				Content = new StringContent(body)
+			};
+
+			request.Headers.TryAddWithoutValidation("Authorization", options.AuthorizationToken); 
 
 			return request;
 		}

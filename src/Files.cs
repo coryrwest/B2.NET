@@ -323,6 +323,24 @@ namespace B2Net
 			return await ResponseParser.ParseResponse<B2File>(response);
 		}
 
+		/// <summary>
+		/// Downloads one file from B2.
+		/// </summary>
+		/// <param name="fileId"></param>
+		/// <param name="cancelToken"></param>
+		/// <returns></returns>
+		public async Task<B2DownloadAuthorization> GetDownloadAuthorization(string fileNamePrefix, int validDurationInSeconds, string bucketId = "", string b2ContentDisposition = "", CancellationToken cancelToken = default(CancellationToken)) {
+			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
+
+			var request = FileDownloadRequestGenerators.GetDownloadAuthorization(_options, fileNamePrefix, validDurationInSeconds, operationalBucketId, b2ContentDisposition);
+
+			// Send the download request
+			var response = await _client.SendAsync(request, cancelToken);
+
+			// Create B2File from response
+			return await ResponseParser.ParseResponse<B2DownloadAuthorization>(response);
+		}
+
 		private async Task<B2File> ParseDownloadResponse(HttpResponseMessage response) {
 			Utilities.CheckForErrors(response);
 

@@ -306,6 +306,13 @@ namespace B2Net.Tests {
             Assert.AreEqual(1, info.FileInfo.Count);
         }
 
+		[TestMethod]
+		public void GetDownloadAuthorizationTest() {
+			var downloadAuth = Client.Files.GetDownloadAuthorization("Test", 120, TestBucket.BucketId).Result;
+			
+			Assert.AreEqual("Test", downloadAuth.FileNamePrefix, "File prefixes were not the same.");
+		}
+
 		[TestCleanup]
 		public void Cleanup() {
 			foreach (B2File b2File in FilesToDelete) {
