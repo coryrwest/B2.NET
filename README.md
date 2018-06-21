@@ -15,7 +15,7 @@ B2.NET is still in Beta, so use it in production at your own risk.
 *  Full Async support
 *  Full test coverage
 *  Targets .NET 4.5 and .NET Standard 1.5
-*  NOTE: There is currently no plans to support the new Key's API's
+*  NOTE: There are currently no plans to support the new Key's API's
 
 ## nuget
 [nuget package](https://www.nuget.org/packages/B2Net/)
@@ -283,6 +283,7 @@ should retry the request if you are so inclined.
 
 ## Release Notes
 
+*  0.5.31 Fixed upload bug introduced in 0.5.21
 *  0.5.3  Fixed incorrect property names for B2UploadPart and added GetDownloadAuthorization
 *  0.5.21 Fixed bug with formatting POST requests
 *  0.5.2  Implemented Interfaces for easier testing (from @mattdewn) and fixed tests
