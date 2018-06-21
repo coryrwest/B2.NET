@@ -71,7 +71,7 @@ namespace B2Net.Http.RequestGenerators
             string hash = Utilities.GetSHA1Hash(fileData);
 
             // Add headers
-            request.Headers.TryAddWithoutValidation("Authorization", options.AuthorizationToken);
+            request.Headers.TryAddWithoutValidation("Authorization", uploadPartUrl.AuthorizationToken);
             request.Headers.Add("X-Bz-Part-Number", partNumber.ToString());
             request.Headers.Add("X-Bz-Content-Sha1", hash);
             request.Content.Headers.ContentLength = fileData.Length;
