@@ -17,16 +17,12 @@ B2.NET is still in Beta, so use it in production at your own risk.
 *  Targets .NET 4.5 and .NET Standard 1.5
 *  NOTE: There are currently no plans to support the new Key's API's
 
-## nuget
+## Install
 [nuget package](https://www.nuget.org/packages/B2Net/)
 
 ```
 Install-Package B2Net
 ```
-
-## Install
-
-Stick the B2Net.dll in your project.
 
 ## Guide
 *  [Buckets](#buckets)
