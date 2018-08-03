@@ -283,6 +283,7 @@ should retry the request if you are so inclined.
 
 ## Release Notes
 
+*  0.5.32 Fixed bug preventing the use of Key's API keys
 *  0.5.31 Fixed upload bug introduced in 0.5.21
 *  0.5.3  Fixed incorrect property names for B2UploadPart and added GetDownloadAuthorization
 *  0.5.21 Fixed bug with formatting POST requests
