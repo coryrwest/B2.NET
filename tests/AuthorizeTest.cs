@@ -4,6 +4,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using B2Net;
+using B2Net.Models;
 using B2Net.Tests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
@@ -18,16 +19,31 @@ namespace B2.Net.Tests {
 	        var result = client.Authorize().Result;
 
 	        Assert.IsFalse(string.IsNullOrEmpty(result.AuthorizationToken));
-        }
+		}
 
-	    [TestMethod]
-	    public void CanWeAuthorizeStatic() {
-	        var result = B2Client.Authorize(Options);
+		[TestMethod]
+		public void CanWeAuthorizeStatic() {
+			var result = B2Client.Authorize(Options);
 
-	        Assert.IsFalse(string.IsNullOrEmpty(result.AuthorizationToken));
-	    }
+			Assert.IsFalse(string.IsNullOrEmpty(result.AuthorizationToken));
+		}
 
-        [TestMethod]
+
+
+		[TestMethod]
+		public void CanWeAuthorizeNonMasterKey() {
+			var key = "";
+			var id = "";
+
+			var result = B2Client.Authorize(new B2Options() {
+				AccountId = id,
+				ApplicationKey = key
+			});
+
+			Assert.IsFalse(string.IsNullOrEmpty(result.AuthorizationToken));
+		}
+
+		[TestMethod]
         public void DoWeGetOptionsBack() {
             var result = B2Client.Authorize(Options);
 

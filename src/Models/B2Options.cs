@@ -30,14 +30,12 @@
         }
 
 		public void SetState(B2AuthResponse response) {
-			if (response.accountId == AccountId) {
-				ApiUrl = response.apiUrl;
-				DownloadUrl = response.downloadUrl;
-				AuthorizationToken = response.authorizationToken;
-                RecommendedPartSize = response.recommendedPartSize;
-                AbsoluteMinimumPartSize = response.absoluteMinimumPartSize;
-                MinimumPartSize = response.minimumPartSize;
-            }
+			ApiUrl = response.apiUrl;
+			DownloadUrl = response.downloadUrl;
+			AuthorizationToken = response.authorizationToken;
+            RecommendedPartSize = response.recommendedPartSize;
+            AbsoluteMinimumPartSize = response.absoluteMinimumPartSize;
+            MinimumPartSize = response.minimumPartSize;
 		}
 	}
 }
