@@ -63,6 +63,24 @@ var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
 var options = await client.Authorize();
 ```
 
+### Application Keys
+
+[Fine grained application keys](https://www.backblaze.com/b2/docs/application_keys.html) allow you to specify access to specific
+capabilities and/or buckets.
+
+To authorize using one of these application keys, you must provide the generated application key and it's specific id, and set them
+on the `B2Options` object:
+
+```csharp
+var options = new B2Options {
+	ApplcationKey = "YOUR GENERATED APPLICATION KEY",
+	ApplcationKeyId = "YOUR GENERATED APPLICATION KEY ID"
+};
+var client = new B2Client(options);
+```
+
+Note you do **not** to specify your master **AccountId**.
+
 ### <a name="buckets"></a>Buckets
 #### List Buckets
 ```csharp
