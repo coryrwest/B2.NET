@@ -42,6 +42,12 @@
             RecommendedPartSize = response.recommendedPartSize;
             AbsoluteMinimumPartSize = response.absoluteMinimumPartSize;
             MinimumPartSize = response.minimumPartSize;
+
+      if (!string.IsNullOrWhiteSpace(response.allowed?.bucketId))
+      {
+        BucketId = response.allowed.bucketId;
+        PersistBucket = true;
+      }
 		}
 	}
 }
