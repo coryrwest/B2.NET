@@ -15,9 +15,9 @@ namespace B2Net.Http {
 				RequestUri = uri
 			};
 
-      var accountId = !string.IsNullOrWhiteSpace(options.ApplicationKeyId)
-        ? options.ApplicationKeyId
-        : options.AccountId;
+			var accountId = !string.IsNullOrWhiteSpace(options.ApplicationKeyId)
+				? options.ApplicationKeyId
+				: options.AccountId;
 
 			request.Headers.Add("Authorization", Utilities.CreateAuthorizationHeader(accountId, options.ApplicationKey));
 

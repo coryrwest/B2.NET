@@ -2,7 +2,7 @@
 	public class B2Options {
 		public string AccountId { get; set; }
 		public string ApplicationKey { get; set; }
-    public string ApplicationKeyId { get; set; }
+		public string ApplicationKeyId { get; set; }
 		public string BucketId { get; set; }
 		/// <summary>
 		/// Setting this to true will use this bucket by default for all
@@ -31,10 +31,10 @@
         }
 
 		public void SetState(B2AuthResponse response) {
-      if (string.IsNullOrWhiteSpace(AccountId))
-      {
-        AccountId = response.accountId;
-      }
+			if (string.IsNullOrWhiteSpace(AccountId))
+			{
+				AccountId = response.accountId;
+			}
 
 			ApiUrl = response.apiUrl;
 			DownloadUrl = response.downloadUrl;
@@ -43,11 +43,11 @@
             AbsoluteMinimumPartSize = response.absoluteMinimumPartSize;
             MinimumPartSize = response.minimumPartSize;
 
-      if (!string.IsNullOrWhiteSpace(response.allowed?.bucketId))
-      {
-        BucketId = response.allowed.bucketId;
-        PersistBucket = true;
-      }
+			if (!string.IsNullOrWhiteSpace(response.allowed?.bucketId))
+			{
+				BucketId = response.allowed.bucketId;
+				PersistBucket = true;
+			}
 		}
 	}
 }
