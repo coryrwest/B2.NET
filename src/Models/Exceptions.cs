@@ -5,7 +5,7 @@ namespace B2Net.Models {
 		public AuthorizationException(string response) : base("There was an error during authorization. See inner exception for details.", new Exception(response)) { }
 	}
 
-    public class B2Exception : Exception {
+	public class B2Exception : Exception {
         public string Status { get; set; }
         public string Code { get; set; }
         public bool ShouldRetryRequest { get; set; }

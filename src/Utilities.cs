@@ -17,7 +17,7 @@ namespace B2Net {
 			return authHeader + credentials;
 		}
 		
-		public static void CheckForErrors(HttpResponseMessage response) {
+		public static void CheckForErrors(HttpResponseMessage response, string callingApi = "") {
 			if (!response.IsSuccessStatusCode) {
                 // Should retry
 			    bool retry = response.StatusCode == (HttpStatusCode) 429 ||
@@ -33,6 +33,10 @@ namespace B2Net {
 					throw new Exception("Seralization of the response failed. See inner exception for response contents and serialization error.", ex);
 				}
 				if (b2Error != null) {
+					// If calling API is supplied, append to the error message
+					if (!string.IsNullOrEmpty(callingApi) && b2Error.Code == "401") {
+						b2Error.Message = $"Unauthorized error when operating on {callingApi}. Are you sure the key you are using has access? {b2Error.Message}";
+					}
 					throw new B2Exception(b2Error.Code, b2Error.Status, b2Error.Message, retry);
 				}
 			}

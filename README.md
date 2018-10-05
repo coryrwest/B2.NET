@@ -9,13 +9,13 @@ B2.NET is still in Beta, so use it in production at your own risk.
 
 ## Features
 
-*  Full implementation of the B2 REST API
-*  Experimental support for file FriendlyURL's
+*  Full implementation of the B2 REST API (except Keys management)
+*  Support for file FriendlyURL's (this functionality is not part of the supported B2 api and may break at any time)
 *  UFT-8 and Url Encoding support
-*  Full Async support
+*  Fully Async
 *  Full test coverage
 *  Targets .NET 4.5 and .NET Standard 1.5
-*  NOTE: There are currently no plans to support the new Key's API's
+*  The new Key's API's is technically supported, but untested. You cannot manage keys with this library, just user already existing ones.
 
 ## Install
 [nuget package](https://www.nuget.org/packages/B2Net/)
@@ -36,6 +36,7 @@ Install-Package B2Net
 // for all subsequent calls if you set PersistBucket to true.
 var options = new B2Options() {
 	AccountId = "YOUR ACCOUNT ID",
+	KeyId = "YOUR APPLICATION KEYID",
 	ApplicationKey = "YOUR APPLICATION KEY",
 	BucketId = "OPTIONAL BUCKET ID",
 	PersistBucket = true/false
@@ -44,23 +45,21 @@ var client = new B2Client(Options);
 ```
 
 ### Authorize
-There are two ways to Authorize a B2Client. The old way is slightly more verbose and there is no clear benefit to using it over the 
-static method. The `options` object returned from the Authorize method will contain the authorizationToken necessary for subsequent 
+The `options` object returned from the Authorize method will contain the authorizationToken necessary for subsequent 
 calls to the B2 API. This will automatically be handled by the library when necessary. You do not have to keep this object around.
 The `options` object requires AccountID and ApplicationKey to authorize.
+
+#### Application Keys
+Application Keys are supported, but have not been tested thoroughly. If you want to use an application key you must specify your AccountId, KeyId, and ApplicationKey for the application key that you want to use. If you do not specify all three parameters you cannot be authenticated.  
+
 ```csharp
-// New, cleaner way to Authorize using the static `Authorize` method.
 var client = new B2Client(B2Client.Authorize(options));
 // OR
-var client = new B2Client(B2Client.Authorize("ACCOUNTID", "APPLICATIONKEY"));
+var client = new B2Client(B2Client.Authorize("ACCOUNTID", "APPLICATIONKEY", "OPTIONAL KEYID"));
 // OR
-var client = new B2Client("ACCOUNTID", "APPLICATIONKEY", "REQUESTTIMEOUT");
-```
-
-The old way:
-```csharp
-var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
-var options = await client.Authorize();
+var client = new B2Client("ACCOUNTID", "APPLICATIONKEY", "OPTIONAL REQUESTTIMEOUT");
+// OR
+var client = new B2Client("ACCOUNTID", "APPLICATIONKEY", "KEYID", "OPTIONAL REQUESTTIMEOUT");
 ```
 
 ### <a name="buckets"></a>Buckets
@@ -245,8 +244,7 @@ var file = await client.Files.Hide("FILEID", "BUCKETID");
 
 #### Get info for a file
 ```csharp
-var client = new B2Client(options);
-await client.Authorize();
+var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
 var file = client.Files.GetInfo("FILEID").Result;
 // { FileId: "",
 //   FileName: "",
@@ -279,7 +277,8 @@ should retry the request if you are so inclined.
 
 ## Release Notes
 
-*  0.5.32 Fixed bug preventing the use of Key's API keys
+*  0.6.0  Preliminary support for the v2 Keys API
+*  0.5.32 Fixed bug preventing the use of Keys API keys
 *  0.5.31 Fixed upload bug introduced in 0.5.21
 *  0.5.3  Fixed incorrect property names for B2UploadPart and added GetDownloadAuthorization
 *  0.5.21 Fixed bug with formatting POST requests

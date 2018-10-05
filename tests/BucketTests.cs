@@ -26,9 +26,9 @@ namespace B2Net.Tests {
 			var deletedBucket = Client.Buckets.Delete(bucket.BucketId).Result;
 
 			Assert.AreNotEqual(0, list.Count);
-	    }
+		}
 
-	    [TestMethod]
+		[TestMethod]
 	    public void CreateBucketTest() {
 	        var bucket = Client.Buckets.Create(BucketName, BucketTypes.allPrivate).Result;
 

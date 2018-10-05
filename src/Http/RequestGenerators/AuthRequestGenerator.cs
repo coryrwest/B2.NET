@@ -15,7 +15,13 @@ namespace B2Net.Http {
 				RequestUri = uri
 			};
 
-			request.Headers.Add("Authorization", Utilities.CreateAuthorizationHeader(options.AccountId, options.ApplicationKey));
+			// Check if this is an application key or a master key
+			var key = options.AccountId;
+			if (!string.IsNullOrEmpty(options.KeyId)) {
+				key = options.KeyId;
+			}
+
+			request.Headers.Add("Authorization", Utilities.CreateAuthorizationHeader(key, options.ApplicationKey));
 
 			return request;
 		}

@@ -1,6 +1,9 @@
-﻿namespace B2Net.Models {
+﻿using Newtonsoft.Json;
+
+namespace B2Net.Models {
 	public class B2Options {
 		public string AccountId { get; set; }
+		public string KeyId { get; set; }
 		public string ApplicationKey { get; set; }
 		public string BucketId { get; set; }
 		/// <summary>
@@ -14,13 +17,20 @@
         public string ApiUrl { get; set; }
 		public string DownloadUrl { get; set; }
 		public string AuthorizationToken { get; set; }
+		public B2Capabilities Capabilities { get; set; }
 		/// <summary>
 		/// This will only be set after a call to the upload API
 		/// </summary>
 		public string UploadAuthorizationToken { get; set; }
         public long RecommendedPartSize { get; set; }
         public long AbsoluteMinimumPartSize { get; set; }
-        public long MinimumPartSize { get; set; }
+
+		/// <summary>
+		/// Deprecated: Will always be the same as RecommendedPartSize
+		/// </summary>
+		public long MinimumPartSize {
+			get { return RecommendedPartSize; }
+		}
 
 	    public int RequestTimeout { get; set; }
 
@@ -35,7 +45,12 @@
 			AuthorizationToken = response.authorizationToken;
             RecommendedPartSize = response.recommendedPartSize;
             AbsoluteMinimumPartSize = response.absoluteMinimumPartSize;
-            MinimumPartSize = response.minimumPartSize;
+			Capabilities = new B2Capabilities() {
+				BucketId = response.allowed.bucketId,
+				BucketName = response.allowed.bucketName,
+				Capabilities = response.allowed.capabilities,
+				NamePrefix = response.allowed.namePrefix
+			};
 		}
 	}
 }

@@ -10,6 +10,7 @@ namespace B2Net {
   {
 		private B2Options _options;
 	    private HttpClient _client;
+		private string _api = "Buckets";
 
         public Buckets(B2Options options) {
 			_options = options;
@@ -36,7 +37,7 @@ namespace B2Net {
 	        var requestMessage = BucketRequestGenerators.CreateBucket(_options, bucketName, bucketType.ToString());
 	        var response = await _client.SendAsync(requestMessage, cancelToken);
 
-	        return await ResponseParser.ParseResponse<B2Bucket>(response);
+	        return await ResponseParser.ParseResponse<B2Bucket>(response, _api);
 	    }
 
 	    /// <summary>
@@ -52,7 +53,7 @@ namespace B2Net {
             var requestMessage = BucketRequestGenerators.CreateBucket(_options, bucketName, options);
             var response = await _client.SendAsync(requestMessage, cancelToken);
 
-            return await ResponseParser.ParseResponse<B2Bucket>(response);
+            return await ResponseParser.ParseResponse<B2Bucket>(response, _api);
         }
 
         /// <summary>
@@ -67,7 +68,7 @@ namespace B2Net {
 			var requestMessage = BucketRequestGenerators.DeleteBucket(_options, operationalBucketId);
 			var response = await _client.SendAsync(requestMessage, cancelToken);
 
-			return await ResponseParser.ParseResponse<B2Bucket>(response);
+			return await ResponseParser.ParseResponse<B2Bucket>(response, _api);
         }
 
         /// <summary>
@@ -83,7 +84,7 @@ namespace B2Net {
             var requestMessage = BucketRequestGenerators.UpdateBucket(_options, operationalBucketId, bucketType.ToString());
             var response = await _client.SendAsync(requestMessage, cancelToken);
 
-            return await ResponseParser.ParseResponse<B2Bucket>(response);
+            return await ResponseParser.ParseResponse<B2Bucket>(response, _api);
         }
 
         /// <summary>
@@ -101,7 +102,7 @@ namespace B2Net {
             var requestMessage = BucketRequestGenerators.UpdateBucket(_options, operationalBucketId, options);
             var response = await _client.SendAsync(requestMessage, cancelToken);
 
-            return await ResponseParser.ParseResponse<B2Bucket>(response);
+            return await ResponseParser.ParseResponse<B2Bucket>(response, _api);
         }
     }
 }

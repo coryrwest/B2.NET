@@ -14,7 +14,8 @@ namespace B2Net
   {
 		private B2Options _options;
 		private HttpClient _client;
-
+	  private string _api = "Files";
+		
 		public Files(B2Options options) {
 			_options = options;
 			_client = HttpClientFactory.CreateHttpClient(options.RequestTimeout);
@@ -49,7 +50,7 @@ namespace B2Net
 	        var requestMessage = FileMetaDataRequestGenerators.GetList(_options, operationalBucketId, startFileName, maxFileCount, prefix, delimiter);
 	        var response = await _client.SendAsync(requestMessage, cancelToken);
 
-	        return await ResponseParser.ParseResponse<B2FileList>(response);
+	        return await ResponseParser.ParseResponse<B2FileList>(response, _api);
 	    }
 
         /// <summary>
@@ -87,7 +88,7 @@ namespace B2Net
 	        var requestMessage = FileMetaDataRequestGenerators.ListVersions(_options, operationalBucketId, startFileName, startFileId, maxFileCount, prefix, delimiter);
 	        var response = await _client.SendAsync(requestMessage, cancelToken);
 
-	        return await ResponseParser.ParseResponse<B2FileList>(response);
+	        return await ResponseParser.ParseResponse<B2FileList>(response, _api);
 	    }
 
         /// <summary>
@@ -100,7 +101,7 @@ namespace B2Net
 			var requestMessage = FileMetaDataRequestGenerators.GetInfo(_options, fileId);
 			var response = await _client.SendAsync(requestMessage, cancelToken);
 
-			return await ResponseParser.ParseResponse<B2File>(response);
+			return await ResponseParser.ParseResponse<B2File>(response, _api);
         }
 
         /// <summary>
@@ -149,7 +150,7 @@ namespace B2Net
             var requestMessage = FileUploadRequestGenerators.Upload(_options, uploadUrlObject.UploadUrl, fileData, fileName, fileInfo);
             var response = await _client.SendAsync(requestMessage, cancelToken);
 
-            return await ResponseParser.ParseResponse<B2File>(response);
+            return await ResponseParser.ParseResponse<B2File>(response, _api);
         }
 
         /// <summary>
@@ -190,7 +191,7 @@ namespace B2Net
                 response = await _client.SendAsync(requestMessage, cancelToken);
             }
 
-	        return await ResponseParser.ParseResponse<B2File>(response);
+	        return await ResponseParser.ParseResponse<B2File>(response, _api);
 	    }
 
         /// <summary>
@@ -283,7 +284,7 @@ namespace B2Net
 			var requestMessage = FileDeleteRequestGenerator.Delete(_options, fileId, fileName);
 			var response = await _client.SendAsync(requestMessage, cancelToken);
 
-			return await ResponseParser.ParseResponse<B2File>(response);
+			return await ResponseParser.ParseResponse<B2File>(response, _api);
 		}
 
 
@@ -320,7 +321,7 @@ namespace B2Net
 			var requestMessage = FileMetaDataRequestGenerators.HideFile(_options, operationalBucketId, fileName, fileId);
 			var response = await _client.SendAsync(requestMessage, cancelToken);
 
-			return await ResponseParser.ParseResponse<B2File>(response);
+			return await ResponseParser.ParseResponse<B2File>(response, _api);
 		}
 
 		/// <summary>
@@ -338,11 +339,11 @@ namespace B2Net
 			var response = await _client.SendAsync(request, cancelToken);
 
 			// Create B2File from response
-			return await ResponseParser.ParseResponse<B2DownloadAuthorization>(response);
+			return await ResponseParser.ParseResponse<B2DownloadAuthorization>(response, _api);
 		}
 
 		private async Task<B2File> ParseDownloadResponse(HttpResponseMessage response) {
-			Utilities.CheckForErrors(response);
+			Utilities.CheckForErrors(response, _api);
 
 			var file = new B2File();
 			IEnumerable<string> values;

@@ -12,6 +12,7 @@ namespace B2Net
   {
 		private B2Options _options;
 		private HttpClient _client;
+		private string _api = "Large Files";
 
 		public LargeFiles(B2Options options) {
 			_options = options;
@@ -35,7 +36,7 @@ namespace B2Net
             var response = await _client.SendAsync(request, cancelToken);
 
             // Create B2File from response
-            return await ResponseParser.ParseResponse<B2File>(response);
+            return await ResponseParser.ParseResponse<B2File>(response, _api);
         }
 
         /// <summary>
@@ -49,7 +50,7 @@ namespace B2Net
 
             var uploadUrlResponse = await _client.SendAsync(request, cancelToken);
 
-            var uploadUrl = await ResponseParser.ParseResponse<B2UploadPartUrl>(uploadUrlResponse);
+            var uploadUrl = await ResponseParser.ParseResponse<B2UploadPartUrl>(uploadUrlResponse, _api);
 
             return uploadUrl;
         }
@@ -67,7 +68,7 @@ namespace B2Net
 
             var response = _client.SendAsync(request, cancelToken).Result;
             
-            return await ResponseParser.ParseResponse<B2UploadPart>(response);
+            return await ResponseParser.ParseResponse<B2UploadPart>(response, _api);
         }
 
 	    /// <summary>
@@ -85,7 +86,7 @@ namespace B2Net
 	        var response = await _client.SendAsync(request, cancelToken);
 
 	        // Create B2File from response
-	        return await ResponseParser.ParseResponse<B2File>(response);
+	        return await ResponseParser.ParseResponse<B2File>(response, _api);
         }
 
         /// <summary>
@@ -103,7 +104,7 @@ namespace B2Net
 	        var response = await _client.SendAsync(request, cancelToken);
 
 	        // Create B2File from response
-	        return await ResponseParser.ParseResponse<B2LargeFileParts>(response);
+	        return await ResponseParser.ParseResponse<B2LargeFileParts>(response, _api);
 	    }
         
         /// <summary>
@@ -119,7 +120,7 @@ namespace B2Net
 	        var response = await _client.SendAsync(request, cancelToken);
 
 	        // Create B2File from response
-	        return await ResponseParser.ParseResponse<B2CancelledFile>(response);
+	        return await ResponseParser.ParseResponse<B2CancelledFile>(response, _api);
 	    }
 
         /// <summary>
@@ -137,7 +138,7 @@ namespace B2Net
 	        var response = await _client.SendAsync(request, cancelToken);
 
 	        // Create B2File from response
-	        return await ResponseParser.ParseResponse<B2IncompleteLargeFiles>(response);
+	        return await ResponseParser.ParseResponse<B2IncompleteLargeFiles>(response, _api);
 	    }
     }
 }
