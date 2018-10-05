@@ -15,7 +15,7 @@ B2.NET is still in Beta, so use it in production at your own risk.
 *  Fully Async
 *  Full test coverage
 *  Targets .NET 4.5 and .NET Standard 1.5
-*  The new Key's API's is technically supported, but untested. You cannot manage keys with this library, just user already existing ones.
+*  The new Key's API's is technically supported, but untested. You cannot manage keys with this library, just use already existing ones.
 
 ## Install
 [nuget package](https://www.nuget.org/packages/B2Net/)
