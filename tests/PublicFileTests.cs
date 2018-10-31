@@ -1,10 +1,8 @@
-﻿using System;
+﻿using B2Net.Models;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
-using B2Net.Http;
-using B2Net.Models;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace B2Net.Tests {
 	[TestClass]
@@ -12,15 +10,15 @@ namespace B2Net.Tests {
 		private B2Bucket TestBucket = new B2Bucket();
 		private B2Client Client = null;
 		private List<B2File> FilesToDelete = new List<B2File>();
-	    private string BucketName = "B2NETTestingBucketPublic";
+		private string BucketName = "B2NETTestingBucketPublic";
 
 #if NETFULL
-	    private string FilePath => Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "../../../");
+		private string FilePath => Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "../../../");
 #else
         private string FilePath => Path.Combine(System.AppContext.BaseDirectory, "../../../");
 #endif
 
-        [TestInitialize]
+		[TestInitialize]
 		public void Initialize() {
 			Client = new B2Client(Options);
 			Options = Client.Authorize().Result;
@@ -35,34 +33,34 @@ namespace B2Net.Tests {
 
 			if (existingBucket != null) {
 				TestBucket = existingBucket;
-			} else {
+			}
+			else {
 				TestBucket = Client.Buckets.Create(BucketName, BucketTypes.allPublic).Result;
 			}
 		}
 
-        [TestMethod]
-        public void FileGetFriendlyUrlTest()
-        {
-            var fileName = "B2Test.txt";
-            var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
-            string hash = Utilities.GetSHA1Hash(fileData);
-            var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
-            // Clean up.
-            FilesToDelete.Add(file);
+		[TestMethod]
+		public void FileGetFriendlyUrlTest() {
+			var fileName = "B2Test.txt";
+			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
+			string hash = Utilities.GetSHA1Hash(fileData);
+			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			// Clean up.
+			FilesToDelete.Add(file);
 
-            Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
+			Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
 
-            // Get url
-            var friendlyUrl = Client.Files.GetFriendlyDownloadUrl(fileName, TestBucket.BucketName);
+			// Get url
+			var friendlyUrl = Client.Files.GetFriendlyDownloadUrl(fileName, TestBucket.BucketName);
 
-            // Test download
-            var client = new HttpClient();
-            var friendFile = client.GetAsync(friendlyUrl).Result;
-            var ffileData = friendFile.Content.ReadAsByteArrayAsync().Result;
-            var downloadHash = Utilities.GetSHA1Hash(ffileData);
+			// Test download
+			var client = new HttpClient();
+			var friendFile = client.GetAsync(friendlyUrl).Result;
+			var ffileData = friendFile.Content.ReadAsByteArrayAsync().Result;
+			var downloadHash = Utilities.GetSHA1Hash(ffileData);
 
-            Assert.AreEqual(hash, downloadHash);
-        }
+			Assert.AreEqual(hash, downloadHash);
+		}
 
 		[TestCleanup]
 		public void Cleanup() {
