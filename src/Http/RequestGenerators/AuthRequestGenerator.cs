@@ -1,6 +1,6 @@
-﻿using System;
+﻿using B2Net.Models;
+using System;
 using System.Net.Http;
-using B2Net.Models;
 
 namespace B2Net.Http {
 	public static class AuthRequestGenerator {

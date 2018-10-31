@@ -1,7 +1,7 @@
-﻿using System;
-using System.Net.Http;
-using B2Net.Models;
+﻿using B2Net.Models;
 using Newtonsoft.Json;
+using System;
+using System.Net.Http;
 
 namespace B2Net.Http {
 	public static class FileDownloadRequestGenerators {
@@ -14,8 +14,8 @@ namespace B2Net.Http {
 		public static HttpRequestMessage DownloadById(B2Options options, string fileId, string byteRange = "") {
 			var uri = new Uri(options.DownloadUrl + "/b2api/" + Constants.Version + "/" + Endpoints.DownloadById);
 
-		    var json = JsonConvert.SerializeObject(new { fileId });
-            var request = new HttpRequestMessage() {
+			var json = JsonConvert.SerializeObject(new { fileId });
+			var request = new HttpRequestMessage() {
 				Method = HttpMethod.Post,
 				RequestUri = uri,
 				Content = new StringContent(json)
@@ -23,12 +23,12 @@ namespace B2Net.Http {
 
 			request.Headers.TryAddWithoutValidation("Authorization", options.AuthorizationToken);
 
-		    // Add byte range header if we have it
-		    if (!string.IsNullOrEmpty(byteRange)) {
-		        request.Headers.Add("Range", $"bytes={byteRange}");
-		    }
+			// Add byte range header if we have it
+			if (!string.IsNullOrEmpty(byteRange)) {
+				request.Headers.Add("Range", $"bytes={byteRange}");
+			}
 
-            return request;
+			return request;
 		}
 
 		public static HttpRequestMessage DownloadByName(B2Options options, string bucketName, string fileName, string byteRange = "") {
@@ -38,12 +38,12 @@ namespace B2Net.Http {
 				RequestUri = uri
 			};
 
-		    request.Headers.TryAddWithoutValidation("Authorization", options.AuthorizationToken);
+			request.Headers.TryAddWithoutValidation("Authorization", options.AuthorizationToken);
 
-            // Add byte range header if we have it
-            if (!string.IsNullOrEmpty(byteRange)) {
-		        request.Headers.Add("Range", $"bytes={byteRange}");
-		    }
+			// Add byte range header if we have it
+			if (!string.IsNullOrEmpty(byteRange)) {
+				request.Headers.Add("Range", $"bytes={byteRange}");
+			}
 
 			return request;
 		}
@@ -52,20 +52,20 @@ namespace B2Net.Http {
 			var uri = new Uri(options.ApiUrl + "/b2api/" + Constants.Version + "/" + Endpoints.GetDownloadAuthorization);
 
 			var body = "{\"bucketId\":" + JsonConvert.ToString(bucketId) + ", \"fileNamePrefix\":" +
-			           JsonConvert.ToString(fileNamePrefix) + ", \"validDurationInSeconds\":" +
-			           JsonConvert.ToString(validDurationInSeconds);
+					   JsonConvert.ToString(fileNamePrefix) + ", \"validDurationInSeconds\":" +
+					   JsonConvert.ToString(validDurationInSeconds);
 			if (!string.IsNullOrEmpty(b2ContentDisposition)) {
 				body += ", \"maxFileCount\":" + JsonConvert.ToString(b2ContentDisposition);
 			}
 			body += "}";
-			
+
 			var request = new HttpRequestMessage() {
 				Method = HttpMethod.Post,
 				RequestUri = uri,
 				Content = new StringContent(body)
 			};
 
-			request.Headers.TryAddWithoutValidation("Authorization", options.AuthorizationToken); 
+			request.Headers.TryAddWithoutValidation("Authorization", options.AuthorizationToken);
 
 			return request;
 		}
