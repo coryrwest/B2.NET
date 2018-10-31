@@ -16,20 +16,21 @@ namespace B2Net {
 			var credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes(accountId + ":" + applicationKey));
 			return authHeader + credentials;
 		}
-		
+
 		public static void CheckForErrors(HttpResponseMessage response, string callingApi = "") {
 			if (!response.IsSuccessStatusCode) {
-                // Should retry
-			    bool retry = response.StatusCode == (HttpStatusCode) 429 ||
-			        response.StatusCode == HttpStatusCode.RequestTimeout ||
-			        response.StatusCode == HttpStatusCode.ServiceUnavailable;
+				// Should retry
+				bool retry = response.StatusCode == (HttpStatusCode)429 ||
+					response.StatusCode == HttpStatusCode.RequestTimeout ||
+					response.StatusCode == HttpStatusCode.ServiceUnavailable;
 
-                string content = response.Content.ReadAsStringAsync().Result;
+				string content = response.Content.ReadAsStringAsync().Result;
 
 				B2Error b2Error;
 				try {
 					b2Error = JsonConvert.DeserializeObject<B2Error>(content);
-				} catch (Exception ex) {
+				}
+				catch (Exception ex) {
 					throw new Exception("Seralization of the response failed. See inner exception for response contents and serialization error.", ex);
 				}
 				if (b2Error != null) {
@@ -53,7 +54,7 @@ namespace B2Net {
 			if (!options.PersistBucket && string.IsNullOrEmpty(bucketId)) {
 				throw new ArgumentNullException(nameof(bucketId));
 			}
-			
+
 			// Are we persisting buckets? If so use the one from settings
 			return options.PersistBucket ? options.BucketId : bucketId;
 		}
