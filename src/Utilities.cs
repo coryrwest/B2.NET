@@ -1,10 +1,10 @@
-﻿using System;
+﻿using B2Net.Models;
+using Newtonsoft.Json;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
-using B2Net.Models;
-using Newtonsoft.Json;
 
 namespace B2Net {
 	public static class Utilities {
