@@ -1,6 +1,6 @@
-﻿using System.Net.Http;
+﻿using Newtonsoft.Json;
+using System.Net.Http;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace B2Net.Http {
 	public static class ResponseParser {
@@ -10,9 +10,9 @@ namespace B2Net.Http {
 			Utilities.CheckForErrors(response, callingApi);
 
 			var obj = JsonConvert.DeserializeObject<T>(jsonResponse, new JsonSerializerSettings() {
-                NullValueHandling = NullValueHandling.Ignore
-            });
-            return obj;
+				NullValueHandling = NullValueHandling.Ignore
+			});
+			return obj;
 		}
 	}
 }
