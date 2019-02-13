@@ -46,17 +46,27 @@ namespace B2Net.Tests {
 		public void LargeFileUploadTest() {
 			var fileName = "B2LargeFileTest.txt";
 			FileStream fileStream = File.OpenRead(Path.Combine(FilePath, fileName));
-            var stream = new StreamReader(fileStream);
-		    char[] c = null;
+			byte[] c = null;
             List<byte[]> parts = new List<byte[]>();
 		    var shas = new List<string>();
+			long fileSize = fileStream.Length;
+			long totalBytesParted = 0;
+			long minPartSize = 1024 * (5 * 1024);
 
-		    while (stream.Peek() >= 0) {
-		        c = new char[1024 * (5 * 1024)];
-		        stream.Read(c, 0, c.Length);
+			while (totalBytesParted < fileSize) {
+				var partSize = minPartSize;
+				// If last part is less than min part size, get that length
+			    if (fileSize - totalBytesParted < minPartSize) {
+				    partSize = fileSize - totalBytesParted;
+			    }
 
-		        parts.Add(Encoding.UTF8.GetBytes(c));
-            }
+			    c = new byte[partSize];
+				fileStream.Seek(totalBytesParted, SeekOrigin.Begin);
+				fileStream.Read(c, 0, c.Length);
+
+				parts.Add(c);
+				totalBytesParted += partSize;
+			}
 
 		    foreach (var part in parts) {
 		        string hash = Utilities.GetSHA1Hash(part);
@@ -76,15 +86,15 @@ namespace B2Net.Tests {
 		        finish = Client.LargeFiles.FinishLargeFile(start.FileId, shas.ToArray()).Result;
 		    }
 		    catch (Exception e) {
+			    Client.LargeFiles.CancelLargeFile(start.FileId);
 		        Console.WriteLine(e);
 		        throw;
 		    }
-		    finally {
-		        // Clean up.
-		        FilesToDelete.Add(start);
-            }
 
-            
+			// Clean up.
+			FilesToDelete.Add(start);
+
+
 			Assert.AreEqual(start.FileId, finish.FileId, "File Ids did not match.");
 		}
 
