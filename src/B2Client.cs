@@ -57,6 +57,14 @@ namespace B2Net {
 		  LargeFiles = new LargeFiles(_options);
 	  }
 
+		public string AllowedBucketId
+		{
+			get { return _options.Capabilities.BucketId; }
+		}
+		public string AllowedBucketName
+		{
+			get { return _options.Capabilities.BucketName; }
+		}
 		public IBuckets Buckets { get; }
 	    public IFiles Files { get; }
 	    public ILargeFiles LargeFiles { get; }

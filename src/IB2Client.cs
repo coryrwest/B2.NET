@@ -6,7 +6,10 @@ namespace B2Net
 {
   public interface IB2Client
   {
-    IBuckets Buckets { get; }
+	string AllowedBucketId { get; }
+	string AllowedBucketName { get; }
+
+	IBuckets Buckets { get; }
     IFiles Files { get; }
     ILargeFiles LargeFiles { get; }
 
