@@ -45,12 +45,12 @@ var client = new B2Client(Options);
 ```
 
 ### Authorize
-The `options` object returned from the Authorize method will contain the authorizationToken necessary for subsequent 
+The `options` object returned from the Authorize method will contain the authorizationToken necessary for subsequent
 calls to the B2 API. This will automatically be handled by the library when necessary. You do not have to keep this object around.
 The `options` object requires AccountID and ApplicationKey to authorize.
 
 #### Application Keys
-Application Keys are supported, but have not been tested thoroughly. If you want to use an application key you must specify your AccountId, KeyId, and ApplicationKey for the application key that you want to use. If you do not specify all three parameters you cannot be authenticated.  
+Application Keys are supported, but have not been tested thoroughly. If you want to use an application key you must specify your AccountId, KeyId, and ApplicationKey for the application key that you want to use. If you do not specify all three parameters you cannot be authenticated.
 
 ```csharp
 var client = new B2Client(B2Client.Authorize(options));
@@ -60,6 +60,12 @@ var client = new B2Client(B2Client.Authorize("ACCOUNTID", "APPLICATIONKEY", "OPT
 var client = new B2Client("ACCOUNTID", "APPLICATIONKEY", "OPTIONAL REQUESTTIMEOUT");
 // OR
 var client = new B2Client("ACCOUNTID", "APPLICATIONKEY", "KEYID", "OPTIONAL REQUESTTIMEOUT");
+```
+
+Once authenticated your allowed bucket ID and name are available on your `B2Client` instance:
+```csharp
+var bucketId = client.AllowedBucketId;
+var bucketName = client.AllowedBucketName;
 ```
 
 ### <a name="buckets"></a>Buckets
@@ -160,8 +166,8 @@ var fileList = await client.Files.GetList("BUCKETID", "FILENAME", prefix: "PREFI
 //   [
 //     { FileId: "",
 //       FileName: "",
-//       ContentLength: "", 
-//       ContentSHA1: "", 
+//       ContentLength: "",
+//       ContentSHA1: "",
 //       ContentType: "" }
 //   ]
 // }
@@ -174,8 +180,8 @@ var uploadUrl = await client.Files.GetUploadUrl("BUCKETID");
 var file = await client.Files.Upload("FILEDATABYTES", "FILENAME", uploadUrl, "AUTORETRY", "BUCKETID", "FILEINFOATTRS");
 // { FileId: "",
 //   FileName: "",
-//   ContentLength: "", 
-//   ContentSHA1: "", 
+//   ContentLength: "",
+//   ContentSHA1: "",
 //   ContentType: "",
 //   FileInfo: Dictionary<string,string> }
 ```
@@ -186,8 +192,8 @@ var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
 var file = await client.Files.DownloadById("FILEID");
 // { FileId: "",
 //   FileName: "",
-//   ContentLength: "", 
-//   ContentSHA1: "", 
+//   ContentLength: "",
+//   ContentSHA1: "",
 //   ContentType: "",
 //   FileData: byte[],
 //   FileInfo: Dictionary<string,string> }
@@ -199,8 +205,8 @@ var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
 var file = await client.Files.DownloadName("FILENAME", "BUCKETNAME");
 // { FileId: "",
 //   FileName: "",
-//   ContentLength: "", 
-//   ContentSHA1: "", 
+//   ContentLength: "",
+//   ContentSHA1: "",
 //   ContentType: "",
 //   FileData: byte[],
 //   FileInfo: Dictionary<string,string> }
@@ -216,8 +222,8 @@ var file = await client.Files.GetVersions("FILENAME", "FILEID");
 //   [
 //     { FileId: "",
 //       FileName: "",
-//       Action: "", 
-//       Size: "", 
+//       Action: "",
+//       Size: "",
 //       UploadTimestamp: "" }
 //   ]
 // }
@@ -271,8 +277,8 @@ See the Large File tests for usage details.
 
 ### <a name="errors"></a>Errors
 Certain errors returned by B2 point to a temporary error with the upload or download of a file.
-If one of these errors are encountered during an upload or download then the B2Exception that 
-is returned will have the `ShouldRetryRequest` flag marked true. This is an indication that you 
+If one of these errors are encountered during an upload or download then the B2Exception that
+is returned will have the `ShouldRetryRequest` flag marked true. This is an indication that you
 should retry the request if you are so inclined.
 
 ## Release Notes
@@ -304,7 +310,7 @@ From the src directory run
 dotnet pack -o ..\tests\
 ```
 
-From the tests directory run 
+From the tests directory run
 ```
 dotnet restore
 dotnet test
