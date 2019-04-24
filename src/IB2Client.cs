@@ -4,9 +4,6 @@ using B2Net.Models;
 
 namespace B2Net {
 		public interface IB2Client {
-		string AllowedBucketId { get; }
-		string AllowedBucketName { get; }
-    
 		IBuckets Buckets { get; }
 		IFiles Files { get; }
 		ILargeFiles LargeFiles { get; }

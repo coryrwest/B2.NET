@@ -15,7 +15,7 @@
 		public string ApiUrl { get; set; }
 		public string DownloadUrl { get; set; }
 		public string AuthorizationToken { get; set; }
-		public B2Capabilities Capabilities { get; set; }
+		public B2Capabilities Capabilities { get; private set; }
 		/// <summary>
 		/// This will only be set after a call to the upload API
 		/// </summary>
@@ -43,12 +43,7 @@
 			AuthorizationToken = response.authorizationToken;
 			RecommendedPartSize = response.recommendedPartSize;
 			AbsoluteMinimumPartSize = response.absoluteMinimumPartSize;
-			Capabilities = new B2Capabilities() {
-				BucketId = response.allowed.bucketId,
-				BucketName = response.allowed.bucketName,
-				Capabilities = response.allowed.capabilities,
-				NamePrefix = response.allowed.namePrefix
-			};
+			Capabilities = new B2Capabilities(response.allowed);
 		}
 	}
 }

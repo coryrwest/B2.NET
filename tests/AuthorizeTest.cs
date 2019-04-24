@@ -3,11 +3,12 @@ using B2Net.Models;
 using B2Net.Tests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace B2.Net.Tests {
+namespace B2Net.Tests {
 	[TestClass]
 	public class AuthorizeTest : BaseTest {
-		string applicationKey = "K001aGKV28pVD3hL7rcXKQ/kCRQf73U";
-		string applicationKeyId = "00151189a8b4c7a0000000005";
+		// TODO Change these to valid keys to run tests
+		string applicationKey = "K001+GGkBNcbJVj3LD4+e3s5pCUMQ7U";
+		string applicationKeyId = "00151189a8b4c7a0000000006";
 
 		[TestMethod]
 		public void CanWeAuthorize() {
@@ -28,7 +29,6 @@ namespace B2.Net.Tests {
 		[TestMethod]
 		public void CanWeAuthorizeNonMasterKey() {
 			var result = B2Client.Authorize(TestConstants.AccountId, applicationKey, applicationKeyId);
-
 			Assert.IsFalse(string.IsNullOrEmpty(result.AuthorizationToken));
 		}
 
@@ -37,7 +37,7 @@ namespace B2.Net.Tests {
 			var result = B2Client.Authorize(applicationKeyId, applicationKey);
 
 			Assert.IsFalse(string.IsNullOrEmpty(result.AuthorizationToken));
-
+			
 			Assert.IsNotNull(result.Capabilities);
 			Assert.IsNotNull(result.Capabilities.Capabilities);
 		}

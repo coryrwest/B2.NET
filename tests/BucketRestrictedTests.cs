@@ -2,7 +2,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System.Threading.Tasks;
-using B2.Net.Tests;
 
 namespace B2Net.Tests {
 	[TestClass]
