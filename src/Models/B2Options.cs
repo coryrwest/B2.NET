@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace B2Net.Models {
+﻿namespace B2Net.Models {
 	public class B2Options {
 		public string AccountId { get; set; }
 		public string KeyId { get; set; }
@@ -13,8 +11,8 @@ namespace B2Net.Models {
 		/// </summary>
 		public bool PersistBucket { get; set; }
 
-        // State
-        public string ApiUrl { get; set; }
+		// State
+		public string ApiUrl { get; set; }
 		public string DownloadUrl { get; set; }
 		public string AuthorizationToken { get; set; }
 		public B2Capabilities Capabilities { get; set; }
@@ -22,8 +20,8 @@ namespace B2Net.Models {
 		/// This will only be set after a call to the upload API
 		/// </summary>
 		public string UploadAuthorizationToken { get; set; }
-        public long RecommendedPartSize { get; set; }
-        public long AbsoluteMinimumPartSize { get; set; }
+		public long RecommendedPartSize { get; set; }
+		public long AbsoluteMinimumPartSize { get; set; }
 
 		/// <summary>
 		/// Deprecated: Will always be the same as RecommendedPartSize
@@ -32,19 +30,19 @@ namespace B2Net.Models {
 			get { return RecommendedPartSize; }
 		}
 
-	    public int RequestTimeout { get; set; }
+		public int RequestTimeout { get; set; }
 
-        public B2Options() {
+		public B2Options() {
 			PersistBucket = false;
-            RequestTimeout = 100;
-        }
+			RequestTimeout = 100;
+		}
 
 		public void SetState(B2AuthResponse response) {
 			ApiUrl = response.apiUrl;
 			DownloadUrl = response.downloadUrl;
 			AuthorizationToken = response.authorizationToken;
-            RecommendedPartSize = response.recommendedPartSize;
-            AbsoluteMinimumPartSize = response.absoluteMinimumPartSize;
+			RecommendedPartSize = response.recommendedPartSize;
+			AbsoluteMinimumPartSize = response.absoluteMinimumPartSize;
 			Capabilities = new B2Capabilities() {
 				BucketId = response.allowed.bucketId,
 				BucketName = response.allowed.bucketName,

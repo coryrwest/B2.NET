@@ -1,13 +1,7 @@
-﻿using System;
-using System.IO;
-using System.Net;
-using System.Security.Cryptography;
-using System.Text;
-using B2Net;
+﻿using B2Net;
 using B2Net.Models;
 using B2Net.Tests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
 
 namespace B2.Net.Tests {
 	[TestClass]
@@ -16,12 +10,12 @@ namespace B2.Net.Tests {
 		string applicationKeyId = "00151189a8b4c7a0000000005";
 
 		[TestMethod]
-	    public void CanWeAuthorize() {
-	        var client = new B2Client(Options);
+		public void CanWeAuthorize() {
+			var client = new B2Client(Options);
 
-	        var result = client.Authorize().Result;
+			var result = client.Authorize().Result;
 
-	        Assert.IsFalse(string.IsNullOrEmpty(result.AuthorizationToken));
+			Assert.IsFalse(string.IsNullOrEmpty(result.AuthorizationToken));
 		}
 
 		[TestMethod]
@@ -57,14 +51,14 @@ namespace B2.Net.Tests {
 		}
 
 		[TestMethod]
-        public void DoWeGetOptionsBack() {
-            var result = B2Client.Authorize(Options);
+		public void DoWeGetOptionsBack() {
+			var result = B2Client.Authorize(Options);
 
-            Assert.AreNotEqual("0", result.AbsoluteMinimumPartSize);
-            Assert.AreNotEqual("0", result.MinimumPartSize);
-            Assert.AreNotEqual("0", result.RecommendedPartSize);
-            Assert.IsFalse(string.IsNullOrEmpty(result.DownloadUrl));
-            Assert.IsFalse(string.IsNullOrEmpty(result.ApiUrl));
-        }
-    }
+			Assert.AreNotEqual("0", result.AbsoluteMinimumPartSize);
+			Assert.AreNotEqual("0", result.MinimumPartSize);
+			Assert.AreNotEqual("0", result.RecommendedPartSize);
+			Assert.IsFalse(string.IsNullOrEmpty(result.DownloadUrl));
+			Assert.IsFalse(string.IsNullOrEmpty(result.ApiUrl));
+		}
+	}
 }
