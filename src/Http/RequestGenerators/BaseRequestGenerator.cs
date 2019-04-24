@@ -1,37 +1,37 @@
-﻿using System;
+﻿using B2Net.Models;
+using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using B2Net.Models;
 
 namespace B2Net.Http.RequestGenerators {
 	public static class BaseRequestGenerator {
-	    public static HttpRequestMessage PostRequest(string endpoint, string body, B2Options options) {
-	        var uri = new Uri(options.ApiUrl + "/b2api/" + Constants.Version + "/" + endpoint);
-	        var request = new HttpRequestMessage() {
-	            Method = HttpMethod.Post,
-	            RequestUri = uri,
-	            Content = new StringContent(body)
-	        };
-            
-            request.Headers.TryAddWithoutValidation("Authorization", options.AuthorizationToken);
+		public static HttpRequestMessage PostRequest(string endpoint, string body, B2Options options) {
+			var uri = new Uri(options.ApiUrl + "/b2api/" + Constants.Version + "/" + endpoint);
+			var request = new HttpRequestMessage() {
+				Method = HttpMethod.Post,
+				RequestUri = uri,
+				Content = new StringContent(body)
+			};
 
-	        return request;
-	    }
+			request.Headers.TryAddWithoutValidation("Authorization", options.AuthorizationToken);
 
-	    public static HttpRequestMessage PostRequestJson(string endpoint, string body, B2Options options) {
-	        var uri = new Uri(options.ApiUrl + "/b2api/" + Constants.Version + "/" + endpoint);
-	        var request = new HttpRequestMessage() {
-	            Method = HttpMethod.Post,
-	            RequestUri = uri,
-	            Content = new StringContent(body)
-	        };
+			return request;
+		}
 
-	        request.Headers.TryAddWithoutValidation("Authorization", options.AuthorizationToken);
+		public static HttpRequestMessage PostRequestJson(string endpoint, string body, B2Options options) {
+			var uri = new Uri(options.ApiUrl + "/b2api/" + Constants.Version + "/" + endpoint);
+			var request = new HttpRequestMessage() {
+				Method = HttpMethod.Post,
+				RequestUri = uri,
+				Content = new StringContent(body)
+			};
 
-	        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-	        request.Content.Headers.ContentLength = body.Length;
+			request.Headers.TryAddWithoutValidation("Authorization", options.AuthorizationToken);
 
-            return request;
-	    }
-    }
+			request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+			request.Content.Headers.ContentLength = body.Length;
+
+			return request;
+		}
+	}
 }
