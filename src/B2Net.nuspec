@@ -11,5 +11,6 @@
     <description>$description$</description>
     <copyright>Copyright 2017</copyright>
     <tags>B2 Cloud Storage Backblaze</tags>
+	<license type="file">LICENSE</license>
   </metadata>
 </package>

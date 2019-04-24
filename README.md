@@ -283,6 +283,7 @@ should retry the request if you are so inclined.
 
 ## Release Notes
 
+*  0.6.1  Made Capabilities on the B2 Client read only, as they define what an application key can do and should not be mutable.
 *  0.6.0  Preliminary support for the v2 Keys API
 *  0.5.32 Fixed bug preventing the use of Keys API keys
 *  0.5.31 Fixed upload bug introduced in 0.5.21
