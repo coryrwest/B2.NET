@@ -29,8 +29,7 @@ namespace B2Net {
 				B2Error b2Error;
 				try {
 					b2Error = JsonConvert.DeserializeObject<B2Error>(content);
-				}
-				catch (Exception ex) {
+				} catch (Exception ex) {
 					throw new Exception("Seralization of the response failed. See inner exception for response contents and serialization error.", ex);
 				}
 				if (b2Error != null) {

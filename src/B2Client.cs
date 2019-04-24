@@ -54,7 +54,7 @@ namespace B2Net {
 			Files = new Files(_options);
 			LargeFiles = new LargeFiles(_options);
 		}
-		
+
 		public IBuckets Buckets { get; }
 		public IFiles Files { get; }
 		public ILargeFiles LargeFiles { get; }
@@ -91,12 +91,10 @@ namespace B2Net {
 				var authResponse = JsonConvert.DeserializeObject<B2AuthResponse>(jsonResponse);
 
 				options.SetState(authResponse);
-			}
-			else if (response.StatusCode == HttpStatusCode.Unauthorized) {
+			} else if (response.StatusCode == HttpStatusCode.Unauthorized) {
 				// Return a better exception because of confusing Keys api.
 				throw new AuthorizationException("If you are using an Application key and not a Master key, make sure that you are supplying the Key ID and Key Value for that Application Key. Do not mix your Account ID with your Application Key.");
-			}
-			else {
+			} else {
 				throw new AuthorizationException(jsonResponse);
 			}
 

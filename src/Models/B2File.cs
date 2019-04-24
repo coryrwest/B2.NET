@@ -21,8 +21,7 @@ namespace B2Net.Models {
 				if (!string.IsNullOrEmpty(UploadTimestamp)) {
 					var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 					return epoch.AddMilliseconds(double.Parse(UploadTimestamp));
-				}
-				else {
+				} else {
 					return DateTime.Now;
 				}
 			}
