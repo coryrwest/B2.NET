@@ -1,8 +1,10 @@
-﻿using B2Net.Models;
+﻿using System;
+using B2Net.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace B2Net.Tests {
 	[TestClass]
@@ -15,7 +17,7 @@ namespace B2Net.Tests {
 #if NETFULL
 		private string FilePath => Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "../../../");
 #else
-        private string FilePath => Path.Combine(System.AppContext.BaseDirectory, "../../../");
+		private string FilePath => Path.Combine(System.AppContext.BaseDirectory, "../../../");
 #endif
 
 		[TestInitialize]
@@ -33,8 +35,7 @@ namespace B2Net.Tests {
 
 			if (existingBucket != null) {
 				TestBucket = existingBucket;
-			}
-			else {
+			} else {
 				TestBucket = Client.Buckets.Create(BucketName, BucketTypes.allPrivate).Result;
 			}
 		}
@@ -179,8 +180,9 @@ namespace B2Net.Tests {
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
 
-			var fileInfo = new Dictionary<string, string>();
-			fileInfo.Add("FileInfoTest", "1234");
+			var fileInfo = new Dictionary<string, string>() {
+				{"FileInfoTest", "1234"}
+			};
 
 			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId, fileInfo).Result;
 
@@ -215,8 +217,9 @@ namespace B2Net.Tests {
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
 
-			var fileInfo = new Dictionary<string, string>();
-			fileInfo.Add("FileInfoTest", "1234");
+			var fileInfo = new Dictionary<string, string>() {
+				{"FileInfoTest", "1234"}
+			};
 
 			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId, fileInfo).Result;
 			// Clean up.
@@ -307,6 +310,63 @@ namespace B2Net.Tests {
 			var downloadAuth = Client.Files.GetDownloadAuthorization("Test", 120, TestBucket.BucketId).Result;
 
 			Assert.AreEqual("Test", downloadAuth.FileNamePrefix, "File prefixes were not the same.");
+		}
+
+		[TestMethod]
+		public async Task CopyFile() {
+			var fileName = "B2Test.txt";
+			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
+			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			// Clean up.
+			FilesToDelete.Add(file);
+
+			var copied = await Client.Files.Copy(file.FileId, "B2TestCopy.txt");
+			// Clean up.
+			FilesToDelete.Add(copied);
+
+			Assert.AreEqual("copy", copied.Action, "Action was not as expected for the copy operation.");
+		}
+
+		[TestMethod]
+		public async Task ReplaceFile() {
+			var fileName = "B2Test.txt";
+			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
+			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			// Clean up.
+			FilesToDelete.Add(file);
+
+			var copied = await Client.Files.Copy(file.FileId, "B2TestCopy.txt", B2MetadataDirective.REPLACE, fileInfo: new Dictionary<string, string>() {
+				{"FileInfoTest", "1234"}
+			});
+			// Clean up.
+			FilesToDelete.Add(copied);
+
+			Assert.AreEqual("replace", copied.Action, "Action was not as expected for the replace operation.");
+			Assert.IsTrue(copied.FileInfo.ContainsKey("FileInfoTest"), "FileInfo was not as expected for the replace operation.");
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(Exception), "Copy did not fail when disallowed fields were provided.")]
+		public void CopyFileWithDisallowedFields() {
+			var fileName = "B2Test.txt";
+			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
+			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			// Clean up.
+			FilesToDelete.Add(file);
+
+			var copied = Client.Files.Copy(file.FileId, "B2TestCopy.txt", contentType: "b2/x-auto");
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(Exception), "Replace did not fail when fields were missing.")]
+		public void ReplaceFileWithMissingFields() {
+			var fileName = "B2Test.txt";
+			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
+			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			// Clean up.
+			FilesToDelete.Add(file);
+
+			var copied = Client.Files.Copy(file.FileId, "B2TestCopy.txt", B2MetadataDirective.REPLACE);
 		}
 
 		[TestCleanup]
