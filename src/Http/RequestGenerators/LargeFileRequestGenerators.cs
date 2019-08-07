@@ -114,12 +114,12 @@ namespace B2Net.Http.RequestGenerators {
 			return request;
 		}
 
-		public static HttpRequestMessage CopyPart(B2Options options, string sourceFileId, string destinationLargeFileId, string destinationPartNumber, string range = "") {
-			var uri = new Uri(options.ApiUrl + "/b2api/" + Constants.Version + "/" + Endpoints.Start);
+		public static HttpRequestMessage CopyPart(B2Options options, string sourceFileId, string destinationLargeFileId, int destinationPartNumber, string range = "") {
+			var uri = new Uri(options.ApiUrl + "/b2api/" + Constants.Version + "/" + Endpoints.CopyPart);
 			var payload = new Dictionary<string,string>() {
 				{ "sourceFileId", sourceFileId },
 				{ "largeFileId", destinationLargeFileId },
-				{ "partNumber", destinationPartNumber },
+				{ "partNumber", destinationPartNumber.ToString() },
 			};
 			if (!string.IsNullOrWhiteSpace(range)) {
 				payload.Add("range", range);

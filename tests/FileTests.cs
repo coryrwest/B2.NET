@@ -325,6 +325,7 @@ namespace B2Net.Tests {
 			FilesToDelete.Add(copied);
 
 			Assert.AreEqual("copy", copied.Action, "Action was not as expected for the copy operation.");
+			Assert.AreEqual(fileData.Length, copied.ContentLength, "Length of the two files was not the same.");
 		}
 
 		[TestMethod]
@@ -335,14 +336,14 @@ namespace B2Net.Tests {
 			// Clean up.
 			FilesToDelete.Add(file);
 
-			var copied = await Client.Files.Copy(file.FileId, "B2TestCopy.txt", B2MetadataDirective.REPLACE, fileInfo: new Dictionary<string, string>() {
+			var copied = await Client.Files.Copy(file.FileId, "B2TestCopy.txt", B2MetadataDirective.REPLACE, "text/plain", new Dictionary<string, string>() {
 				{"FileInfoTest", "1234"}
 			});
 			// Clean up.
 			FilesToDelete.Add(copied);
 
-			Assert.AreEqual("replace", copied.Action, "Action was not as expected for the replace operation.");
 			Assert.IsTrue(copied.FileInfo.ContainsKey("FileInfoTest"), "FileInfo was not as expected for the replace operation.");
+			Assert.AreEqual(fileData.Length, copied.ContentLength, "Length of the two files was not the same.");
 		}
 
 		[TestMethod]
@@ -351,6 +352,7 @@ namespace B2Net.Tests {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
 			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+
 			// Clean up.
 			FilesToDelete.Add(file);
 

@@ -12,10 +12,10 @@ namespace B2Net.Http {
 		}
 
 		public static HttpRequestMessage Copy(B2Options options, string sourceFileId, string fileName, B2MetadataDirective metadataDirective,
-			string contentType = "", Dictionary<string, string> fileInfo = null, string range = "") {
-			var uri = new Uri(options.DownloadUrl + "/b2api/" + Constants.Version + "/" + Endpoints.Copy);
+			string contentType = "", Dictionary<string, string> fileInfo = null, string range = "", string destinationBucketId = "") {
+			var uri = new Uri(options.ApiUrl + "/b2api/" + Constants.Version + "/" + Endpoints.Copy);
 
-			var payload = new Dictionary<string, string>() {
+			var payload = new Dictionary<string, object>() {
 				{"sourceFileId", sourceFileId},
 				{"fileName", fileName},
 				{"metadataDirective", metadataDirective.ToString()},
@@ -23,8 +23,19 @@ namespace B2Net.Http {
 			if (!string.IsNullOrWhiteSpace(range)) {
 				payload.Add("range", range);
 			}
+			if (!string.IsNullOrWhiteSpace(destinationBucketId)) {
+				payload.Add("destinationBucketId", destinationBucketId);
+			}
 			if (metadataDirective == B2MetadataDirective.REPLACE) {
-				payload.Add("contentType", contentType);
+				if(string.IsNullOrWhiteSpace(contentType)) {
+					payload.Add("contentType", "b2/x-auto");
+				} else {
+					payload.Add("contentType", contentType);
+				}
+			}
+			// File Info
+			if (metadataDirective == B2MetadataDirective.REPLACE && fileInfo != null && fileInfo.Count > 0) {
+				payload.Add("fileInfo", fileInfo);
 			}
 			var json = JsonConvert.SerializeObject(payload);
 
@@ -33,12 +44,6 @@ namespace B2Net.Http {
 				RequestUri = uri,
 				Content = new StringContent(json)
 			};
-			// File Info headers
-			if (metadataDirective == B2MetadataDirective.REPLACE && fileInfo != null && fileInfo.Count > 0) {
-				foreach (var info in fileInfo.Take(10)) {
-					request.Headers.Add($"X-Bz-Info-{info.Key}", info.Value);
-				}
-			}
 
 			request.Headers.TryAddWithoutValidation("Authorization", options.AuthorizationToken);
 			

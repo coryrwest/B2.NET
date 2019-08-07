@@ -148,14 +148,14 @@ namespace B2Net {
 		/// <param name="fileInfo"></param>
 		/// <param name="cancelToken"></param>
 		/// <returns></returns>
-		public async Task<B2LargeFilePart> CopyPart(string sourceFileId, string destinationLargeFileId, string destinationPartNumber, string range = "", CancellationToken cancelToken = default(CancellationToken)) {
-			var request = LargeFileRequestGenerators.CopyPart(_options, sourceFileId, destinationLargeFileId, destinationPartNumber, range);
+		//public async Task<B2LargeFilePart> CopyPart(string sourceFileId, string destinationLargeFileId, int destinationPartNumber, string range = "", CancellationToken cancelToken = default(CancellationToken)) {
+		//	var request = LargeFileRequestGenerators.CopyPart(_options, sourceFileId, destinationLargeFileId, destinationPartNumber, range);
 
-			// Send the download request
-			var response = await _client.SendAsync(request, cancelToken);
+		//	// Send the download request
+		//	var response = await _client.SendAsync(request, cancelToken);
 
-			// Create B2File from response
-			return await ResponseParser.ParseResponse<B2LargeFilePart>(response, _api);
-		}
+		//	// Create B2File from response
+		//	return await ResponseParser.ParseResponse<B2LargeFilePart>(response, _api);
+		//}
 	}
 }

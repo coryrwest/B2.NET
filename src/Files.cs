@@ -336,7 +336,7 @@ namespace B2Net {
 		/// <returns></returns>
 		public async Task<B2File> Copy(string sourceFileId, string newFileName,
 			B2MetadataDirective metadataDirective = B2MetadataDirective.COPY, string contentType = "",
-			Dictionary<string, string> fileInfo = null, string range = "",
+			Dictionary<string, string> fileInfo = null, string range = "", string destinationBucketId = "",
 			CancellationToken cancelToken = default(CancellationToken)) {
 			if (metadataDirective == B2MetadataDirective.COPY && (!string.IsNullOrWhiteSpace(contentType) || fileInfo != null)) {
 				throw new Exception("Copy operations cannot specify fileInfo or contentType.");
@@ -347,7 +347,7 @@ namespace B2Net {
 				throw new Exception("Replace operations must specify fileInfo and contentType.");
 			}
 			
-			var request = FileCopyRequestGenerators.Copy(_options, sourceFileId, newFileName, metadataDirective, contentType, fileInfo, range);
+			var request = FileCopyRequestGenerators.Copy(_options, sourceFileId, newFileName, metadataDirective, contentType, fileInfo, range, destinationBucketId);
 
 			// Send the download request
 			var response = await _client.SendAsync(request, cancelToken);
