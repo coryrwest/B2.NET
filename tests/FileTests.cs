@@ -343,7 +343,7 @@ namespace B2Net.Tests {
 			FilesToDelete.Add(copied);
 
 			Assert.AreEqual("copy", copied.Action, "Action was not as expected for the copy operation.");
-			Assert.AreEqual(fileData.Length, copied.ContentLength, "Length of the two files was not the same.");
+			Assert.AreEqual(fileData.Length.ToString(), copied.ContentLength, "Length of the two files was not the same.");
 		}
 
 		[TestMethod]
@@ -360,13 +360,13 @@ namespace B2Net.Tests {
 			// Clean up.
 			FilesToDelete.Add(copied);
 
-			Assert.IsTrue(copied.FileInfo.ContainsKey("FileInfoTest"), "FileInfo was not as expected for the replace operation.");
-			Assert.AreEqual(fileData.Length, copied.ContentLength, "Length of the two files was not the same.");
+			Assert.IsTrue(copied.FileInfo.ContainsKey("fileinfotest"), "FileInfo was not as expected for the replace operation.");
+			Assert.AreEqual(fileData.Length.ToString(), copied.ContentLength, "Length of the two files was not the same.");
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(Exception), "Copy did not fail when disallowed fields were provided.")]
-		public void CopyFileWithDisallowedFields() {
+		[ExpectedException(typeof(CopyReplaceSetupException), "Copy did not fail when disallowed fields were provided.")]
+		public async Task CopyFileWithDisallowedFields() {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
 			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
@@ -374,19 +374,19 @@ namespace B2Net.Tests {
 			// Clean up.
 			FilesToDelete.Add(file);
 
-			var copied = Client.Files.Copy(file.FileId, "B2TestCopy.txt", contentType: "b2/x-auto");
+			var copied = await Client.Files.Copy(file.FileId, "B2TestCopy.txt", contentType: "b2/x-auto");
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(Exception), "Replace did not fail when fields were missing.")]
-		public void ReplaceFileWithMissingFields() {
+		[ExpectedException(typeof(CopyReplaceSetupException), "Replace did not fail when fields were missing.")]
+		public async Task ReplaceFileWithMissingFields() {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
 			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
 			// Clean up.
 			FilesToDelete.Add(file);
 
-			var copied = Client.Files.Copy(file.FileId, "B2TestCopy.txt", B2MetadataDirective.REPLACE);
+			var copied = await Client.Files.Copy(file.FileId, "B2TestCopy.txt", B2MetadataDirective.REPLACE);
 		}
 
 		[TestCleanup]

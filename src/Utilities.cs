@@ -51,7 +51,7 @@ namespace B2Net {
 		public static string DetermineBucketId(B2Options options, string bucketId) {
 			// Check for a persistant bucket
 			if (!options.PersistBucket && string.IsNullOrEmpty(bucketId)) {
-				throw new ArgumentNullException(nameof(bucketId));
+				throw new ArgumentNullException(nameof(bucketId), "You must either Persist a Bucket or provide a BucketId in the method call.");
 			}
 
 			// Are we persisting buckets? If so use the one from settings

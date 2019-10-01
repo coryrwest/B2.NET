@@ -339,12 +339,12 @@ namespace B2Net {
 			Dictionary<string, string> fileInfo = null, string range = "", string destinationBucketId = "",
 			CancellationToken cancelToken = default(CancellationToken)) {
 			if (metadataDirective == B2MetadataDirective.COPY && (!string.IsNullOrWhiteSpace(contentType) || fileInfo != null)) {
-				throw new Exception("Copy operations cannot specify fileInfo or contentType.");
+				throw new CopyReplaceSetupException("Copy operations cannot specify fileInfo or contentType.");
 			}
 
 			if (metadataDirective == B2MetadataDirective.REPLACE &&
 			    (string.IsNullOrWhiteSpace(contentType) || fileInfo == null)) {
-				throw new Exception("Replace operations must specify fileInfo and contentType.");
+				throw new CopyReplaceSetupException("Replace operations must specify fileInfo and contentType.");
 			}
 			
 			var request = FileCopyRequestGenerators.Copy(_options, sourceFileId, newFileName, metadataDirective, contentType, fileInfo, range, destinationBucketId);

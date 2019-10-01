@@ -7,6 +7,9 @@ namespace B2Net.Models {
 	public class NotAuthorizedException : Exception {
 		public NotAuthorizedException(string message) : base(message) { }
 	}
+	public class CopyReplaceSetupException : Exception {
+		public CopyReplaceSetupException(string message) : base(message) { }
+	}
 
 	public class B2Exception : Exception {
 		public string Status { get; set; }

@@ -6,10 +6,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace B2Net.Tests {
 	[TestClass]
 	public class AuthorizeTest : BaseTest {
-		// TODO Change these to valid keys to run tests
-		string applicationKey = "K001+GGkBNcbJVj3LD4+e3s5pCUMQ7U";
-		string applicationKeyId = "00151189a8b4c7a0000000006";
-
 		[TestMethod]
 		public void CanWeAuthorize() {
 			var client = new B2Client(Options);
@@ -45,18 +41,8 @@ namespace B2Net.Tests {
 		[TestMethod]
 		public void DoWeGetCapabilitiesOnClientWithApplicationKey() {
 			var client = new B2Client(B2Client.Authorize(applicationKeyId, applicationKey));
-
-			Assert.IsFalse(string.IsNullOrEmpty(client.Capabilities.BucketName));
-
+			
 			Assert.IsNotNull(client.Capabilities.Capabilities);
-		}
-
-		[TestMethod]
-		[ExpectedException(typeof(NotAuthorizedException), "Capabilties did not throw exception on unauthorized client")]
-		public void DoWeGetExceptionAccessingCapabilitiesOnUnauthorizedClient() {
-			var client = new B2Client(Options);
-
-			var caps = client.Capabilities;
 		}
 
 		[TestMethod]

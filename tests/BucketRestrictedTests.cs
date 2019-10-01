@@ -6,17 +6,16 @@ using System.Threading.Tasks;
 namespace B2Net.Tests {
 	[TestClass]
 	public class BucketRestrictedTests : BaseTest {
-		private string RestrictedBucketName = "B2Net-Test";
 		private string BucketName = "";
 
 		[TestMethod]
 		[ExpectedException(typeof(B2Exception), "Unauthorized error when operating on Buckets. Are you sure the key you are using has access? ")]
 		public async Task GetBucketListTest() {
-			// Key that is restricted to RestrictedBucketName above.
+			// Key that is restricted to a specific bucket name above.
 			var client = new B2Client(B2Client.Authorize(new B2Options() {
 				AccountId = TestConstants.AccountId,
-				KeyId = "00151189a8b4c7a0000000006",
-				ApplicationKey = "K001+GGkBNcbJVj3LD4+e3s5pCUMQ7U"
+				KeyId = restrictedApplicationKeyId,
+				ApplicationKey = restrictedApplicationKey
 			}));
 			BucketName = $"B2NETTestingBucket-{Path.GetRandomFileName().Replace(".", "").Substring(0, 6)}";
 
@@ -28,8 +27,8 @@ namespace B2Net.Tests {
 		public void BadInitialization() {
 			// Missing AccountId
 			var client = new B2Client(B2Client.Authorize(new B2Options() {
-				KeyId = "00151189a8b4c7a0000000006",
-				ApplicationKey = "K001+GGkBNcbJVj3LD4+e3s5pCUMQ7U"
+				KeyId = applicationKeyId,
+				ApplicationKey = applicationKey
 			}));
 		}
 	}
