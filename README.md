@@ -41,7 +41,7 @@ var options = new B2Options() {
 	BucketId = "OPTIONAL BUCKET ID",
 	PersistBucket = true/false
 };
-var client = new B2Client(Options);
+var client = new B2Client(B2Client.Authorize(options));
 ```
 
 ### Authorize
@@ -62,11 +62,13 @@ var client = new B2Client("ACCOUNTID", "APPLICATIONKEY", "OPTIONAL REQUESTTIMEOU
 var client = new B2Client("ACCOUNTID", "APPLICATIONKEY", "KEYID", "OPTIONAL REQUESTTIMEOUT");
 ```
 
-Once authenticated your allowed bucket ID and name are available on your `B2Client` instance:
+Once authenticated the capabilities of your Key are available on your `B2Client` `Capabilities` property:
 ```csharp
-var bucketId = client.AllowedBucketId;
-var bucketName = client.AllowedBucketName;
+var bucketId = client.Capabilities.BucketName;
+var capabilities = client.Capabilities.Capabilities;
+// See here for available capabilities: [https://www.backblaze.com/b2/docs/application_keys.html](https://www.backblaze.com/b2/docs/application_keys.html)
 ```
+NOTE: You must call Authorize or have an Authorized client instance before you can access Capabilities. This is because only Backblaze knows the capabilities of a key and that information is returned in the Authorization response.
 
 ### <a name="buckets"></a>Buckets
 #### List Buckets
@@ -212,6 +214,32 @@ var file = await client.Files.DownloadName("FILENAME", "BUCKETNAME");
 //   FileInfo: Dictionary<string,string> }
 ```
 
+#### Copy a file by id
+```csharp
+var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
+var file = await client.Files.Copy("FILEID", "NEWFILENAME");
+// { FileId: "",
+//   FileName: "",
+//   ContentLength: "",
+//   ContentSHA1: "",
+//   ContentType: "",
+//   FileData: byte[],
+//   FileInfo: Dictionary<string,string> }
+```
+
+#### Replace a file by id
+```csharp
+var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
+var file = await client.Files.Copy("FILEID", "NEWFILENAME", B2MetadataDirective.REPLACE, "CONTENT/TYPE");
+// { FileId: "",
+//   FileName: "",
+//   ContentLength: "",
+//   ContentSHA1: "",
+//   ContentType: "",
+//   FileData: byte[],
+//   FileInfo: Dictionary<string,string> }
+```
+
 #### Get versions for a file
 ```csharp
 var client = new B2Client("ACCOUNTID", "APPLICATIONKEY");
@@ -283,6 +311,7 @@ should retry the request if you are so inclined.
 
 ## Release Notes
 
+*  0.7.0  Fixed bug with encoding file names with /, All B2Client constructors will auto authorize with Backblaze, Capabilities surfaced to property on the B2Client, File copy API added.
 *  0.6.1  Made Capabilities on the B2 Client read only, as they define what an application key can do and should not be mutable.
 *  0.6.0  Preliminary support for the v2 Keys API
 *  0.5.32 Fixed bug preventing the use of Keys API keys

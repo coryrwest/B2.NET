@@ -254,6 +254,24 @@ namespace B2Net.Tests {
 		}
 
 		[TestMethod]
+		public void FileDownloadFolderTest() {
+			var fileName = "B2Test.txt";
+			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
+			string hash = Utilities.GetSHA1Hash(fileData);
+			var file = Client.Files.Upload(fileData, "B2Folder/Test/File.txt", TestBucket.BucketId).Result;
+			// Clean up.
+			FilesToDelete.Add(file);
+
+			Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
+
+			// Test download
+			var download = Client.Files.DownloadById(file.FileId).Result;
+			var downloadHash = Utilities.GetSHA1Hash(download.FileData);
+
+			Assert.AreEqual(hash, downloadHash);
+		}
+
+		[TestMethod]
 		public void FileDeleteTest() {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));

@@ -43,6 +43,23 @@ namespace B2Net.Tests {
 		}
 
 		[TestMethod]
+		public void DoWeGetCapabilitiesOnClientWithApplicationKey() {
+			var client = new B2Client(B2Client.Authorize(applicationKeyId, applicationKey));
+
+			Assert.IsFalse(string.IsNullOrEmpty(client.Capabilities.BucketName));
+
+			Assert.IsNotNull(client.Capabilities.Capabilities);
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(NotAuthorizedException), "Capabilties did not throw exception on unauthorized client")]
+		public void DoWeGetExceptionAccessingCapabilitiesOnUnauthorizedClient() {
+			var client = new B2Client(Options);
+
+			var caps = client.Capabilities;
+		}
+
+		[TestMethod]
 		[ExpectedException(typeof(AuthorizationException))]
 		public void ErrorAuthorizeNonMasterKeyWithAccountID() {
 			var key = "K001LarMmmWDIveFaZz3yvB4uattO+Q";

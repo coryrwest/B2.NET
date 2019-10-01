@@ -1,4 +1,5 @@
-﻿using B2Net.Http;
+﻿using System;
+using B2Net.Http;
 using B2Net.Models;
 using Newtonsoft.Json;
 using System.Net;
@@ -8,16 +9,30 @@ using System.Threading.Tasks;
 namespace B2Net {
 	public class B2Client : IB2Client {
 		private B2Options _options;
+		private B2Capabilities _capabilities { get; set; }
+
+		public B2Capabilities Capabilities {
+			get {
+				if (_options.Authenticated) {
+					return _capabilities;
+				}
+				else {
+					throw new NotAuthorizedException("You attempted to load the cabapilities of this key before authenticating with Backblaze. You must Authorize before you can access Capabilities.");
+				}
+			}
+		}
 
 		public B2Client(B2Options options) {
-			_options = options;
+			_options = Authorize(options);
 			Buckets = new Buckets(options);
 			Files = new Files(options);
 			LargeFiles = new LargeFiles(options);
+			_capabilities = options.Capabilities;
 		}
 
 		/// <summary>
 		/// Simple method for instantiating the B2Client. Does auth for you. See https://www.backblaze.com/b2/docs/application_keys.html for details on application keys.
+		/// This method defaults to not persisting a bucket. Manually build the options object if you wish to do that.
 		/// </summary>
 		/// <param name="accountId"></param>
 		/// <param name="applicationkey"></param>
@@ -33,10 +48,12 @@ namespace B2Net {
 			Buckets = new Buckets(_options);
 			Files = new Files(_options);
 			LargeFiles = new LargeFiles(_options);
+			_capabilities = _options.Capabilities;
 		}
 
 		/// <summary>
 		/// Simple method for instantiating the B2Client. Does auth for you. See https://www.backblaze.com/b2/docs/application_keys.html for details on application keys.
+		/// This method defaults to not persisting a bucket. Manually build the options object if you wish to do that.
 		/// </summary>
 		/// <param name="accountId"></param>
 		/// <param name="applicationkey"></param>
@@ -53,6 +70,7 @@ namespace B2Net {
 			Buckets = new Buckets(_options);
 			Files = new Files(_options);
 			LargeFiles = new LargeFiles(_options);
+			_capabilities = _options.Capabilities;
 		}
 
 		public IBuckets Buckets { get; }
@@ -77,6 +95,11 @@ namespace B2Net {
 		/// <param name="options"></param>
 		/// <returns></returns>
 		public static B2Options Authorize(B2Options options) {
+			// Return if already authenticated.
+			if (options.Authenticated) {
+				return options;
+			}
+
 			var client = HttpClientFactory.CreateHttpClient(options.RequestTimeout);
 
 			if (!string.IsNullOrEmpty(options.KeyId) && string.IsNullOrEmpty(options.AccountId)) {

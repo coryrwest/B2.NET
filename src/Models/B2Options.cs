@@ -32,6 +32,8 @@
 
 		public int RequestTimeout { get; set; }
 
+		public bool	Authenticated { get; private set; }
+
 		public B2Options() {
 			PersistBucket = false;
 			RequestTimeout = 100;
@@ -44,6 +46,7 @@
 			RecommendedPartSize = response.recommendedPartSize;
 			AbsoluteMinimumPartSize = response.absoluteMinimumPartSize;
 			Capabilities = new B2Capabilities(response.allowed);
+			Authenticated = true;
 		}
 	}
 }
