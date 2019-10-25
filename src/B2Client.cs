@@ -51,6 +51,18 @@ namespace B2Net {
 			_capabilities = _options.Capabilities;
 		}
 		
+		/// <summary>
+		/// Simple method for instantiating the B2Client. Does auth for you. See https://www.backblaze.com/b2/docs/application_keys.html for details on application keys.
+		/// This method defaults to not persisting a bucket. Manually build the options object if you wish to do that.
+		/// </summary>
+		/// <param name="accountId"></param>
+		/// <param name="applicationkey"></param>
+		/// <param name="requestTimeout"></param>
+		[Obsolete("Use B2Client(string keyId, string applicationkey, int requestTimeout = 100) instead as AccountId is no longer needed")]
+		public B2Client(string accountId, string applicationkey, string keyId, int requestTimeout = 100) :this(keyId, applicationkey, requestTimeout)
+		{
+		}
+		
 		public IBuckets Buckets { get; }
 		public IFiles Files { get; }
 		public ILargeFiles LargeFiles { get; }
