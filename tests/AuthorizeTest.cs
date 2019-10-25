@@ -1,4 +1,5 @@
-﻿using B2Net;
+﻿using B2.Net.Tests;
+using B2Net;
 using B2Net.Models;
 using B2Net.Tests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -24,8 +25,8 @@ namespace B2Net.Tests {
 
 		[TestMethod]
 		public void CanWeAuthorizeNonMasterKey() {
-			var result = B2Client.Authorize(TestConstants.AccountId, applicationKey, applicationKeyId);
-			Assert.IsFalse(string.IsNullOrEmpty(result.AuthorizationToken));
+			var result = B2Client.Authorize(applicationKeyId, applicationKey);
+			Assert.IsTrue(string.IsNullOrEmpty(result.AuthorizationToken));
 		}
 
 		[TestMethod]

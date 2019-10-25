@@ -45,6 +45,7 @@
 			AuthorizationToken = response.authorizationToken;
 			RecommendedPartSize = response.recommendedPartSize;
 			AbsoluteMinimumPartSize = response.absoluteMinimumPartSize;
+			AccountId = response.accountId;
 			Capabilities = new B2Capabilities(response.allowed);
 			Authenticated = true;
 		}
