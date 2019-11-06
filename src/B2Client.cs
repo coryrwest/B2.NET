@@ -37,30 +37,8 @@ namespace B2Net {
 		/// <param name="accountId"></param>
 		/// <param name="applicationkey"></param>
 		/// <param name="requestTimeout"></param>
-		public B2Client(string accountId, string applicationkey, int requestTimeout = 100) {
+		public B2Client(string keyId, string applicationkey, int requestTimeout = 100) {
 			_options = new B2Options() {
-				AccountId = accountId,
-				ApplicationKey = applicationkey,
-				RequestTimeout = requestTimeout
-			};
-			_options = Authorize(_options);
-
-			Buckets = new Buckets(_options);
-			Files = new Files(_options);
-			LargeFiles = new LargeFiles(_options);
-			_capabilities = _options.Capabilities;
-		}
-
-		/// <summary>
-		/// Simple method for instantiating the B2Client. Does auth for you. See https://www.backblaze.com/b2/docs/application_keys.html for details on application keys.
-		/// This method defaults to not persisting a bucket. Manually build the options object if you wish to do that.
-		/// </summary>
-		/// <param name="accountId"></param>
-		/// <param name="applicationkey"></param>
-		/// <param name="requestTimeout"></param>
-		public B2Client(string accountId, string applicationkey, string keyId, int requestTimeout = 100) {
-			_options = new B2Options() {
-				AccountId = accountId,
 				KeyId = keyId,
 				ApplicationKey = applicationkey,
 				RequestTimeout = requestTimeout
@@ -72,21 +50,33 @@ namespace B2Net {
 			LargeFiles = new LargeFiles(_options);
 			_capabilities = _options.Capabilities;
 		}
-
+		
+		/// <summary>
+		/// Simple method for instantiating the B2Client. Does auth for you. See https://www.backblaze.com/b2/docs/application_keys.html for details on application keys.
+		/// This method defaults to not persisting a bucket. Manually build the options object if you wish to do that.
+		/// </summary>
+		/// <param name="accountId"></param>
+		/// <param name="applicationkey"></param>
+		/// <param name="requestTimeout"></param>
+		[Obsolete("Use B2Client(string keyId, string applicationkey, int requestTimeout = 100) instead as AccountId is no longer needed")]
+		public B2Client(string accountId, string applicationkey, string keyId, int requestTimeout = 100) :this(keyId, applicationkey, requestTimeout)
+		{
+		}
+		
 		public IBuckets Buckets { get; }
 		public IFiles Files { get; }
 		public ILargeFiles LargeFiles { get; }
 
 		/// <summary>
-		/// Authorize against the B2 storage service. Requires that AccountId and ApplicationKey on the options object be set.
+		/// Authorize against the B2 storage service. Requires that KeyId and ApplicationKey on the options object be set.
 		/// </summary>
-		/// <returns>B2Options containing the download url, new api url, and authorization token.</returns>
+		/// <returns>B2Options containing the download url, new api url, AccountID and authorization token.</returns>
 		public async Task<B2Options> Authorize(CancellationToken cancelToken = default(CancellationToken)) {
 			return Authorize(_options);
 		}
 
-		public static B2Options Authorize(string accountId, string applicationkey, string keyId = "") {
-			return Authorize(new B2Options() { AccountId = accountId, ApplicationKey = applicationkey, KeyId = keyId });
+		public static B2Options Authorize(string keyId, string applicationkey) {
+			return Authorize(new B2Options() { ApplicationKey = applicationkey, KeyId = keyId });
 		}
 
 		/// <summary>
@@ -101,11 +91,7 @@ namespace B2Net {
 			}
 
 			var client = HttpClientFactory.CreateHttpClient(options.RequestTimeout);
-
-			if (!string.IsNullOrEmpty(options.KeyId) && string.IsNullOrEmpty(options.AccountId)) {
-				throw new AuthorizationException("You supplied an application keyid, but not the accountid. Both are required if you are not using a master key.");
-			}
-
+			
 			var requestMessage = AuthRequestGenerator.Authorize(options);
 			var response = client.SendAsync(requestMessage).Result;
 
