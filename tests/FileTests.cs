@@ -22,7 +22,7 @@ namespace B2Net.Tests {
 
 		[TestInitialize]
 		public void Initialize() {
-			Client = new B2Client(Options.AccountId, Options.ApplicationKey);
+			Client = new B2Client(Options);
 			BucketName = $"B2NETTestingBucket-{Path.GetRandomFileName().Replace(".", "").Substring(0, 6)}";
 
 			var buckets = Client.Buckets.GetList().Result;
