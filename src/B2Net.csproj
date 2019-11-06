@@ -21,7 +21,10 @@
     <PackageVersion>0.7.0.0</PackageVersion>
     <PackageProjectUrl>https://github.com/coryrwest/B2.NET</PackageProjectUrl>
     <RepositoryUrl>https://github.com/coryrwest/B2.NET</RepositoryUrl>
+    <LicenseURL>https://github.com/coryrwest/B2.NET/blob/master/LICENSE</LicenseURL>
     <PackageTags>B2 Backblaze Cloud Storage</PackageTags>
+    <PackageIconUrl>https://github.com/coryrwest/B2.NET/blob/master/LICENSE</PackageIconUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5'">

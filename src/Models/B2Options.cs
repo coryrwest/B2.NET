@@ -1,6 +1,6 @@
 ﻿namespace B2Net.Models {
 	public class B2Options {
-		public string AccountId { get; set; }
+		public string AccountId { get; private set; }
 		public string KeyId { get; set; }
 		public string ApplicationKey { get; set; }
 		public string BucketId { get; set; }

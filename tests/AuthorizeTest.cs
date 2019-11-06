@@ -1,8 +1,11 @@
-﻿using B2.Net.Tests;
+﻿using System;
+using System.Diagnostics;
+using B2Net.Tests;
 using B2Net;
 using B2Net.Models;
 using B2Net.Tests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 
 namespace B2Net.Tests {
 	[TestClass]
@@ -19,14 +22,15 @@ namespace B2Net.Tests {
 		[TestMethod]
 		public void CanWeAuthorizeStatic() {
 			var result = B2Client.Authorize(Options);
-
+			Console.WriteLine(JsonConvert.SerializeObject(result));
 			Assert.IsFalse(string.IsNullOrEmpty(result.AuthorizationToken));
 		}
 
 		[TestMethod]
 		public void CanWeAuthorizeNonMasterKey() {
 			var result = B2Client.Authorize(applicationKeyId, applicationKey);
-			Assert.IsTrue(string.IsNullOrEmpty(result.AuthorizationToken));
+			Console.WriteLine(JsonConvert.SerializeObject(result));
+			Assert.IsFalse(string.IsNullOrEmpty(result.AuthorizationToken));
 		}
 
 		[TestMethod]
@@ -48,10 +52,10 @@ namespace B2Net.Tests {
 
 		[TestMethod]
 		[ExpectedException(typeof(AuthorizationException))]
-		public void ErrorAuthorizeNonMasterKeyWithAccountID() {
+		public void ErrorAuthorizeNonMasterKeyWithMissingKeyID() {
 			var key = "K001LarMmmWDIveFaZz3yvB4uattO+Q";
 
-			var result = B2Client.Authorize(Options.AccountId, key);
+			var result = B2Client.Authorize("", key);
 		}
 
 		[TestMethod]

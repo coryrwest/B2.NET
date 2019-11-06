@@ -80,7 +80,7 @@ namespace B2Net {
 		}
 
 		/// <summary>
-		/// Requires that AccountId and ApplicationKey on the options object be set. If you are using an application key you must specify the accountId, the keyId, and the applicationKey.
+		/// Requires that KeyId and ApplicationKey on the options object be set. If you are using an application key you must specify the accountId, the keyId, and the applicationKey.
 		/// </summary>
 		/// <param name="options"></param>
 		/// <returns></returns>
@@ -88,6 +88,10 @@ namespace B2Net {
 			// Return if already authenticated.
 			if (options.Authenticated) {
 				return options;
+			}
+
+			if (string.IsNullOrWhiteSpace(options.KeyId) || string.IsNullOrWhiteSpace(options.ApplicationKey)) {
+				throw new AuthorizationException("Either KeyId or ApplicationKey were not specified.");
 			}
 
 			var client = HttpClientFactory.CreateHttpClient(options.RequestTimeout);

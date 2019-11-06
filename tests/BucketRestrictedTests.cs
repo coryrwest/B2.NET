@@ -13,7 +13,6 @@ namespace B2Net.Tests {
 		public async Task GetBucketListTest() {
 			// Key that is restricted to a specific bucket name above.
 			var client = new B2Client(B2Client.Authorize(new B2Options() {
-				AccountId = TestConstants.AccountId,
 				KeyId = restrictedApplicationKeyId,
 				ApplicationKey = restrictedApplicationKey
 			}));
