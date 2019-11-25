@@ -79,7 +79,10 @@ var bucketList = await client.Buckets.GetList();
 //   { BucketId: "",
 //     BucketName: "",
 //     BucketType: "",
-//     BucketInfo: Dictionary<string,string> }
+//     BucketInfo: Dictionary<string,string>,
+//     LifecycleRules: List<B2BucketLifecycleRule>,
+//     CORSRules: List<B2CORSRule>,
+//     Revision: int }
 // ]
 ```
 
@@ -89,7 +92,11 @@ var client = new B2Client("KEYID", "APPLICATIONKEY");
 var bucket = await client.Buckets.Create("BUCKETNAME", "OPTIONAL_BUCKET_TYPE");
 // { BucketId: "",
 //   BucketName: "",
-//   BucketType: "" }
+//   BucketType: "",
+//   BucketInfo: Dictionary<string,string>,
+//   LifecycleRules: List<B2BucketLifecycleRule>,
+//   CORSRules: List<B2CORSRule>,
+//   Revision: int }
 ```
 
 #### Create a Bucket with options
@@ -103,13 +110,25 @@ var bucket = await client.Buckets.Create("BUCKETNAME", new B2BucketOptions() {
 			DaysFromUploadingToHiding = null,
 			FileNamePrefix = ""
 		}
-	}
+	},
+	CORSRules = new List<B2CORSRule>() {
+		new B2CORSRule() {
+			CorsRuleName = "corsRule",
+			AllowedOrigins = new string[],
+			AllowedOperations = new string[],
+			AllowedHeaders = new string[],
+			ExposeHeaders = new string[],
+			MaxAgeSeconds = 1200
+		}
+	},
 });
 // { BucketId: "",
 //   BucketName: "",
 //   BucketType: "",
 //   BucketInfo: Dictionary<string,string>,
-//   LifecycleRules: List<B2BucketLifecycleRule> }
+//   LifecycleRules: List<B2BucketLifecycleRule>,
+//   CORSRules: List<B2CORSRule>,
+//   Revision: int }
 ```
 
 #### Update a Bucket
@@ -118,7 +137,10 @@ var client = new B2Client("KEYID", "APPLICATIONKEY");
 var bucket = await client.Buckets.Update("BUCKETID", "BUCKETYPE");
 // { BucketId: "",
 //   BucketName: "",
-//   BucketType: "" }
+//   BucketInfo: Dictionary<string,string>,
+//   LifecycleRules: List<B2BucketLifecycleRule>,
+//   CORSRules: List<B2CORSRule>,
+//   Revision: int }
 ```
 
 #### Update a Bucket with options
@@ -126,19 +148,31 @@ var bucket = await client.Buckets.Update("BUCKETID", "BUCKETYPE");
 var client = new B2Client("KEYID", "APPLICATIONKEY");
 var bucket = await client.Buckets.Update("BUCKETID", new B2BucketOptions() {
 	CacheControl = 300,
-	LifecycleRules = new System.Collections.Generic.List<B2BucketLifecycleRule>() {
+	LifecycleRules = new List<B2BucketLifecycleRule>() {
 		new B2BucketLifecycleRule() {
 			DaysFromHidingToDeleting = 30,
 			DaysFromUploadingToHiding = null,
 			FileNamePrefix = ""
 		}
-	}
+	},
+	CORSRules = new List<B2CORSRule>() {
+		new B2CORSRule() {
+			CorsRuleName = "corsRule",
+			AllowedOrigins = new string[],
+			AllowedOperations = new string[],
+			AllowedHeaders = new string[],
+			ExposeHeaders = new string[],
+			MaxAgeSeconds = 1200
+		}
+	},
 });
 // { BucketId: "",
 //   BucketName: "",
 //   BucketType: "",
 //   BucketInfo: Dictionary<string,string>,
-//   LifecycleRules: List<B2BucketLifecycleRule> }
+//   LifecycleRules: List<B2BucketLifecycleRule>,
+//   CORSRules: List<B2CORSRule>,
+//   Revision: int }
 ```
 
 ##### Bucket Types

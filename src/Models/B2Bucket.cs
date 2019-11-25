@@ -7,6 +7,8 @@ namespace B2Net.Models {
 		public string BucketType { get; set; }
 		public Dictionary<string, string> BucketInfo { get; set; }
 		public List<B2BucketLifecycleRule> LifecycleRules { get; set; }
+		public List<B2CORSRule> CORSRules { get; set; }
+		public int Revision { get; set; }
 	}
 
 	public class B2BucketLifecycleRule {

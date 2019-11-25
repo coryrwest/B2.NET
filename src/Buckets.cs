@@ -86,7 +86,7 @@ namespace B2Net {
 
 		/// <summary>
 		/// Update an existing bucket. bucketId is only optional if you are persisting a bucket for this client.
-		/// Use this method to set Cache-Control.
+		/// Use this method to set Cache-Control, Lifecycle Rules, or CORS rules.
 		/// </summary>
 		/// <param name="bucketType"></param>
 		/// <param name="bucketId"></param>
@@ -96,6 +96,23 @@ namespace B2Net {
 			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
 
 			var requestMessage = BucketRequestGenerators.UpdateBucket(_options, operationalBucketId, options);
+			var response = await _client.SendAsync(requestMessage, cancelToken);
+
+			return await ResponseParser.ParseResponse<B2Bucket>(response, _api);
+		}
+
+		/// <summary>
+		/// Update an existing bucket. bucketId is only optional if you are persisting a bucket for this client.
+		/// Use this method to set Cache-Control, Lifecycle Rules, or CORS rules.
+		/// </summary>
+		/// <param name="bucketType"></param>
+		/// <param name="bucketId"></param>
+		/// <param name="cancelToken"></param>
+		/// <returns></returns>
+		public async Task<B2Bucket> Update(B2BucketOptions options, int revisionNumber, string bucketId = "", CancellationToken cancelToken = default(CancellationToken)) {
+			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
+
+			var requestMessage = BucketRequestGenerators.UpdateBucket(_options, operationalBucketId, options, revisionNumber);
 			var response = await _client.SendAsync(requestMessage, cancelToken);
 
 			return await ResponseParser.ParseResponse<B2Bucket>(response, _api);

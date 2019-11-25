@@ -22,12 +22,12 @@ namespace B2Net.Tests {
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(AuthorizationException), "You supplied an application keyid, but not the accountid. Both are required if you are not using a master key.")]
+		[ExpectedException(typeof(AuthorizationException), "Either KeyId or ApplicationKey were not specified.")]
 		public void BadInitialization() {
 			// Missing AccountId
 			var client = new B2Client(B2Client.Authorize(new B2Options() {
 				KeyId = applicationKeyId,
-				ApplicationKey = applicationKey
+				ApplicationKey = ""
 			}));
 		}
 	}

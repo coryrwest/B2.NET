@@ -1,19 +1,20 @@
 ﻿using B2Net.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace B2Net.Tests {
 	[TestClass]
 	public class BucketTests : BaseTest {
 		private B2Client Client = null;
-		private string BucketName = "";
+		private string BucketName = $"B2NETTestingBucket-{Path.GetRandomFileName().Replace(".", "").Substring(0, 6)}";
 
 		[TestInitialize]
 		public void Initialize() {
 			Client = new B2Client(B2Client.Authorize(Options));
-			BucketName = $"B2NETTestingBucket-{Path.GetRandomFileName().Replace(".", "").Substring(0, 6)}";
 		}
 
 		[TestMethod]
@@ -29,14 +30,15 @@ namespace B2Net.Tests {
 
 		[TestMethod]
 		public void CreateBucketTest() {
-			var bucket = Client.Buckets.Create(BucketName, BucketTypes.allPrivate).Result;
+			var name = BucketName;
+			var bucket = Client.Buckets.Create(name, BucketTypes.allPrivate).Result;
 
 			// Clean up
 			if (!string.IsNullOrEmpty(bucket.BucketId)) {
 				Client.Buckets.Delete(bucket.BucketId).Wait();
 			}
 
-			Assert.AreEqual(BucketName, bucket.BucketName);
+			Assert.AreEqual(name, bucket.BucketName);
 		}
 
 		[TestMethod]
@@ -100,18 +102,18 @@ namespace B2Net.Tests {
 		}
 
 		[TestMethod]
-		public void UpdateBucketWithCacheControlTest() {
-			var bucket = Client.Buckets.Create(BucketName, new B2BucketOptions() { CacheControl = 600 }).Result;
+		public async Task UpdateBucketWithCacheControlTest() {
+			var bucket = await Client.Buckets.Create(BucketName, new B2BucketOptions() { CacheControl = 600 });
 
 			// Update bucket with new info
-			bucket = Client.Buckets.Update(new B2BucketOptions() { CacheControl = 300 }, bucket.BucketId).Result;
+			bucket = await Client.Buckets.Update(new B2BucketOptions() { CacheControl = 300 }, bucket.BucketId);
 
 			// Get bucket to check for info
-			var bucketList = Client.Buckets.GetList().Result;
+			var bucketList = await Client.Buckets.GetList();
 
 			// Clean up
 			if (!string.IsNullOrEmpty(bucket.BucketId)) {
-				Client.Buckets.Delete(bucket.BucketId).Wait();
+				await Client.Buckets.Delete(bucket.BucketId);
 			}
 
 			var savedBucket = bucketList.FirstOrDefault(b => b.BucketName == bucket.BucketName);
@@ -163,12 +165,13 @@ namespace B2Net.Tests {
 
 		[TestMethod]
 		public void DeleteBucketTest() {
+			var name = BucketName;
 			//Creat a bucket to delete
-			var bucket = Client.Buckets.Create(BucketName, BucketTypes.allPrivate).Result;
+			var bucket = Client.Buckets.Create(name, BucketTypes.allPrivate).Result;
 
 			if (!string.IsNullOrEmpty(bucket.BucketId)) {
 				var deletedBucket = Client.Buckets.Delete(bucket.BucketId).Result;
-				Assert.AreEqual(BucketName, deletedBucket.BucketName);
+				Assert.AreEqual(name, deletedBucket.BucketName);
 			}
 			else {
 				Assert.Fail("The bucket was not deleted. The response did not contain a bucketid.");
@@ -196,5 +199,81 @@ namespace B2Net.Tests {
 				Client.Buckets.Delete(bucket.BucketId).Wait();
 			}
 		}
+
+		[TestMethod]
+		public void BucketCORSRulesTest() {
+			var bucket = Client.Buckets.Create(BucketName, new B2BucketOptions() {
+				CORSRules = new List<B2CORSRule>() {
+					new B2CORSRule() {
+						CorsRuleName = "allowAnyHttps",
+						AllowedHeaders = new []{ "x-bz-content-sha1", "x-bz-info-*" },
+						AllowedOperations = new []{ "b2_upload_file" },
+						AllowedOrigins = new [] { "https://*" }
+					}
+				}
+			}).Result;
+
+			try {
+				var list = Client.Buckets.GetList().Result;
+				Assert.AreNotEqual(0, list.Count);
+
+				var corsBucket = list.First(x => x.BucketId == bucket.BucketId);
+
+				Assert.AreEqual("allowAnyHttps", corsBucket.CORSRules.First().CorsRuleName, "CORS header was not saved or returned for bucket.");
+			}
+			finally {
+				Client.Buckets.Delete(bucket.BucketId).Wait();
+			}
+		}
+
+		[TestMethod]
+		public void BucketCORSRuleUpdateTest() {
+			var bucket = Client.Buckets.Create(BucketName, new B2BucketOptions() {
+				CORSRules = new List<B2CORSRule>() {
+					new B2CORSRule() {
+						CorsRuleName = "allowAnyHttps",
+						AllowedHeaders = new []{ "x-bz-content-sha1", "x-bz-info-*" },
+						AllowedOperations = new []{ "b2_upload_file" },
+						AllowedOrigins = new [] { "https://*" }
+					}
+				}
+			}).Result;
+
+			try {
+				var updatedBucket = Client.Buckets.Update(new B2BucketOptions() {
+					CORSRules = new List<B2CORSRule>() {
+						new B2CORSRule() {
+							CorsRuleName = "updatedRule",
+							AllowedOperations = new []{ "b2_upload_part" },
+							AllowedOrigins = new [] { "https://*" }
+						}
+					}
+				}, bucket.Revision, bucket.BucketId).Result;
+
+				var list = Client.Buckets.GetList().Result;
+				Assert.AreNotEqual(0, list.Count);
+
+				var corsBucket = list.First(x => x.BucketId == bucket.BucketId);
+
+				Assert.AreEqual("updatedRule", corsBucket.CORSRules.First().CorsRuleName, "CORS header was not updated for bucket.");
+				Assert.AreEqual("b2_upload_part", corsBucket.CORSRules.First().AllowedOperations.First(), "CORS header was not updated for bucket.");
+			} finally {
+				Client.Buckets.Delete(bucket.BucketId).Wait();
+			}
+		}
+
+		//[TestMethod]
+		//public async Task CleanUpAccount() {
+		//	// Only use this test to clean up an account after tests run if buckets are left over.
+		//	var list = await Client.Buckets.GetList();
+		//	foreach (var b2Bucket in list.Where(x => x.BucketName.Contains("B2NETTestingBucket"))) {
+		//		var files = await Client.Files.GetList(bucketId: b2Bucket.BucketId);
+		//		if (files.Files.Count > 0) {
+		//			files.Files.ForEach(async x => await Client.Files.Delete(x.FileId, x.FileName));
+		//		}
+
+		//		await Client.Buckets.Delete(b2Bucket.BucketId);
+		//	}
+		//}
 	}
 }

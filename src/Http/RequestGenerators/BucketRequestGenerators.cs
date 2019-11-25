@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 
@@ -89,6 +90,11 @@ namespace B2Net.Http {
 				body.lifecycleRules = bucketOptions.LifecycleRules;
 			}
 
+			// Has cors rules
+			if (bucketOptions.CORSRules != null && bucketOptions.CORSRules.Count > 0) {
+				body.corsRules = bucketOptions.CORSRules;
+			}
+
 			var json = JsonSerialize(body);
 			return BaseRequestGenerator.PostRequest(Endpoints.Create, json, options);
 		}
@@ -106,9 +112,9 @@ namespace B2Net.Http {
 		/// <summary>
 		/// Used to modify the bucket type of the provided bucket.
 		/// </summary>
-		/// <param name="options"></param>
+		/// <param name="revisionNumber">(optional) When set, the update will only happen if the revision number stored in the B2 service matches the one passed in. This can be used to avoid having simultaneous updates make conflicting changes. </param>
 		/// <returns></returns>
-		public static HttpRequestMessage UpdateBucket(B2Options options, string bucketId, B2BucketOptions bucketOptions) {
+		public static HttpRequestMessage UpdateBucket(B2Options options, string bucketId, B2BucketOptions bucketOptions, int? revisionNumber = null) {
 			// Check lifecycle rules
 			var hasLifecycleRules = bucketOptions.LifecycleRules != null && bucketOptions.LifecycleRules.Count > 0;
 			if (hasLifecycleRules) {
@@ -138,6 +144,24 @@ namespace B2Net.Http {
 				body.lifecycleRules = bucketOptions.LifecycleRules;
 			}
 
+			// Has cors rules
+			if (bucketOptions.CORSRules != null && bucketOptions.CORSRules.Count > 0) {
+				if (bucketOptions.CORSRules.Any(x => x.AllowedOperations == null || x.AllowedOperations.Length == 0)) {
+					throw new System.Exception("You must set allowedOperations on the bucket CORS rules.");
+				}
+				if (bucketOptions.CORSRules.Any(x => x.AllowedOrigins == null || x.AllowedOrigins.Length == 0)) {
+					throw new System.Exception("You must set allowedOrigins on the bucket CORS rules.");
+				}
+				if (bucketOptions.CORSRules.Any(x => string.IsNullOrEmpty(x.CorsRuleName))) {
+					throw new System.Exception("You must set corsRuleName on the bucket CORS rules.");
+				}
+				body.corsRules = bucketOptions.CORSRules;
+			}
+
+			if (revisionNumber.HasValue) {
+				body.ifRevisionIs = revisionNumber.Value;
+			}
+
 			var json = JsonSerialize(body);
 			return BaseRequestGenerator.PostRequest(Endpoints.Update, json, options);
 		}
@@ -155,6 +179,7 @@ namespace B2Net.Http {
 		public string bucketType { get; set; }
 		public Dictionary<string, string> bucketInfo { get; set; }
 		public List<B2BucketLifecycleRule> lifecycleRules { get; set; }
+		public List<B2CORSRule> corsRules { get; set; }
 	}
 
 	internal class B2BucketUpdateModel {
@@ -163,5 +188,7 @@ namespace B2Net.Http {
 		public string bucketType { get; set; }
 		public Dictionary<string, string> bucketInfo { get; set; }
 		public List<B2BucketLifecycleRule> lifecycleRules { get; set; }
+		public List<B2CORSRule> corsRules { get; set; }
+		public int? ifRevisionIs { get; set; }
 	}
 }
