@@ -138,5 +138,24 @@ namespace B2Net {
 			// Create B2File from response
 			return await ResponseParser.ParseResponse<B2IncompleteLargeFiles>(response, _api);
 		}
+
+		/// <summary>
+		/// Copy a source file into part of a large file
+		/// </summary>
+		/// <param name="fileName"></param>
+		/// <param name="contentType"></param>
+		/// <param name="bucketId"></param>
+		/// <param name="fileInfo"></param>
+		/// <param name="cancelToken"></param>
+		/// <returns></returns>
+		//public async Task<B2LargeFilePart> CopyPart(string sourceFileId, string destinationLargeFileId, int destinationPartNumber, string range = "", CancellationToken cancelToken = default(CancellationToken)) {
+		//	var request = LargeFileRequestGenerators.CopyPart(_options, sourceFileId, destinationLargeFileId, destinationPartNumber, range);
+
+		//	// Send the download request
+		//	var response = await _client.SendAsync(request, cancelToken);
+
+		//	// Create B2File from response
+		//	return await ResponseParser.ParseResponse<B2LargeFilePart>(response, _api);
+		//}
 	}
 }

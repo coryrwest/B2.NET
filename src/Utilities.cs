@@ -51,7 +51,7 @@ namespace B2Net {
 		public static string DetermineBucketId(B2Options options, string bucketId) {
 			// Check for a persistant bucket
 			if (!options.PersistBucket && string.IsNullOrEmpty(bucketId)) {
-				throw new ArgumentNullException(nameof(bucketId));
+				throw new ArgumentNullException(nameof(bucketId), "You must either Persist a Bucket or provide a BucketId in the method call.");
 			}
 
 			// Are we persisting buckets? If so use the one from settings
@@ -79,7 +79,8 @@ namespace B2Net {
 			if (str == "/") {
 				return str;
 			}
-			return Uri.EscapeDataString(str);
+			// Decode / back to un-encoded value
+			return Uri.EscapeDataString(str).Replace("%2F", "/");
 		}
 
 		public static string b2UrlDecode(this string str) {

@@ -1,6 +1,6 @@
 ﻿namespace B2Net.Models {
 	public class B2Options {
-		public string AccountId { get; set; }
+		public string AccountId { get; private set; }
 		public string KeyId { get; set; }
 		public string ApplicationKey { get; set; }
 		public string BucketId { get; set; }
@@ -32,6 +32,8 @@
 
 		public int RequestTimeout { get; set; }
 
+		public bool	Authenticated { get; private set; }
+
 		public B2Options() {
 			PersistBucket = false;
 			RequestTimeout = 100;
@@ -43,7 +45,9 @@
 			AuthorizationToken = response.authorizationToken;
 			RecommendedPartSize = response.recommendedPartSize;
 			AbsoluteMinimumPartSize = response.absoluteMinimumPartSize;
+			AccountId = response.accountId;
 			Capabilities = new B2Capabilities(response.allowed);
+			Authenticated = true;
 		}
 	}
 }

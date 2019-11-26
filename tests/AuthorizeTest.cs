@@ -1,15 +1,15 @@
-﻿using B2Net;
+﻿using System;
+using System.Diagnostics;
+using B2Net.Tests;
+using B2Net;
 using B2Net.Models;
 using B2Net.Tests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 
 namespace B2Net.Tests {
 	[TestClass]
 	public class AuthorizeTest : BaseTest {
-		// TODO Change these to valid keys to run tests
-		string applicationKey = "K001+GGkBNcbJVj3LD4+e3s5pCUMQ7U";
-		string applicationKeyId = "00151189a8b4c7a0000000006";
-
 		[TestMethod]
 		public void CanWeAuthorize() {
 			var client = new B2Client(Options);
@@ -22,13 +22,14 @@ namespace B2Net.Tests {
 		[TestMethod]
 		public void CanWeAuthorizeStatic() {
 			var result = B2Client.Authorize(Options);
-
+			Console.WriteLine(JsonConvert.SerializeObject(result));
 			Assert.IsFalse(string.IsNullOrEmpty(result.AuthorizationToken));
 		}
 
 		[TestMethod]
 		public void CanWeAuthorizeNonMasterKey() {
-			var result = B2Client.Authorize(TestConstants.AccountId, applicationKey, applicationKeyId);
+			var result = B2Client.Authorize(applicationKeyId, applicationKey);
+			Console.WriteLine(JsonConvert.SerializeObject(result));
 			Assert.IsFalse(string.IsNullOrEmpty(result.AuthorizationToken));
 		}
 
@@ -43,11 +44,18 @@ namespace B2Net.Tests {
 		}
 
 		[TestMethod]
+		public void DoWeGetCapabilitiesOnClientWithApplicationKey() {
+			var client = new B2Client(B2Client.Authorize(applicationKeyId, applicationKey));
+			
+			Assert.IsNotNull(client.Capabilities.Capabilities);
+		}
+
+		[TestMethod]
 		[ExpectedException(typeof(AuthorizationException))]
-		public void ErrorAuthorizeNonMasterKeyWithAccountID() {
+		public void ErrorAuthorizeNonMasterKeyWithMissingKeyID() {
 			var key = "K001LarMmmWDIveFaZz3yvB4uattO+Q";
 
-			var result = B2Client.Authorize(Options.AccountId, key);
+			var result = B2Client.Authorize("", key);
 		}
 
 		[TestMethod]

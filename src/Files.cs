@@ -1,4 +1,5 @@
-﻿using B2Net.Http;
+﻿using System;
+using B2Net.Http;
 using B2Net.Models;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -319,6 +320,39 @@ namespace B2Net {
 			var requestMessage = FileMetaDataRequestGenerators.HideFile(_options, operationalBucketId, fileName, fileId);
 			var response = await _client.SendAsync(requestMessage, cancelToken);
 
+			return await ResponseParser.ParseResponse<B2File>(response, _api);
+		}
+
+		/// <summary>
+		/// Copy or Replace a file stored in B2. This will copy the file on B2's servers, resulting in no download or upload charges.
+		/// </summary>
+		/// <param name="sourceFileId"></param>
+		/// <param name="newFileName"></param>
+		/// <param name="metadataDirective">COPY or REPLACE. COPY will not allow any changes to File Info or Content Type. REPLACE will.</param>
+		/// <param name="contentType"></param>
+		/// <param name="fileInfo"></param>
+		/// <param name="range">byte range to copy.</param>
+		/// <param name="cancelToken"></param>
+		/// <returns></returns>
+		public async Task<B2File> Copy(string sourceFileId, string newFileName,
+			B2MetadataDirective metadataDirective = B2MetadataDirective.COPY, string contentType = "",
+			Dictionary<string, string> fileInfo = null, string range = "", string destinationBucketId = "",
+			CancellationToken cancelToken = default(CancellationToken)) {
+			if (metadataDirective == B2MetadataDirective.COPY && (!string.IsNullOrWhiteSpace(contentType) || fileInfo != null)) {
+				throw new CopyReplaceSetupException("Copy operations cannot specify fileInfo or contentType.");
+			}
+
+			if (metadataDirective == B2MetadataDirective.REPLACE &&
+			    (string.IsNullOrWhiteSpace(contentType) || fileInfo == null)) {
+				throw new CopyReplaceSetupException("Replace operations must specify fileInfo and contentType.");
+			}
+			
+			var request = FileCopyRequestGenerators.Copy(_options, sourceFileId, newFileName, metadataDirective, contentType, fileInfo, range, destinationBucketId);
+
+			// Send the download request
+			var response = await _client.SendAsync(request, cancelToken);
+
+			// Create B2File from response
 			return await ResponseParser.ParseResponse<B2File>(response, _api);
 		}
 

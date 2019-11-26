@@ -198,3 +198,4 @@ FakesAssemblies/
 
 **TestConstants.cs
 *.exe
+nuget.txt

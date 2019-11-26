@@ -1,8 +1,10 @@
-﻿using B2Net.Models;
+﻿using System;
+using B2Net.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace B2Net.Tests {
 	[TestClass]
@@ -15,12 +17,12 @@ namespace B2Net.Tests {
 #if NETFULL
 		private string FilePath => Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "../../../");
 #else
-        private string FilePath => Path.Combine(System.AppContext.BaseDirectory, "../../../");
+		private string FilePath => Path.Combine(System.AppContext.BaseDirectory, "../../../");
 #endif
 
 		[TestInitialize]
 		public void Initialize() {
-			Client = new B2Client(Options.AccountId, Options.ApplicationKey);
+			Client = new B2Client(Options);
 			BucketName = $"B2NETTestingBucket-{Path.GetRandomFileName().Replace(".", "").Substring(0, 6)}";
 
 			var buckets = Client.Buckets.GetList().Result;
@@ -33,8 +35,7 @@ namespace B2Net.Tests {
 
 			if (existingBucket != null) {
 				TestBucket = existingBucket;
-			}
-			else {
+			} else {
 				TestBucket = Client.Buckets.Create(BucketName, BucketTypes.allPrivate).Result;
 			}
 		}
@@ -179,8 +180,9 @@ namespace B2Net.Tests {
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
 
-			var fileInfo = new Dictionary<string, string>();
-			fileInfo.Add("FileInfoTest", "1234");
+			var fileInfo = new Dictionary<string, string>() {
+				{"FileInfoTest", "1234"}
+			};
 
 			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId, fileInfo).Result;
 
@@ -215,8 +217,9 @@ namespace B2Net.Tests {
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
 
-			var fileInfo = new Dictionary<string, string>();
-			fileInfo.Add("FileInfoTest", "1234");
+			var fileInfo = new Dictionary<string, string>() {
+				{"FileInfoTest", "1234"}
+			};
 
 			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId, fileInfo).Result;
 			// Clean up.
@@ -238,6 +241,24 @@ namespace B2Net.Tests {
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
 			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			// Clean up.
+			FilesToDelete.Add(file);
+
+			Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
+
+			// Test download
+			var download = Client.Files.DownloadById(file.FileId).Result;
+			var downloadHash = Utilities.GetSHA1Hash(download.FileData);
+
+			Assert.AreEqual(hash, downloadHash);
+		}
+
+		[TestMethod]
+		public void FileDownloadFolderTest() {
+			var fileName = "B2Test.txt";
+			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
+			string hash = Utilities.GetSHA1Hash(fileData);
+			var file = Client.Files.Upload(fileData, "B2Folder/Test/File.txt", TestBucket.BucketId).Result;
 			// Clean up.
 			FilesToDelete.Add(file);
 
@@ -307,6 +328,65 @@ namespace B2Net.Tests {
 			var downloadAuth = Client.Files.GetDownloadAuthorization("Test", 120, TestBucket.BucketId).Result;
 
 			Assert.AreEqual("Test", downloadAuth.FileNamePrefix, "File prefixes were not the same.");
+		}
+
+		[TestMethod]
+		public async Task CopyFile() {
+			var fileName = "B2Test.txt";
+			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
+			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			// Clean up.
+			FilesToDelete.Add(file);
+
+			var copied = await Client.Files.Copy(file.FileId, "B2TestCopy.txt");
+			// Clean up.
+			FilesToDelete.Add(copied);
+
+			Assert.AreEqual("copy", copied.Action, "Action was not as expected for the copy operation.");
+			Assert.AreEqual(fileData.Length.ToString(), copied.ContentLength, "Length of the two files was not the same.");
+		}
+
+		[TestMethod]
+		public async Task ReplaceFile() {
+			var fileName = "B2Test.txt";
+			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
+			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			// Clean up.
+			FilesToDelete.Add(file);
+
+			var copied = await Client.Files.Copy(file.FileId, "B2TestCopy.txt", B2MetadataDirective.REPLACE, "text/plain", new Dictionary<string, string>() {
+				{"FileInfoTest", "1234"}
+			});
+			// Clean up.
+			FilesToDelete.Add(copied);
+
+			Assert.IsTrue(copied.FileInfo.ContainsKey("fileinfotest"), "FileInfo was not as expected for the replace operation.");
+			Assert.AreEqual(fileData.Length.ToString(), copied.ContentLength, "Length of the two files was not the same.");
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(CopyReplaceSetupException), "Copy did not fail when disallowed fields were provided.")]
+		public async Task CopyFileWithDisallowedFields() {
+			var fileName = "B2Test.txt";
+			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
+			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+
+			// Clean up.
+			FilesToDelete.Add(file);
+
+			var copied = await Client.Files.Copy(file.FileId, "B2TestCopy.txt", contentType: "b2/x-auto");
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(CopyReplaceSetupException), "Replace did not fail when fields were missing.")]
+		public async Task ReplaceFileWithMissingFields() {
+			var fileName = "B2Test.txt";
+			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
+			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			// Clean up.
+			FilesToDelete.Add(file);
+
+			var copied = await Client.Files.Copy(file.FileId, "B2TestCopy.txt", B2MetadataDirective.REPLACE);
 		}
 
 		[TestCleanup]
