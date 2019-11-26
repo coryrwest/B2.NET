@@ -165,7 +165,7 @@ var bucket = await client.Buckets.Update(new B2BucketOptions() {
 			MaxAgeSeconds = 1200
 		}
 	},
-}, "BUCKETID", );
+}, "BUCKETID");
 
 // { BucketId: "",
 //   BucketName: "",
