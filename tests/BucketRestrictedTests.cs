@@ -23,12 +23,12 @@ namespace B2Net.Tests {
 
 		[TestMethod]
 		[ExpectedException(typeof(AuthorizationException), "Either KeyId or ApplicationKey were not specified.")]
-		public void BadInitialization() {
+		public async Task BadInitialization() {
 			// Missing AccountId
-			var client = new B2Client(B2Client.Authorize(new B2Options() {
+			var auth = await B2Client.AuthorizeAsync(new B2Options() {
 				KeyId = applicationKeyId,
 				ApplicationKey = ""
-			}));
+			});
 		}
 	}
 }

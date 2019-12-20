@@ -20,7 +20,7 @@ namespace B2Net {
 			var requestMessage = BucketRequestGenerators.GetBucketList(_options);
 			var response = await _client.SendAsync(requestMessage, cancelToken);
 
-			var bucketList = ResponseParser.ParseResponse<B2BucketListDeserializeModel>(response).Result;
+			var bucketList = await ResponseParser.ParseResponse<B2BucketListDeserializeModel>(response);
 			return bucketList.Buckets;
 		}
 

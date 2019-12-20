@@ -48,12 +48,15 @@ The `options` object returned from the Authorize method will contain the authori
 calls to the B2 API. This will automatically be handled by the library when necessary. You do not have to keep this object around.
 The `options` object requires KeyId and ApplicationKey to authorize.
 
+#### authorizeOnInitialize
+If you set `authorizeOnInitialize` to false the B2Client will not call the B2 API until you tell it to. This requires that you call Initialize() before making any other calls with the client. The client WILL NOT automatically call this if needed, you MUST call it yourself.
+
 #### Application Keys
 Application Keys are supported for use, but you cannot manage them with this library. If you want to use an application key you must specify your KeyId, and ApplicationKey for the application key that you want to use.
 
 ```csharp
 // This is the prefered way of authenticating. (Use this method if you want to use PersistBucket)
-var client = new B2Client(options);
+var client = new B2Client(options, authorizeOnInitialize = true);
 // OR (Use this method if you want to use PersistBucket)
 var client = new B2Client(B2Client.Authorize(options));
 // OR
@@ -345,6 +348,7 @@ should retry the request if you are so inclined.
 
 ## Release Notes
 
+*  0.7.2  Async the authorize method, Added initialize path that does not call the API until told.
 *  0.7.1  Updated documentation and API for removal of AccountId, which is no longer needed. (thanks @seertenedos)
 *  0.7.0  Fixed bug with encoding file names with /, All B2Client constructors will auto authorize with Backblaze, Capabilities surfaced to property on the B2Client, File copy API added.
 *  0.6.1  Made Capabilities on the B2 Client read only, as they define what an application key can do and should not be mutable.

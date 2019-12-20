@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using B2Net.Tests;
 using B2Net;
 using B2Net.Models;
@@ -52,10 +53,10 @@ namespace B2Net.Tests {
 
 		[TestMethod]
 		[ExpectedException(typeof(AuthorizationException))]
-		public void ErrorAuthorizeNonMasterKeyWithMissingKeyID() {
+		public async Task ErrorAuthorizeNonMasterKeyWithMissingKeyID() {
 			var key = "K001LarMmmWDIveFaZz3yvB4uattO+Q";
 
-			var result = B2Client.Authorize("", key);
+			var result = await B2Client.AuthorizeAsync("", key);
 		}
 
 		[TestMethod]

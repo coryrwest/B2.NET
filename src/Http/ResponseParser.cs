@@ -7,7 +7,7 @@ namespace B2Net.Http {
 		public static async Task<T> ParseResponse<T>(HttpResponseMessage response, string callingApi = "") {
 			var jsonResponse = await response.Content.ReadAsStringAsync();
 
-			Utilities.CheckForErrors(response, callingApi);
+			await Utilities.CheckForErrors(response, callingApi);
 
 			var obj = JsonConvert.DeserializeObject<T>(jsonResponse, new JsonSerializerSettings() {
 				NullValueHandling = NullValueHandling.Ignore

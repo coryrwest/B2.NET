@@ -22,12 +22,24 @@ namespace B2Net {
 			}
 		}
 
-		public B2Client(B2Options options) {
-			_options = Authorize(options);
-			Buckets = new Buckets(options);
-			Files = new Files(options);
-			LargeFiles = new LargeFiles(options);
-			_capabilities = options.Capabilities;
+		/// <summary>
+		/// If you specify authorizeOnInitialize = false, you MUST call Initialize() once before you use the client.
+		/// </summary>
+		/// <param name="options"></param>
+		/// <param name="authorizeOnInitialize"></param>
+		public B2Client(B2Options options, bool authorizeOnInitialize = true) {
+			// Should we authorize on the class initialization?
+			if (authorizeOnInitialize) {
+				_options = Authorize(options);
+				Buckets = new Buckets(options);
+				Files = new Files(options);
+				LargeFiles = new LargeFiles(options);
+				_capabilities = options.Capabilities;
+			}
+			else {
+				// If not, then the user will have to Initialize() before making any calls.
+				_options = options;
+			}
 		}
 
 		/// <summary>
@@ -63,16 +75,32 @@ namespace B2Net {
 		{
 		}
 		
-		public IBuckets Buckets { get; }
-		public IFiles Files { get; }
-		public ILargeFiles LargeFiles { get; }
+		public IBuckets Buckets { get; private set; }
+		public IFiles Files { get; private set; }
+		public ILargeFiles LargeFiles { get; private set; }
+
+		/// <summary>
+		/// Only call this method if you created a B2Client with authorizeOnInitalize = false. This method of using B2.NET is considered in Beta, as it has not been extensively tested.
+		/// </summary>
+		/// <returns></returns>
+		public async Task Initialize() {
+			_options = Authorize(_options);
+			Buckets = new Buckets(_options);
+			Files = new Files(_options);
+			LargeFiles = new LargeFiles(_options);
+			_capabilities = _options.Capabilities;
+		}
 
 		/// <summary>
 		/// Authorize against the B2 storage service. Requires that KeyId and ApplicationKey on the options object be set.
 		/// </summary>
 		/// <returns>B2Options containing the download url, new api url, AccountID and authorization token.</returns>
 		public async Task<B2Options> Authorize(CancellationToken cancelToken = default(CancellationToken)) {
-			return Authorize(_options);
+			return await AuthorizeAsync(_options);
+		}
+
+		public static async Task<B2Options> AuthorizeAsync(string keyId, string applicationkey) {
+			return await AuthorizeAsync(new B2Options() { ApplicationKey = applicationkey, KeyId = keyId });
 		}
 
 		public static B2Options Authorize(string keyId, string applicationkey) {
@@ -84,7 +112,7 @@ namespace B2Net {
 		/// </summary>
 		/// <param name="options"></param>
 		/// <returns></returns>
-		public static B2Options Authorize(B2Options options) {
+		public static async Task<B2Options> AuthorizeAsync(B2Options options) {
 			// Return if already authenticated.
 			if (options.Authenticated) {
 				return options;
@@ -95,11 +123,11 @@ namespace B2Net {
 			}
 
 			var client = HttpClientFactory.CreateHttpClient(options.RequestTimeout);
-			
-			var requestMessage = AuthRequestGenerator.Authorize(options);
-			var response = client.SendAsync(requestMessage).Result;
 
-			var jsonResponse = response.Content.ReadAsStringAsync().Result;
+			var requestMessage = AuthRequestGenerator.Authorize(options);
+			var response = await client.SendAsync(requestMessage);
+
+			var jsonResponse = await response.Content.ReadAsStringAsync();
 			if (response.IsSuccessStatusCode) {
 				var authResponse = JsonConvert.DeserializeObject<B2AuthResponse>(jsonResponse);
 
@@ -112,6 +140,15 @@ namespace B2Net {
 			}
 
 			return options;
+		}
+
+		/// <summary>
+		/// Requires that KeyId and ApplicationKey on the options object be set. If you are using an application key you must specify the accountId, the keyId, and the applicationKey.
+		/// </summary>
+		/// <param name="options"></param>
+		/// <returns></returns>
+		public static B2Options Authorize(B2Options options) {
+			return AuthorizeAsync(options).Result;
 		}
 	}
 }

@@ -64,7 +64,7 @@ namespace B2Net {
 		public async Task<B2UploadPart> UploadPart(byte[] fileData, int partNumber, B2UploadPartUrl uploadPartUrl, CancellationToken cancelToken = default(CancellationToken)) {
 			var request = LargeFileRequestGenerators.Upload(_options, fileData, partNumber, uploadPartUrl);
 
-			var response = _client.SendAsync(request, cancelToken).Result;
+			var response = await _client.SendAsync(request, cancelToken);
 
 			return await ResponseParser.ParseResponse<B2UploadPart>(response, _api);
 		}

@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace B2Net {
 	public static class Utilities {
@@ -17,14 +18,14 @@ namespace B2Net {
 			return authHeader + credentials;
 		}
 
-		public static void CheckForErrors(HttpResponseMessage response, string callingApi = "") {
+		public static async Task CheckForErrors(HttpResponseMessage response, string callingApi = "") {
 			if (!response.IsSuccessStatusCode) {
 				// Should retry
 				bool retry = response.StatusCode == (HttpStatusCode)429 ||
 					response.StatusCode == HttpStatusCode.RequestTimeout ||
 					response.StatusCode == HttpStatusCode.ServiceUnavailable;
 
-				string content = response.Content.ReadAsStringAsync().Result;
+				string content = await response.Content.ReadAsStringAsync();
 
 				B2Error b2Error;
 				try {

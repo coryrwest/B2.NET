@@ -139,7 +139,7 @@ namespace B2Net {
 
 			// Get the upload url for this file
 			var uploadUrlRequest = FileUploadRequestGenerators.GetUploadUrl(_options, operationalBucketId);
-			var uploadUrlResponse = _client.SendAsync(uploadUrlRequest, cancelToken).Result;
+			var uploadUrlResponse = await _client.SendAsync(uploadUrlRequest, cancelToken);
 			var uploadUrlData = await uploadUrlResponse.Content.ReadAsStringAsync();
 			var uploadUrlObject = JsonConvert.DeserializeObject<B2UploadUrl>(uploadUrlData);
 			// Set the upload auth token
@@ -375,7 +375,7 @@ namespace B2Net {
 		}
 
 		private async Task<B2File> ParseDownloadResponse(HttpResponseMessage response) {
-			Utilities.CheckForErrors(response, _api);
+			await Utilities.CheckForErrors(response, _api);
 
 			var file = new B2File();
 			IEnumerable<string> values;
