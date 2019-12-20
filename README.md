@@ -149,7 +149,7 @@ var bucket = await client.Buckets.Update("BUCKETID", "BUCKETYPE");
 #### Update a Bucket with options
 ```csharp
 var client = new B2Client("KEYID", "APPLICATIONKEY");
-var bucket = await client.Buckets.Update("BUCKETID", new B2BucketOptions() {
+var bucket = await client.Buckets.Update(new B2BucketOptions() {
 	CacheControl = 300,
 	LifecycleRules = new List<B2BucketLifecycleRule>() {
 		new B2BucketLifecycleRule() {
@@ -168,7 +168,8 @@ var bucket = await client.Buckets.Update("BUCKETID", new B2BucketOptions() {
 			MaxAgeSeconds = 1200
 		}
 	},
-});
+}, "BUCKETID");
+
 // { BucketId: "",
 //   BucketName: "",
 //   BucketType: "",
