@@ -7,17 +7,19 @@ namespace B2Net.Http {
 		private static HttpClient _client;
 
 		public static HttpClient CreateHttpClient(int timeout) {
-			if (_client == null) {
+			var client = _client;
+			if (client == null) {
 				var handler = new HttpClientHandler() { AllowAutoRedirect = true };
 
-				_client = new HttpClient(handler);
+				client = new HttpClient(handler);
 
-				_client.Timeout = TimeSpan.FromSeconds(timeout);
+				client.Timeout = TimeSpan.FromSeconds(timeout);
 
-				_client.DefaultRequestHeaders.Accept.Clear();
-				_client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+				client.DefaultRequestHeaders.Accept.Clear();
+				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+				_client = client;
 			}
-			return _client;
+			return client;
 		}
 	}
 }
