@@ -161,7 +161,7 @@ namespace B2Net {
 		/// <param name="cancelToken"></param>
 		/// <returns></returns>
 		public async Task<B2File> Upload(byte[] fileData, string fileName, B2UploadUrl uploadUrl, string bucketId = "", Dictionary<string, string> fileInfo = null, CancellationToken cancelToken = default(CancellationToken)) {
-			return await Upload(fileData, fileName, uploadUrl, false, bucketId, fileInfo, cancelToken);
+			return await Upload(fileData, fileName, uploadUrl, "", false, bucketId, fileInfo, cancelToken);
 		}
 
 		/// <summary>
@@ -177,15 +177,32 @@ namespace B2Net {
 		/// <param name="cancelToken"></param>
 		/// <returns></returns>
 		public async Task<B2File> Upload(byte[] fileData, string fileName, B2UploadUrl uploadUrl, bool autoRetry, string bucketId = "", Dictionary<string, string> fileInfo = null, CancellationToken cancelToken = default(CancellationToken)) {
+			return await Upload(fileData, fileName, uploadUrl, "", autoRetry, bucketId, fileInfo, cancelToken);
+		}
+
+		/// <summary>
+		/// Uploads one file to B2, returning its unique file ID. Filename will be URL Encoded. If auto retry
+		/// is set true it will retry a failed upload once after 1 second.
+		/// </summary>
+		/// <param name="fileData"></param>
+		/// <param name="fileName"></param>
+		/// <param name="uploadUrl"></param>
+		/// <param name="bucketId"></param>
+		/// <param name="contentType"></param>
+		/// <param name="autoRetry">Retry a failed upload one time after waiting for 1 second.</param>
+		/// <param name="fileInfo"></param>
+		/// <param name="cancelToken"></param>
+		/// <returns></returns>
+		public async Task<B2File> Upload(byte[] fileData, string fileName, B2UploadUrl uploadUrl, string contentType, bool autoRetry, string bucketId = "", Dictionary<string, string> fileInfo = null, CancellationToken cancelToken = default(CancellationToken)) {
 			// Now we can upload the file
-			var requestMessage = FileUploadRequestGenerators.Upload(_options, uploadUrl.UploadUrl, fileData, fileName, fileInfo);
+			var requestMessage = FileUploadRequestGenerators.Upload(_options, uploadUrl.UploadUrl, fileData, fileName, fileInfo, contentType);
 
 			var response = await _client.SendAsync(requestMessage, cancelToken);
 			// Auto retry
 			if (autoRetry && (
-			response.StatusCode == (HttpStatusCode)429 ||
-			response.StatusCode == HttpStatusCode.RequestTimeout ||
-			response.StatusCode == HttpStatusCode.ServiceUnavailable)) {
+				    response.StatusCode == (HttpStatusCode)429 ||
+				    response.StatusCode == HttpStatusCode.RequestTimeout ||
+				    response.StatusCode == HttpStatusCode.ServiceUnavailable)) {
 				Task.Delay(1000, cancelToken).Wait(cancelToken);
 				response = await _client.SendAsync(requestMessage, cancelToken);
 			}

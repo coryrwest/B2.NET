@@ -22,7 +22,7 @@ namespace B2Net.Http {
 		/// <param name="fileName"></param>
 		/// <param name="fileInfo"></param>
 		/// <returns></returns>
-		public static HttpRequestMessage Upload(B2Options options, string uploadUrl, byte[] fileData, string fileName, Dictionary<string, string> fileInfo) {
+		public static HttpRequestMessage Upload(B2Options options, string uploadUrl, byte[] fileData, string fileName, Dictionary<string, string> fileInfo, string contentType = "") {
 			var uri = new Uri(uploadUrl);
 			var request = new HttpRequestMessage() {
 				Method = HttpMethod.Post,
@@ -46,7 +46,7 @@ namespace B2Net.Http {
 			// TODO last modified
 			//request.Headers.Add("X-Bz-src_last_modified_millis", hash);
 
-			request.Content.Headers.ContentType = new MediaTypeHeaderValue("b2/x-auto");
+			request.Content.Headers.ContentType = new MediaTypeHeaderValue(string.IsNullOrWhiteSpace(contentType) ? "b2/x-auto" : contentType);
 			request.Content.Headers.ContentLength = fileData.Length;
 
 			return request;

@@ -217,7 +217,7 @@ var fileList = await client.Files.GetList("BUCKETID", "FILENAME", prefix: "PREFI
 ```csharp
 var client = new B2Client("KEYID", "APPLICATIONKEY");
 var uploadUrl = await client.Files.GetUploadUrl("BUCKETID");
-var file = await client.Files.Upload("FILEDATABYTES", "FILENAME", uploadUrl, "AUTORETRY", "BUCKETID", "FILEINFOATTRS");
+var file = await client.Files.Upload("FILEDATABYTES", "FILENAME", "CONTENTTYPE", uploadUrl, "AUTORETRY", "BUCKETID", "FILEINFOATTRS");
 // { FileId: "",
 //   FileName: "",
 //   ContentLength: "",
@@ -349,6 +349,8 @@ should retry the request if you are so inclined.
 
 ## Release Notes
 
+*  0.7.4  Content-Type setting on Upload.
+*  0.7.3  Thread-safeish HttpClient.
 *  0.7.2  Async the authorize method, Added initialize path that does not call the API until told.
 *  0.7.1  Updated documentation and API for removal of AccountId, which is no longer needed. (thanks @seertenedos)
 *  0.7.0  Fixed bug with encoding file names with /, All B2Client constructors will auto authorize with Backblaze, Capabilities surfaced to property on the B2Client, File copy API added.
