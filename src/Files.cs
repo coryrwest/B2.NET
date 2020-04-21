@@ -3,6 +3,7 @@ using B2Net.Http;
 using B2Net.Models;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -204,7 +205,40 @@ namespace B2Net {
 				    response.StatusCode == HttpStatusCode.RequestTimeout ||
 				    response.StatusCode == HttpStatusCode.ServiceUnavailable)) {
 				Task.Delay(1000, cancelToken).Wait(cancelToken);
-				response = await _client.SendAsync(requestMessage, cancelToken);
+				var retryMessage = FileUploadRequestGenerators.Upload(_options, uploadUrl.UploadUrl, fileData, fileName, fileInfo, contentType);
+				response = await _client.SendAsync(retryMessage, cancelToken);
+			}
+
+			return await ResponseParser.ParseResponse<B2File>(response, _api);
+		}
+
+		/// <summary>
+		/// Uploads one file to B2 using a stream, returning its unique file ID. Filename will be URL Encoded. If auto retry
+		/// is set true it will retry a failed upload once after 1 second. If you don't want to use a SHA1 for the stream set dontSHA.
+		/// </summary>
+		/// <param name="fileDataWithSHA"></param>
+		/// <param name="fileName"></param>
+		/// <param name="uploadUrl"></param>
+		/// <param name="contentType"></param>
+		/// <param name="autoRetry"></param>
+		/// <param name="bucketId"></param>
+		/// <param name="fileInfo"></param>
+		/// <param name="dontSHA"></param>
+		/// <param name="cancelToken"></param>
+		/// <returns></returns>
+		public async Task<B2File> Upload(Stream fileDataWithSHA, string fileName, B2UploadUrl uploadUrl, string contentType, bool autoRetry, string bucketId = "", Dictionary<string, string> fileInfo = null, bool dontSHA = false, CancellationToken cancelToken = default(CancellationToken)) {
+			// Now we can upload the file
+			var requestMessage = FileUploadRequestGenerators.Upload(_options, uploadUrl.UploadUrl, fileDataWithSHA, fileName, fileInfo, contentType, dontSHA);
+			
+			var response = await _client.SendAsync(requestMessage, cancelToken);
+			// Auto retry
+			if (autoRetry && (
+				response.StatusCode == (HttpStatusCode)429 ||
+				response.StatusCode == HttpStatusCode.RequestTimeout ||
+				response.StatusCode == HttpStatusCode.ServiceUnavailable)) {
+				Task.Delay(1000, cancelToken).Wait(cancelToken);
+				var retryMessage = FileUploadRequestGenerators.Upload(_options, uploadUrl.UploadUrl, fileDataWithSHA, fileName, fileInfo, contentType, dontSHA);
+				response = await _client.SendAsync(retryMessage, cancelToken);
 			}
 
 			return await ResponseParser.ParseResponse<B2File>(response, _api);

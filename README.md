@@ -3,13 +3,14 @@
 
 B2.NET is a C# client for the [Backblaze B2 Cloud Storage](https://secure.backblaze.com/b2/) service.
 
-B2.NET is still in Beta, so use it in production at your own risk.
+While the core of B2.NET is mature you should still consider this library in Beta, so use it in production at your own risk.
 
 [B2 Documentation](https://www.backblaze.com/b2/docs/)
 
 ## Features
 
 *  Full implementation of the B2 REST API (except Keys management)
+*  Suport for uploading Streams
 *  Support for file FriendlyURL's (this functionality is not part of the supported B2 api and may break at any time)
 *  UFT-8 and Url Encoding support
 *  Fully Async
@@ -226,6 +227,23 @@ var file = await client.Files.Upload("FILEDATABYTES", "FILENAME", "CONTENTTYPE",
 //   FileInfo: Dictionary<string,string> }
 ```
 
+#### Upload a file via Stream
+Please note that there are ceratin limitations when using Streams for upload. Firstly, If you want to use SHA1 hash verification on your uploads
+you will have to append the SHA1 to the end of your data stream. The library will not do this for you. It is up to you to decide how to get the SHA1
+based on the type of stream you have and how you are handling it. Secondly, you may disable SHA1 verification on the upload by setting the `dontSHA`
+flag to true.
+```csharp
+var client = new B2Client("KEYID", "APPLICATIONKEY");
+var uploadUrl = await client.Files.GetUploadUrl("BUCKETID");
+var file = await client.Files.Upload("FILESTREAM", "FILENAME", "CONTENTTYPE", uploadUrl, "AUTORETRY", dontSHA, "BUCKETID", "FILEINFOATTRS");
+// { FileId: "",
+//   FileName: "",
+//   ContentLength: "",
+//   ContentSHA1: "",
+//   ContentType: "",
+//   FileInfo: Dictionary<string,string> }
+```
+
 #### Download a file by id
 ```csharp
 var client = new B2Client("KEYID", "APPLICATIONKEY");
@@ -349,6 +367,7 @@ should retry the request if you are so inclined.
 
 ## Release Notes
 
+*  0.7.5  Stream uploading.
 *  0.7.4  Content-Type setting on Upload.
 *  0.7.3  Thread-safeish HttpClient.
 *  0.7.2  Async the authorize method, Added initialize path that does not call the API until told.

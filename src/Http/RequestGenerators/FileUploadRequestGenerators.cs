@@ -4,7 +4,9 @@ using System.Net.Http.Headers;
 using B2Net.Http.RequestGenerators;
 using B2Net.Models;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using Newtonsoft.Json;
 
 namespace B2Net.Http {
@@ -48,6 +50,44 @@ namespace B2Net.Http {
 
 			request.Content.Headers.ContentType = new MediaTypeHeaderValue(string.IsNullOrWhiteSpace(contentType) ? "b2/x-auto" : contentType);
 			request.Content.Headers.ContentLength = fileData.Length;
+
+			return request;
+		}
+
+		/// <summary>
+		/// Upload a file to B2 using a stream. NOTE: You MUST provide the SHA1 at the end of your stream. This method will NOT do it for you.
+		/// </summary>
+		/// <param name="options"></param>
+		/// <param name="uploadUrl"></param>
+		/// <param name="fileData"></param>
+		/// <param name="fileName"></param>
+		/// <param name="fileInfo"></param>
+		/// <returns></returns>
+		public static HttpRequestMessage Upload(B2Options options, string uploadUrl, Stream fileDataWithSHA, string fileName, Dictionary<string, string> fileInfo, string contentType = "", bool dontSHA = false) {
+			var uri = new Uri(uploadUrl);
+			var request = new HttpRequestMessage() {
+				Method = HttpMethod.Post,
+				RequestUri = uri,
+				Content = new StreamContent(fileDataWithSHA)
+			};
+
+			// Add headers
+			request.Headers.TryAddWithoutValidation("Authorization", options.UploadAuthorizationToken);
+			request.Headers.Add("X-Bz-File-Name", fileName.b2UrlEncode());
+			// Stream puts the SHA1 at the end of the content
+			request.Headers.Add("X-Bz-Content-Sha1", dontSHA ? "do_not_verify" : "hex_digits_at_end");
+			// File Info headers
+			if (fileInfo != null && fileInfo.Count > 0) {
+				foreach (var info in fileInfo.Take(10)) {
+					request.Headers.Add($"X-Bz-Info-{info.Key}", info.Value);
+				}
+			}
+			// TODO last modified
+			//request.Headers.Add("X-Bz-src_last_modified_millis", hash);
+
+			request.Content.Headers.ContentType = new MediaTypeHeaderValue(string.IsNullOrWhiteSpace(contentType) ? "b2/x-auto" : contentType);
+			// SHA will be in Stream already
+			request.Content.Headers.ContentLength = fileDataWithSHA.Length;
 
 			return request;
 		}

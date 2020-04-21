@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace B2Net.Tests {
@@ -191,6 +192,43 @@ namespace B2Net.Tests {
 
 			Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
 			Assert.AreEqual(1, file.FileInfo.Count, "File info count was off.");
+		}
+		
+		[TestMethod]
+		public void FileUploadStreamTest() {
+			var fileName = "B2Test.txt";
+			var bytes = File.ReadAllBytes(Path.Combine(FilePath, fileName));
+			
+			string hash = Utilities.GetSHA1Hash(bytes);
+			var hashBytes = Encoding.UTF8.GetBytes(hash);
+
+			var fileData = new MemoryStream(bytes.Concat(hashBytes).ToArray());
+
+			var uploadUrl = Client.Files.GetUploadUrl(TestBucket.BucketId).Result;
+
+			var file = Client.Files.Upload(fileData, fileName, uploadUrl, "", false, TestBucket.BucketId).Result;
+
+			// Clean up.
+			FilesToDelete.Add(file);
+
+			Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
+		}
+		
+		[TestMethod]
+		public void FileUploadStreamNoSHATest() {
+			var fileName = "B2Test.txt";
+			var bytes = File.ReadAllBytes(Path.Combine(FilePath, fileName));
+			
+			var fileData = new MemoryStream(bytes);
+
+			var uploadUrl = Client.Files.GetUploadUrl(TestBucket.BucketId).Result;
+
+			var file = Client.Files.Upload(fileData, fileName, uploadUrl, "", false, TestBucket.BucketId, null, true).Result;
+
+			// Clean up.
+			FilesToDelete.Add(file);
+
+			Assert.IsTrue(file.ContentSHA1.StartsWith("unverified"), $"File was verified when it should not have been: {file.ContentSHA1}.");
 		}
 
 		[TestMethod]

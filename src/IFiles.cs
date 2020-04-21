@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using B2Net.Models;
@@ -23,6 +24,7 @@ namespace B2Net {
 		Task<B2File> Upload(byte[] fileData, string fileName, B2UploadUrl uploadUrl, string bucketId = "", Dictionary<string, string> fileInfo = null, CancellationToken cancelToken = default(CancellationToken));
 		Task<B2File> Upload(byte[] fileData, string fileName, B2UploadUrl uploadUrl, bool autoRetry, string bucketId = "", Dictionary<string, string> fileInfo = null, CancellationToken cancelToken = default(CancellationToken));
 		Task<B2File> Upload(byte[] fileData, string fileName, B2UploadUrl uploadUrl, string contentType, bool autoRetry, string bucketId = "", Dictionary<string, string> fileInfo = null, CancellationToken cancelToken = default(CancellationToken));
+		Task<B2File> Upload(Stream fileDataWithSHA, string fileName, B2UploadUrl uploadUrl, string contentType, bool autoRetry, string bucketId = "", Dictionary<string, string> fileInfo = null, bool dontSHA = false, CancellationToken cancelToken = default(CancellationToken));
 		Task<B2File> Copy(string sourceFileId, string newFileName, B2MetadataDirective metadataDirective = B2MetadataDirective.COPY, string contentType = "", Dictionary<string, string> fileInfo = null, string range = "", string destinationBucketId = "", CancellationToken cancelToken = default(CancellationToken));
 	}
 }
