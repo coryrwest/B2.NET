@@ -55,7 +55,7 @@ namespace B2Net.Http {
 					   JsonConvert.ToString(fileNamePrefix) + ", \"validDurationInSeconds\":" +
 					   JsonConvert.ToString(validDurationInSeconds);
 			if (!string.IsNullOrEmpty(b2ContentDisposition)) {
-				body += ", \"maxFileCount\":" + JsonConvert.ToString(b2ContentDisposition);
+				body += ", \"b2ContentDisposition\":" + JsonConvert.ToString(b2ContentDisposition);
 			}
 			body += "}";
 
