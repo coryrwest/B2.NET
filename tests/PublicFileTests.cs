@@ -1,4 +1,5 @@
-﻿using B2Net.Models;
+﻿using System;
+using B2Net.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.IO;
@@ -48,7 +49,8 @@ namespace B2Net.Tests {
 			// Clean up.
 			FilesToDelete.Add(file);
 
-			Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
+			// Since we did not pass a sha, hash will be prepended with unverified:
+			Assert.AreEqual($"unverified:{hash}", file.ContentSHA1, "File hashes did not match.");
 
 			// Get url
 			var friendlyUrl = Client.Files.GetFriendlyDownloadUrl(fileName, TestBucket.BucketName);
@@ -64,10 +66,27 @@ namespace B2Net.Tests {
 
 		[TestCleanup]
 		public void Cleanup() {
+			var fileFailure = false;
 			foreach (B2File b2File in FilesToDelete) {
-				var deletedFile = Client.Files.Delete(b2File.FileId, b2File.FileName).Result;
+				try {
+					var deletedFile = Client.Files.Delete(b2File.FileId, b2File.FileName).Result;
+				}
+				catch (Exception e) {
+					fileFailure = true;
+				}
 			}
-			var deletedBucket = Client.Buckets.Delete(TestBucket.BucketId).Result;
+
+			if (fileFailure) {
+				Assert.Inconclusive("Cleanup failed");
+			}
+			else {
+				try {
+					var deletedBucket = Client.Buckets.Delete(TestBucket.BucketId).Result;
+				}
+				catch (Exception e) {
+					Assert.Inconclusive("Cleanup failed");
+				}
+			}
 		}
 	}
 }

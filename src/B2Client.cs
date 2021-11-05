@@ -17,7 +17,7 @@ namespace B2Net {
 					return _capabilities;
 				}
 				else {
-					throw new NotAuthorizedException("You attempted to load the cabapilities of this key before authenticating with Backblaze. You must Authorize before you can access Capabilities.");
+					throw new NotAuthorizedException("You attempted to load the capabilities of this key before authenticating with Backblaze. You must Authorize before you can access Capabilities.");
 				}
 			}
 		}
@@ -31,9 +31,9 @@ namespace B2Net {
 			// Should we authorize on the class initialization?
 			if (authorizeOnInitialize) {
 				_options = Authorize(options);
-				Buckets = new Buckets(options);
-				Files = new Files(options);
-				LargeFiles = new LargeFiles(options);
+				Buckets = new Buckets(options, Authorize);
+				Files = new Files(options, Authorize);
+				LargeFiles = new LargeFiles(options, Authorize);
 				_capabilities = options.Capabilities;
 			}
 			else {
@@ -57,9 +57,9 @@ namespace B2Net {
 			};
 			_options = Authorize(_options);
 
-			Buckets = new Buckets(_options);
-			Files = new Files(_options);
-			LargeFiles = new LargeFiles(_options);
+			Buckets = new Buckets(_options, Authorize);
+			Files = new Files(_options, Authorize);
+			LargeFiles = new LargeFiles(_options, Authorize);
 			_capabilities = _options.Capabilities;
 		}
 		
@@ -84,10 +84,10 @@ namespace B2Net {
 		/// </summary>
 		/// <returns></returns>
 		public async Task Initialize() {
-			_options = Authorize(_options);
-			Buckets = new Buckets(_options);
-			Files = new Files(_options);
-			LargeFiles = new LargeFiles(_options);
+			_options = await AuthorizeAsync(_options);
+			Buckets = new Buckets(_options, Authorize);
+			Files = new Files(_options, Authorize);
+			LargeFiles = new LargeFiles(_options, Authorize);
 			_capabilities = _options.Capabilities;
 		}
 

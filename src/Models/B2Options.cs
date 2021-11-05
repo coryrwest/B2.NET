@@ -1,4 +1,6 @@
-﻿namespace B2Net.Models {
+﻿using System;
+
+namespace B2Net.Models {
 	public class B2Options {
 		public string AccountId { get; private set; }
 		public string KeyId { get; set; }
@@ -11,8 +13,15 @@
 		/// </summary>
 		public bool PersistBucket { get; set; }
 
+		/// <summary>
+		/// Specify true if you want to disable the library automatically updating your Authorization Token.
+		/// This is only required if you have a long-lived B2Client instance and want to manage the token yourself.
+		/// </summary>
+		public bool NoTokenRefresh { get; set; }
+
 		// State
 		public string ApiUrl { get; set; }
+		public string S3ApiUrl { get; set; }
 		public string DownloadUrl { get; set; }
 		public string AuthorizationToken { get; set; }
 		public B2Capabilities Capabilities { get; private set; }
@@ -26,13 +35,13 @@
 		/// <summary>
 		/// Deprecated: Will always be the same as RecommendedPartSize
 		/// </summary>
-		public long MinimumPartSize {
-			get { return RecommendedPartSize; }
-		}
+		public long MinimumPartSize => RecommendedPartSize;
 
 		public int RequestTimeout { get; set; }
 
-		public bool	Authenticated { get; private set; }
+		public bool Authenticated => AuthTokenExpiration > DateTime.Now;
+
+		public DateTime AuthTokenExpiration { get; private set; }
 
 		public B2Options() {
 			PersistBucket = false;
@@ -41,13 +50,15 @@
 
 		public void SetState(B2AuthResponse response) {
 			ApiUrl = response.apiUrl;
+			S3ApiUrl = response.s3ApiUrl;
 			DownloadUrl = response.downloadUrl;
 			AuthorizationToken = response.authorizationToken;
 			RecommendedPartSize = response.recommendedPartSize;
 			AbsoluteMinimumPartSize = response.absoluteMinimumPartSize;
 			AccountId = response.accountId;
 			Capabilities = new B2Capabilities(response.allowed);
-			Authenticated = true;
+			// Set auth token expiration to 23 hours from now. Max is 24, make sure we don't accidentally use an expired token because our timing was off.
+			AuthTokenExpiration = DateTime.Now.AddHours(23);
 		}
 	}
 }

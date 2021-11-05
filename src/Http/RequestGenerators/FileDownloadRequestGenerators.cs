@@ -1,9 +1,13 @@
 ﻿using B2Net.Models;
 using Newtonsoft.Json;
 using System;
+using System.ComponentModel;
 using System.Net.Http;
 
 namespace B2Net.Http {
+	/// <summary>
+	/// These are internal methods and should not be used by consumers of the library.
+	/// </summary>
 	public static class FileDownloadRequestGenerators {
 		private static class Endpoints {
 			public const string DownloadById = "b2_download_file_by_id";
@@ -48,21 +52,45 @@ namespace B2Net.Http {
 			return request;
 		}
 
-		public static HttpRequestMessage GetDownloadAuthorization(B2Options options, string fileNamePrefix, int validDurationInSeconds, string bucketId, string b2ContentDisposition = "") {
+		public class DownloadAuthorizationContext {
+			public string bucketId { get; set; }
+			public string fileNamePrefix { get; set; }
+			[DefaultValue("")]
+			public int validDurationInSeconds { get; set; }
+			[DefaultValue("")]
+			public string b2ContentDisposition { get; set; }
+			[DefaultValue("")]
+			public string b2ContentLanguage { get; set; }
+			[DefaultValue("")]
+			public string b2Expires { get; set; }
+			[DefaultValue("")]
+			public string b2CacheControl { get; set; }
+			[DefaultValue("")]
+			public string b2ContentEncoding { get; set; }
+			[DefaultValue("")]
+			public string b2ContentType { get; set; }
+		}
+
+		public static HttpRequestMessage GetDownloadAuthorization(B2Options options, string fileNamePrefix, int validDurationInSeconds, string bucketId
+			, string b2ContentDisposition = "", string b2ContentLanguage = "", string b2Expires = "", string b2CacheControl = "", string b2ContentEncoding = "", string b2ContentType = "") {
 			var uri = new Uri(options.ApiUrl + "/b2api/" + Constants.Version + "/" + Endpoints.GetDownloadAuthorization);
 
-			var body = "{\"bucketId\":" + JsonConvert.ToString(bucketId) + ", \"fileNamePrefix\":" +
-					   JsonConvert.ToString(fileNamePrefix) + ", \"validDurationInSeconds\":" +
-					   JsonConvert.ToString(validDurationInSeconds);
-			if (!string.IsNullOrEmpty(b2ContentDisposition)) {
-				body += ", \"b2ContentDisposition\":" + JsonConvert.ToString(b2ContentDisposition);
-			}
-			body += "}";
+			var body = new DownloadAuthorizationContext {
+				bucketId = bucketId, fileNamePrefix = fileNamePrefix, validDurationInSeconds = validDurationInSeconds,
+				b2ContentDisposition = b2ContentDisposition,
+				b2ContentLanguage = b2ContentLanguage,
+				b2Expires = b2Expires,
+				b2CacheControl = b2CacheControl,
+				b2ContentEncoding = b2ContentEncoding,
+				b2ContentType = b2ContentType
+			};
 
 			var request = new HttpRequestMessage() {
 				Method = HttpMethod.Post,
 				RequestUri = uri,
-				Content = new StringContent(body)
+				Content = new StringContent(JsonConvert.SerializeObject(body, new JsonSerializerSettings {
+					NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore
+				}))
 			};
 
 			request.Headers.TryAddWithoutValidation("Authorization", options.AuthorizationToken);

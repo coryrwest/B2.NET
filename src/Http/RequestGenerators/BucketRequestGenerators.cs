@@ -77,7 +77,8 @@ namespace B2Net.Http {
 			var body = new B2BucketCreateModel() {
 				accountId = options.AccountId,
 				bucketName = bucketName,
-				bucketType = bucketOptions.BucketType.ToString()
+				bucketType = bucketOptions.BucketType.ToString(),
+				fileLockEnabled =  bucketOptions.FileLockEnabled
 			};
 
 			// Add optional options
@@ -162,6 +163,10 @@ namespace B2Net.Http {
 				body.ifRevisionIs = revisionNumber.Value;
 			}
 
+			if (bucketOptions.DefaultRetention != null) {
+				body.defaultRetention = bucketOptions.DefaultRetention;
+			}
+
 			var json = JsonSerialize(body);
 			return BaseRequestGenerator.PostRequest(Endpoints.Update, json, options);
 		}
@@ -180,6 +185,7 @@ namespace B2Net.Http {
 		public Dictionary<string, string> bucketInfo { get; set; }
 		public List<B2BucketLifecycleRule> lifecycleRules { get; set; }
 		public List<B2CORSRule> corsRules { get; set; }
+		public bool fileLockEnabled { get; set; }
 	}
 
 	internal class B2BucketUpdateModel {
@@ -190,5 +196,6 @@ namespace B2Net.Http {
 		public List<B2BucketLifecycleRule> lifecycleRules { get; set; }
 		public List<B2CORSRule> corsRules { get; set; }
 		public int? ifRevisionIs { get; set; }
+		public B2DefaultRetention defaultRetention { get; set; }
 	}
 }

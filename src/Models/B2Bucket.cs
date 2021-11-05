@@ -9,6 +9,7 @@ namespace B2Net.Models {
 		public List<B2BucketLifecycleRule> LifecycleRules { get; set; }
 		public List<B2CORSRule> CORSRules { get; set; }
 		public int Revision { get; set; }
+		public FileLockConfiguration FileLockConfiguration { get; set; }
 	}
 
 	public class B2BucketLifecycleRule {
@@ -20,4 +21,13 @@ namespace B2Net.Models {
 	public class B2BucketListDeserializeModel {
 		public List<B2Bucket> Buckets { get; set; }
 	}
+	public class FileLockValue {
+		public B2DefaultRetention DefaultRetention { get; set; }
+		public bool IsFileLockEnabled { get; set; }
+	}
+	public class FileLockConfiguration {
+		public bool IsClientAuthorizedToRead { get; set; }
+		public FileLockValue Value { get; set; }
+	}
+
 }

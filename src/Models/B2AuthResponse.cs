@@ -2,6 +2,7 @@
 	public class B2AuthResponse {
 		public string accountId { get; set; }
 		public string apiUrl { get; set; }
+		public string s3ApiUrl { get; set; }
 		public string authorizationToken { get; set; }
 		public string downloadUrl { get; set; }
 		public long recommendedPartSize { get; set; }

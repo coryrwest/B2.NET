@@ -10,6 +10,7 @@ namespace B2Net.Http {
 			public const string Versions = "b2_list_file_versions";
 			public const string Hide = "b2_hide_file";
 			public const string Info = "b2_get_file_info";
+			public const string UpdateFileRetention = "b2_update_file_retention";
 		}
 
 		public static HttpRequestMessage GetList(B2Options options, string bucketId, string startFileName = "", int? maxFileCount = null, string prefix = "", string delimiter = "") {
@@ -66,6 +67,16 @@ namespace B2Net.Http {
 		public static HttpRequestMessage GetInfo(B2Options options, string fileId) {
 			var json = JsonConvert.SerializeObject(new { fileId });
 			return BaseRequestGenerator.PostRequest(Endpoints.Info, json, options);
+		}
+
+		public static HttpRequestMessage UpdateFileRetention(B2Options options, string fileName, string fileId, B2DefaultRetention fileRetention, bool bypassGovernance = false) {
+			var json = JsonConvert.SerializeObject(new {
+				fileName,
+				fileId,
+				fileRetention,
+				bypassGovernance
+			});
+			return BaseRequestGenerator.PostRequest(Endpoints.UpdateFileRetention, json, options);
 		}
 	}
 }

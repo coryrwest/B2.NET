@@ -26,7 +26,7 @@ namespace B2Net.Tests {
 		public async Task BadInitialization() {
 			// Missing AccountId
 			var auth = await B2Client.AuthorizeAsync(new B2Options() {
-				KeyId = applicationKeyId,
+				KeyId = Options.KeyId,
 				ApplicationKey = ""
 			});
 		}

@@ -36,7 +36,7 @@ namespace B2Net.Tests {
 				TestBucket = existingBucket;
 			}
 			else {
-				TestBucket = Client.Buckets.Create(BucketName, BucketTypes.allPrivate).Result;
+				TestBucket = Client.Buckets.Create(BucketName, new B2BucketOptions() {FileLockEnabled = true, BucketType = Models.BucketTypes.allPrivate }).Result;
 			}
 		}
 
@@ -96,6 +96,79 @@ namespace B2Net.Tests {
 
 			Assert.AreEqual(start.FileId, finish.FileId, "File Ids did not match.");
 		}
+
+		// THIS TEST DOES NOT PROPERLY CLEAN UP after an exception.
+		[TestMethod]
+		public async System.Threading.Tasks.Task LargeFileUploadTest_WithRetention() {
+			var fileName = "B2LargeFileTest.txt";
+			FileStream fileStream = File.OpenRead(Path.Combine(FilePath, fileName));
+			byte[] c = null;
+			List<byte[]> parts = new List<byte[]>();
+			var shas = new List<string>();
+			long fileSize = fileStream.Length;
+			long totalBytesParted = 0;
+			long minPartSize = 1024 * (5 * 1024);
+
+			while (totalBytesParted < fileSize) {
+				var partSize = minPartSize;
+				// If last part is less than min part size, get that length
+				if (fileSize - totalBytesParted < minPartSize) {
+					partSize = fileSize - totalBytesParted;
+				}
+
+				c = new byte[partSize];
+				fileStream.Seek(totalBytesParted, SeekOrigin.Begin);
+				fileStream.Read(c, 0, c.Length);
+
+				parts.Add(c);
+				totalBytesParted += partSize;
+			}
+
+			foreach (var part in parts) {
+				string hash = Utilities.GetSHA1Hash(part);
+				shas.Add(hash);
+			}
+
+			B2File start = null;
+			B2File finish = null;
+
+			// Get timestamp
+			DateTimeOffset now = DateTimeOffset.UtcNow.AddDays(1);
+#if NETFULL
+			var UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+			long unixTimeMilliseconds = (long) (DateTime.UtcNow - UnixEpoch).TotalMilliseconds;
+#else
+			long unixTimeMilliseconds = now.ToUnixTimeMilliseconds();
+#endif
+
+			try {
+				start = Client.LargeFiles.StartLargeFile(fileName, new B2LargeFileRetention() {
+					Mode = RetentionMode.governance,
+					RetainUntilTimestamp = unixTimeMilliseconds
+				}, "", TestBucket.BucketId).Result;
+
+				for (int i = 0; i < parts.Count; i++) {
+					var uploadUrl = Client.LargeFiles.GetUploadPartUrl(start.FileId).Result;
+					var part = Client.LargeFiles.UploadPart(parts[i], i + 1, uploadUrl).Result;
+				}
+
+				finish = Client.LargeFiles.FinishLargeFile(start.FileId, shas.ToArray()).Result;
+			}
+			catch (Exception e) {
+				await Client.LargeFiles.CancelLargeFile(start.FileId);
+				Console.WriteLine(e);
+				throw;
+			}
+
+			// Clean up.
+			FilesToDelete.Add(start);
+
+
+			Assert.AreEqual(start.FileId, finish.FileId, "File Ids did not match.");
+			Assert.AreEqual(RetentionMode.governance.ToString(), start.FileRetention.Value.Mode, "File retention mode was not returned correctly.");
+			Assert.AreEqual(unixTimeMilliseconds, start.FileRetention.Value.RetainUntilTimestamp, "File retention timestamp was not returned correctly.");
+		}
+
 
 		[TestMethod]
 		public void LargeFileUploadIncompleteGetPartsTest() {

@@ -42,6 +42,23 @@ namespace B2Net.Tests {
 		}
 
 		[TestMethod]
+		public void CreateBucket_WithFileLock_Test() {
+			var name = BucketName;
+			var bucket = Client.Buckets.Create(name, new B2BucketOptions() {
+				BucketType = Models.BucketTypes.allPublic,
+				FileLockEnabled = true
+			}).Result;
+
+			// Clean up
+			if (!string.IsNullOrEmpty(bucket.BucketId)) {
+				Client.Buckets.Delete(bucket.BucketId).Wait();
+			}
+
+			Assert.AreEqual(name, bucket.BucketName);
+			Assert.IsTrue(bucket.FileLockConfiguration.Value.IsFileLockEnabled);
+		}
+
+		[TestMethod]
 		[ExpectedException(typeof(AggregateException))]
 		public void CreateBucketInvalidNameTest() {
 			var name = "B2net-testing-bucket-%$";

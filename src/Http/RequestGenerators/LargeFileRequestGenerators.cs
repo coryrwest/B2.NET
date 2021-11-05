@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using Newtonsoft.Json.Serialization;
 
 namespace B2Net.Http.RequestGenerators {
 	public class LargeFileRequestGenerators {
@@ -19,14 +20,18 @@ namespace B2Net.Http.RequestGenerators {
 			public const string CopyPart = "b2_copy_part";
 		}
 
-		public static HttpRequestMessage Start(B2Options options, string bucketId, string fileName, string contentType, Dictionary<string, string> fileInfo = null) {
+		public static HttpRequestMessage Start(B2Options options, string bucketId, string fileName, string contentType, B2LargeFileRetention fileRetention, Dictionary<string, string> fileInfo = null) {
 			var uri = new Uri(options.ApiUrl + "/b2api/" + Constants.Version + "/" + Endpoints.Start);
-			var content = "{\"bucketId\":\"" + bucketId + "\",\"fileName\":\"" + fileName +
-											"\",\"contentType\":\"" + (string.IsNullOrEmpty(contentType) ? "b2/x-auto" : contentType) + "\"}";
+			var json = JsonConvert.SerializeObject(new {
+				bucketId,
+				fileName,
+				fileRetention,
+				contentType = (string.IsNullOrEmpty(contentType) ? "b2/x-auto" : contentType)
+			}, new JsonSerializerSettings() { ContractResolver = new CamelCasePropertyNamesContractResolver() });
 			var request = new HttpRequestMessage() {
 				Method = HttpMethod.Post,
 				RequestUri = uri,
-				Content = new StringContent(content),
+				Content = new StringContent(json),
 			};
 
 			request.Headers.TryAddWithoutValidation("Authorization", options.AuthorizationToken);
@@ -37,7 +42,7 @@ namespace B2Net.Http.RequestGenerators {
 				}
 			}
 			request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-			request.Content.Headers.ContentLength = content.Length;
+			request.Content.Headers.ContentLength = json.Length;
 
 			return request;
 		}
