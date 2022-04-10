@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
-using Newtonsoft.Json;
+
 
 namespace B2Net.Http {
 	public static class FileUploadRequestGenerators {
@@ -24,7 +24,8 @@ namespace B2Net.Http {
 		/// <param name="fileName"></param>
 		/// <param name="fileInfo"></param>
 		/// <returns></returns>
-		public static HttpRequestMessage Upload(B2Options options, string uploadUrl, byte[] fileData, string fileName, Dictionary<string, string> fileInfo, string contentType = "") {
+		public static HttpRequestMessage Upload(B2Options options, string uploadUrl, byte[] fileData, string fileName,
+			Dictionary<string, string> fileInfo, string contentType = "") {
 			var uri = new Uri(uploadUrl);
 			var request = new HttpRequestMessage() {
 				Method = HttpMethod.Post,
@@ -48,7 +49,8 @@ namespace B2Net.Http {
 			// TODO last modified
 			//request.Headers.Add("X-Bz-src_last_modified_millis", hash);
 
-			request.Content.Headers.ContentType = new MediaTypeHeaderValue(string.IsNullOrWhiteSpace(contentType) ? "b2/x-auto" : contentType);
+			request.Content.Headers.ContentType =
+				new MediaTypeHeaderValue(string.IsNullOrWhiteSpace(contentType) ? "b2/x-auto" : contentType);
 			request.Content.Headers.ContentLength = fileData.Length;
 
 			return request;
@@ -63,7 +65,8 @@ namespace B2Net.Http {
 		/// <param name="fileName"></param>
 		/// <param name="fileInfo"></param>
 		/// <returns></returns>
-		public static HttpRequestMessage Upload(B2Options options, string uploadUrl, Stream fileDataWithSHA, string fileName, Dictionary<string, string> fileInfo, string contentType = "", bool dontSHA = false) {
+		public static HttpRequestMessage Upload(B2Options options, string uploadUrl, Stream fileDataWithSHA,
+			string fileName, Dictionary<string, string> fileInfo, string contentType = "", bool dontSHA = false) {
 			var uri = new Uri(uploadUrl);
 			var request = new HttpRequestMessage() {
 				Method = HttpMethod.Post,
@@ -85,7 +88,8 @@ namespace B2Net.Http {
 			// TODO last modified
 			//request.Headers.Add("X-Bz-src_last_modified_millis", hash);
 
-			request.Content.Headers.ContentType = new MediaTypeHeaderValue(string.IsNullOrWhiteSpace(contentType) ? "b2/x-auto" : contentType);
+			request.Content.Headers.ContentType =
+				new MediaTypeHeaderValue(string.IsNullOrWhiteSpace(contentType) ? "b2/x-auto" : contentType);
 			// SHA will be in Stream already
 			request.Content.Headers.ContentLength = fileDataWithSHA.Length;
 
@@ -93,7 +97,8 @@ namespace B2Net.Http {
 		}
 
 		public static HttpRequestMessage GetUploadUrl(B2Options options, string bucketId) {
-			var json = JsonConvert.SerializeObject(new { bucketId });
+			var json = Utilities.Serialize(new { bucketId });
+
 			return BaseRequestGenerator.PostRequest(Endpoints.GetUploadUrl, json, options);
 		}
 	}

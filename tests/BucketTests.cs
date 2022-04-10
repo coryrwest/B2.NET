@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using B2Net.Http;
 
 namespace B2Net.Tests {
 	[TestClass]
@@ -14,7 +15,7 @@ namespace B2Net.Tests {
 
 		[TestInitialize]
 		public void Initialize() {
-			Client = new B2Client(B2Client.Authorize(Options));
+			Client = new B2Client(B2Client.Authorize(Options, Options.StaticHttpClient()), Options.StaticHttpClient());
 		}
 
 		[TestMethod]
@@ -67,8 +68,10 @@ namespace B2Net.Tests {
 
 			Assert.IsNotNull(savedBucket, "Retreived bucket was null");
 			Assert.IsNotNull(savedBucket.BucketInfo, "Bucekt info was null");
-			Assert.IsTrue(savedBucket.BucketInfo.ContainsKey("cache-control"), "Bucket info did not contain Cache-Control");
-			Assert.AreEqual("max-age=600", savedBucket.BucketInfo["cache-control"], "Cache-Control values were not equal.");
+			Assert.IsTrue(savedBucket.BucketInfo.ContainsKey("cache-control"),
+				"Bucket info did not contain Cache-Control");
+			Assert.AreEqual("max-age=600", savedBucket.BucketInfo["cache-control"],
+				"Cache-Control values were not equal.");
 		}
 
 		[TestMethod]
@@ -95,10 +98,14 @@ namespace B2Net.Tests {
 
 			Assert.IsNotNull(savedBucket, "Retreived bucket was null");
 			Assert.IsNotNull(savedBucket.BucketInfo, "Bucekt info was null");
-			Assert.AreEqual(savedBucket.LifecycleRules.Count, 1, "Lifecycle rules count was " + savedBucket.LifecycleRules.Count);
-			Assert.AreEqual("testing", savedBucket.LifecycleRules.First().FileNamePrefix, "File name prefixes in the first lifecycle rule were not equal.");
-			Assert.AreEqual(null, savedBucket.LifecycleRules.First().DaysFromUploadingToHiding, "The first lifecycle rule DaysFromUploadingToHiding was not null");
-			Assert.AreEqual(30, savedBucket.LifecycleRules.First().DaysFromHidingToDeleting, "The first lifecycle rule DaysFromHidingToDeleting was not 30");
+			Assert.AreEqual(savedBucket.LifecycleRules.Count, 1,
+				"Lifecycle rules count was " + savedBucket.LifecycleRules.Count);
+			Assert.AreEqual("testing", savedBucket.LifecycleRules.First().FileNamePrefix,
+				"File name prefixes in the first lifecycle rule were not equal.");
+			Assert.AreEqual(null, savedBucket.LifecycleRules.First().DaysFromUploadingToHiding,
+				"The first lifecycle rule DaysFromUploadingToHiding was not null");
+			Assert.AreEqual(30, savedBucket.LifecycleRules.First().DaysFromHidingToDeleting,
+				"The first lifecycle rule DaysFromHidingToDeleting was not 30");
 		}
 
 		[TestMethod]
@@ -120,8 +127,10 @@ namespace B2Net.Tests {
 
 			Assert.IsNotNull(savedBucket, "Retreived bucket was null");
 			Assert.IsNotNull(savedBucket.BucketInfo, "Bucekt info was null");
-			Assert.IsTrue(savedBucket.BucketInfo.ContainsKey("cache-control"), "Bucket info did not contain Cache-Control");
-			Assert.AreEqual("max-age=300", savedBucket.BucketInfo["cache-control"], "Cache-Control values were not equal.");
+			Assert.IsTrue(savedBucket.BucketInfo.ContainsKey("cache-control"),
+				"Bucket info did not contain Cache-Control");
+			Assert.AreEqual("max-age=300", savedBucket.BucketInfo["cache-control"],
+				"Cache-Control values were not equal.");
 		}
 
 		[TestMethod]
@@ -159,8 +168,10 @@ namespace B2Net.Tests {
 
 			Assert.IsNotNull(savedBucket, "Retreived bucket was null");
 			Assert.IsNotNull(savedBucket.BucketInfo, "Bucekt info was null");
-			Assert.AreEqual(savedBucket.LifecycleRules.Count, 1, "Lifecycle rules count was " + savedBucket.LifecycleRules.Count);
-			Assert.AreEqual("tested", savedBucket.LifecycleRules.First().FileNamePrefix, "File name prefixes in the first lifecycle rule were not equal.");
+			Assert.AreEqual(savedBucket.LifecycleRules.Count, 1,
+				"Lifecycle rules count was " + savedBucket.LifecycleRules.Count);
+			Assert.AreEqual("tested", savedBucket.LifecycleRules.First().FileNamePrefix,
+				"File name prefixes in the first lifecycle rule were not equal.");
 		}
 
 		[TestMethod]
@@ -206,9 +217,9 @@ namespace B2Net.Tests {
 				CORSRules = new List<B2CORSRule>() {
 					new B2CORSRule() {
 						CorsRuleName = "allowAnyHttps",
-						AllowedHeaders = new []{ "x-bz-content-sha1", "x-bz-info-*" },
-						AllowedOperations = new []{ "b2_upload_file" },
-						AllowedOrigins = new [] { "https://*" }
+						AllowedHeaders = new[] { "x-bz-content-sha1", "x-bz-info-*" },
+						AllowedOperations = new[] { "b2_upload_file" },
+						AllowedOrigins = new[] { "https://*" }
 					}
 				}
 			}).Result;
@@ -219,7 +230,8 @@ namespace B2Net.Tests {
 
 				var corsBucket = list.First(x => x.BucketId == bucket.BucketId);
 
-				Assert.AreEqual("allowAnyHttps", corsBucket.CORSRules.First().CorsRuleName, "CORS header was not saved or returned for bucket.");
+				Assert.AreEqual("allowAnyHttps", corsBucket.CORSRules.First().CorsRuleName,
+					"CORS header was not saved or returned for bucket.");
 			}
 			finally {
 				Client.Buckets.Delete(bucket.BucketId).Wait();
@@ -232,9 +244,9 @@ namespace B2Net.Tests {
 				CORSRules = new List<B2CORSRule>() {
 					new B2CORSRule() {
 						CorsRuleName = "allowAnyHttps",
-						AllowedHeaders = new []{ "x-bz-content-sha1", "x-bz-info-*" },
-						AllowedOperations = new []{ "b2_upload_file" },
-						AllowedOrigins = new [] { "https://*" }
+						AllowedHeaders = new[] { "x-bz-content-sha1", "x-bz-info-*" },
+						AllowedOperations = new[] { "b2_upload_file" },
+						AllowedOrigins = new[] { "https://*" }
 					}
 				}
 			}).Result;
@@ -244,8 +256,8 @@ namespace B2Net.Tests {
 					CORSRules = new List<B2CORSRule>() {
 						new B2CORSRule() {
 							CorsRuleName = "updatedRule",
-							AllowedOperations = new []{ "b2_upload_part" },
-							AllowedOrigins = new [] { "https://*" }
+							AllowedOperations = new[] { "b2_upload_part" },
+							AllowedOrigins = new[] { "https://*" }
 						}
 					}
 				}, bucket.Revision, bucket.BucketId).Result;
@@ -255,9 +267,12 @@ namespace B2Net.Tests {
 
 				var corsBucket = list.First(x => x.BucketId == bucket.BucketId);
 
-				Assert.AreEqual("updatedRule", corsBucket.CORSRules.First().CorsRuleName, "CORS header was not updated for bucket.");
-				Assert.AreEqual("b2_upload_part", corsBucket.CORSRules.First().AllowedOperations.First(), "CORS header was not updated for bucket.");
-			} finally {
+				Assert.AreEqual("updatedRule", corsBucket.CORSRules.First().CorsRuleName,
+					"CORS header was not updated for bucket.");
+				Assert.AreEqual("b2_upload_part", corsBucket.CORSRules.First().AllowedOperations.First(),
+					"CORS header was not updated for bucket.");
+			}
+			finally {
 				Client.Buckets.Delete(bucket.BucketId).Wait();
 			}
 		}

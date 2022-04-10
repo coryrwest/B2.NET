@@ -1,4 +1,5 @@
-﻿using B2Net.Models;
+﻿using B2.Net.Tests;
+using B2Net.Models;
 
 namespace B2Net.Tests {
 	public class BaseTest {

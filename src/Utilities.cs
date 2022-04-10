@@ -1,43 +1,71 @@
 ﻿using B2Net.Models;
-using Newtonsoft.Json;
 using System;
 using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace B2Net {
 	public static class Utilities {
+		private static readonly JsonSerializerOptions FormattedJsonSerializerOptions = new JsonSerializerOptions() {
+			WriteIndented = true,
+			PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+		};
+
+		public static string Serialize<T>(T obj) {
+			//the branch origin used: JsonConvert
+			return JsonSerializer.Serialize(obj);
+		}
+
+		public static string SerializeFormatted<T>(T obj) {
+			//the branch origin used: JsonConvert.Serialize(data, Formatting.Indented, new JsonSerializerSettings() {ContractResolver = new CamelCasePropertyNamesContractResolver()})
+			return JsonSerializer.Serialize(obj, FormattedJsonSerializerOptions);
+		}
+
+		public static T Deserialize<T>(string jsonResponse) {
+			//the branch origin used: JsonConvert (and NullValueHandling.Ignore)
+			return System.Text.Json.JsonSerializer.Deserialize<T>(jsonResponse);
+		}
+
+
 		/// <summary>
 		/// Create the B2 Authorization header. Base64 encoded accountId:applicationKey.
 		/// </summary>
 		public static string CreateAuthorizationHeader(string accountId, string applicationKey) {
 			var authHeader = "Basic ";
 			var credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes(accountId + ":" + applicationKey));
+
 			return authHeader + credentials;
 		}
 
 		public static async Task CheckForErrors(HttpResponseMessage response, string callingApi = "") {
 			if (!response.IsSuccessStatusCode) {
 				// Should retry
-				bool retry = response.StatusCode == (HttpStatusCode)429 ||
-					response.StatusCode == HttpStatusCode.RequestTimeout ||
-					response.StatusCode == HttpStatusCode.ServiceUnavailable;
+				bool retry = response.StatusCode == (HttpStatusCode) 429 ||
+				             response.StatusCode == HttpStatusCode.RequestTimeout ||
+				             response.StatusCode == HttpStatusCode.ServiceUnavailable;
 
 				string content = await response.Content.ReadAsStringAsync();
 
 				B2Error b2Error;
 				try {
-					b2Error = JsonConvert.DeserializeObject<B2Error>(content);
-				} catch (Exception ex) {
-					throw new Exception("Seralization of the response failed. See inner exception for response contents and serialization error.", ex);
+					b2Error = Utilities.Deserialize<B2Error>(content);
 				}
+				catch (Exception ex) {
+					throw new Exception(
+						"Seralization of the response failed. See inner exception for response contents and serialization error.",
+						ex);
+				}
+
 				if (b2Error != null) {
 					// If calling API is supplied, append to the error message
 					if (!string.IsNullOrEmpty(callingApi) && b2Error.Code == "401") {
-						b2Error.Message = $"Unauthorized error when operating on {callingApi}. Are you sure the key you are using has access? {b2Error.Message}";
+						b2Error.Message =
+							$"Unauthorized error when operating on {callingApi}. Are you sure the key you are using has access? {b2Error.Message}";
 					}
+
 					throw new B2Exception(b2Error.Code, b2Error.Status, b2Error.Message, retry);
 				}
 			}
@@ -52,7 +80,8 @@ namespace B2Net {
 		public static string DetermineBucketId(B2Options options, string bucketId) {
 			// Check for a persistant bucket
 			if (!options.PersistBucket && string.IsNullOrEmpty(bucketId)) {
-				throw new ArgumentNullException(nameof(bucketId), "You must either Persist a Bucket or provide a BucketId in the method call.");
+				throw new ArgumentNullException(nameof(bucketId),
+					"You must either Persist a Bucket or provide a BucketId in the method call.");
 			}
 
 			// Are we persisting buckets? If so use the one from settings
@@ -65,6 +94,7 @@ namespace B2Net {
 				var hex = b.ToString("x2");
 				sb.Append(hex);
 			}
+
 			return sb.ToString();
 		}
 
@@ -80,6 +110,7 @@ namespace B2Net {
 			if (str == "/") {
 				return str;
 			}
+
 			// Decode / back to un-encoded value
 			return Uri.EscapeDataString(str).Replace("%2F", "/");
 		}
@@ -88,6 +119,7 @@ namespace B2Net {
 			if (str == "+") {
 				return " ";
 			}
+
 			return Uri.UnescapeDataString(str);
 		}
 	}

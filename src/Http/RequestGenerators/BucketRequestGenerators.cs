@@ -1,7 +1,5 @@
 ﻿using B2Net.Http.RequestGenerators;
 using B2Net.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,12 +16,14 @@ namespace B2Net.Http {
 		}
 
 		public static HttpRequestMessage GetBucketList(B2Options options) {
-			var json = JsonConvert.SerializeObject(new { accountId = options.AccountId });
+			var json = Utilities.Serialize(new { accountId = options.AccountId });
+
 			return BaseRequestGenerator.PostRequest(Endpoints.List, json, options);
 		}
 
 		public static HttpRequestMessage DeleteBucket(B2Options options, string bucketId) {
-			var json = JsonConvert.SerializeObject(new { accountId = options.AccountId, bucketId });
+			var json = Utilities.Serialize(new { accountId = options.AccountId, bucketId });
+
 			return BaseRequestGenerator.PostRequest(Endpoints.Delete, json, options);
 		}
 
@@ -34,15 +34,18 @@ namespace B2Net.Http {
 		/// <param name="bucketName"></param>
 		/// <param name="bucketType"></param>
 		/// <returns></returns>
-		public static HttpRequestMessage CreateBucket(B2Options options, string bucketName, string bucketType = "allPrivate") {
+		public static HttpRequestMessage CreateBucket(B2Options options, string bucketName,
+			string bucketType = "allPrivate") {
 			var allowed = new Regex("^[a-zA-Z0-9-]+$");
-			if (bucketName.Length < 6 || bucketName.Length > 50 || !allowed.IsMatch(bucketName) || bucketName.StartsWith("b2-")) {
+			if (bucketName.Length < 6 || bucketName.Length > 50 || !allowed.IsMatch(bucketName) ||
+			    bucketName.StartsWith("b2-")) {
 				throw new Exception(@"The bucket name specified does not match the requirements. 
                             Bucket Name can consist of upper-case letters, lower-case letters, numbers, and "" - "", 
                             must be at least 6 characters long, and can be at most 50 characters long");
 			}
 
-			var json = JsonConvert.SerializeObject(new { accountId = options.AccountId, bucketName, bucketType });
+			var json = Utilities.Serialize(new { accountId = options.AccountId, bucketName, bucketType });
+
 			return BaseRequestGenerator.PostRequest(Endpoints.Create, json, options);
 		}
 
@@ -53,7 +56,8 @@ namespace B2Net.Http {
 		/// <param name="bucketName"></param>
 		/// <param name="bucketType"></param>
 		/// <returns></returns>
-		public static HttpRequestMessage CreateBucket(B2Options options, string bucketName, B2BucketOptions bucketOptions) {
+		public static HttpRequestMessage CreateBucket(B2Options options, string bucketName,
+			B2BucketOptions bucketOptions) {
 			// Check lifecycle rules
 			var hasLifecycleRules = bucketOptions.LifecycleRules != null && bucketOptions.LifecycleRules.Count > 0;
 			if (hasLifecycleRules) {
@@ -61,14 +65,17 @@ namespace B2Net.Http {
 					if (rule.DaysFromHidingToDeleting < 1 || rule.DaysFromUploadingToHiding < 1) {
 						throw new System.Exception("The smallest number of days you can set in a lifecycle rule is 1.");
 					}
+
 					if (rule.DaysFromHidingToDeleting == null && rule.DaysFromUploadingToHiding == null) {
-						throw new System.Exception("You must set either DaysFromHidingToDeleting or DaysFromUploadingToHiding. Both cannot be null.");
+						throw new System.Exception(
+							"You must set either DaysFromHidingToDeleting or DaysFromUploadingToHiding. Both cannot be null.");
 					}
 				}
 			}
 
 			var allowed = new Regex("^[a-zA-Z0-9-]+$");
-			if (bucketName.Length < 6 || bucketName.Length > 50 || !allowed.IsMatch(bucketName) || bucketName.StartsWith("b2-")) {
+			if (bucketName.Length < 6 || bucketName.Length > 50 || !allowed.IsMatch(bucketName) ||
+			    bucketName.StartsWith("b2-")) {
 				throw new Exception(@"The bucket name specified does not match the requirements. 
                             Bucket Name can consist of upper-case letters, lower-case letters, numbers, and "" - "", 
                             must be at least 6 characters long, and can be at most 50 characters long");
@@ -86,6 +93,7 @@ namespace B2Net.Http {
 					{ "Cache-Control", "max-age=" + bucketOptions.CacheControl }
 				};
 			}
+
 			if (hasLifecycleRules) {
 				body.lifecycleRules = bucketOptions.LifecycleRules;
 			}
@@ -96,6 +104,7 @@ namespace B2Net.Http {
 			}
 
 			var json = JsonSerialize(body);
+
 			return BaseRequestGenerator.PostRequest(Endpoints.Create, json, options);
 		}
 
@@ -105,7 +114,8 @@ namespace B2Net.Http {
 		/// <param name="options"></param>
 		/// <returns></returns>
 		public static HttpRequestMessage UpdateBucket(B2Options options, string bucketId, string bucketType) {
-			var json = JsonConvert.SerializeObject(new { accountId = options.AccountId, bucketId, bucketType });
+			var json = Utilities.Serialize(new { accountId = options.AccountId, bucketId, bucketType });
+
 			return BaseRequestGenerator.PostRequest(Endpoints.Update, json, options);
 		}
 
@@ -114,7 +124,8 @@ namespace B2Net.Http {
 		/// </summary>
 		/// <param name="revisionNumber">(optional) When set, the update will only happen if the revision number stored in the B2 service matches the one passed in. This can be used to avoid having simultaneous updates make conflicting changes. </param>
 		/// <returns></returns>
-		public static HttpRequestMessage UpdateBucket(B2Options options, string bucketId, B2BucketOptions bucketOptions, int? revisionNumber = null) {
+		public static HttpRequestMessage UpdateBucket(B2Options options, string bucketId, B2BucketOptions bucketOptions,
+			int? revisionNumber = null) {
 			// Check lifecycle rules
 			var hasLifecycleRules = bucketOptions.LifecycleRules != null && bucketOptions.LifecycleRules.Count > 0;
 			if (hasLifecycleRules) {
@@ -122,8 +133,10 @@ namespace B2Net.Http {
 					if (rule.DaysFromHidingToDeleting < 1 || rule.DaysFromUploadingToHiding < 1) {
 						throw new System.Exception("The smallest number of days you can set in a lifecycle rule is 1.");
 					}
+
 					if (rule.DaysFromHidingToDeleting == null && rule.DaysFromUploadingToHiding == null) {
-						throw new System.Exception("You must set either DaysFromHidingToDeleting or DaysFromUploadingToHiding. Both cannot be null.");
+						throw new System.Exception(
+							"You must set either DaysFromHidingToDeleting or DaysFromUploadingToHiding. Both cannot be null.");
 					}
 				}
 			}
@@ -140,6 +153,7 @@ namespace B2Net.Http {
 					{ "Cache-Control", "max-age=" + bucketOptions.CacheControl }
 				};
 			}
+
 			if (hasLifecycleRules) {
 				body.lifecycleRules = bucketOptions.LifecycleRules;
 			}
@@ -149,12 +163,15 @@ namespace B2Net.Http {
 				if (bucketOptions.CORSRules.Any(x => x.AllowedOperations == null || x.AllowedOperations.Length == 0)) {
 					throw new System.Exception("You must set allowedOperations on the bucket CORS rules.");
 				}
+
 				if (bucketOptions.CORSRules.Any(x => x.AllowedOrigins == null || x.AllowedOrigins.Length == 0)) {
 					throw new System.Exception("You must set allowedOrigins on the bucket CORS rules.");
 				}
+
 				if (bucketOptions.CORSRules.Any(x => string.IsNullOrEmpty(x.CorsRuleName))) {
 					throw new System.Exception("You must set corsRuleName on the bucket CORS rules.");
 				}
+
 				body.corsRules = bucketOptions.CORSRules;
 			}
 
@@ -163,13 +180,12 @@ namespace B2Net.Http {
 			}
 
 			var json = JsonSerialize(body);
+
 			return BaseRequestGenerator.PostRequest(Endpoints.Update, json, options);
 		}
 
 		private static string JsonSerialize(object data) {
-			return JsonConvert.SerializeObject(data, Formatting.Indented, new JsonSerializerSettings() {
-				ContractResolver = new CamelCasePropertyNamesContractResolver()
-			});
+			return Utilities.SerializeFormatted(data);
 		}
 	}
 

@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using B2Net.Http;
 
 namespace B2Net.Tests {
 	[TestClass]
@@ -23,7 +24,7 @@ namespace B2Net.Tests {
 
 		[TestInitialize]
 		public void Initialize() {
-			Client = new B2Client(Options);
+			Client = new B2Client(Options, Options.StaticHttpClient());
 			BucketName = $"B2NETTestingBucket-{Path.GetRandomFileName().Replace(".", "").Substring(0, 6)}";
 
 			var buckets = Client.Buckets.GetList().Result;
@@ -36,7 +37,8 @@ namespace B2Net.Tests {
 
 			if (existingBucket != null) {
 				TestBucket = existingBucket;
-			} else {
+			}
+			else {
 				TestBucket = Client.Buckets.Create(BucketName, BucketTypes.allPrivate).Result;
 			}
 		}
@@ -65,7 +67,8 @@ namespace B2Net.Tests {
 			FilesToDelete.Add(file);
 			FilesToDelete.Add(fileFolder);
 
-			var list = Client.Files.GetListWithPrefixOrDemiliter(bucketId: TestBucket.BucketId, prefix: "test").Result.Files;
+			var list = Client.Files.GetListWithPrefixOrDemiliter(bucketId: TestBucket.BucketId, prefix: "test").Result
+				.Files;
 
 			Assert.AreEqual(1, list.Count, list.Count + " files found.");
 		}
@@ -81,7 +84,9 @@ namespace B2Net.Tests {
 			FilesToDelete.Add(file);
 			FilesToDelete.Add(fileFolder);
 
-			var list = Client.Files.GetListWithPrefixOrDemiliter(bucketId: TestBucket.BucketId, prefix: "test", delimiter: "/").Result.Files;
+			var list = Client.Files
+				.GetListWithPrefixOrDemiliter(bucketId: TestBucket.BucketId, prefix: "test", delimiter: "/").Result
+				.Files;
 
 			Assert.AreEqual(1, list.Count, list.Count + " files found.");
 			Assert.AreEqual("test/", list.First().FileName, "File names to not match.");
@@ -99,7 +104,8 @@ namespace B2Net.Tests {
 			FilesToDelete.Add(file);
 			FilesToDelete.Add(fileFolder);
 
-			var list = Client.Files.GetListWithPrefixOrDemiliter(bucketId: TestBucket.BucketId, delimiter: "/").Result.Files;
+			var list = Client.Files.GetListWithPrefixOrDemiliter(bucketId: TestBucket.BucketId, delimiter: "/").Result
+				.Files;
 
 			Assert.AreEqual(2, list.Count, list.Count + " files found.");
 			Assert.IsTrue(list.All(f => f.Action == "folder"), "Not all list items were folders.");
@@ -182,7 +188,7 @@ namespace B2Net.Tests {
 			string hash = Utilities.GetSHA1Hash(fileData);
 
 			var fileInfo = new Dictionary<string, string>() {
-				{"FileInfoTest", "1234"}
+				{ "FileInfoTest", "1234" }
 			};
 
 			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId, fileInfo).Result;
@@ -193,12 +199,12 @@ namespace B2Net.Tests {
 			Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
 			Assert.AreEqual(1, file.FileInfo.Count, "File info count was off.");
 		}
-		
+
 		[TestMethod]
 		public void FileUploadStreamTest() {
 			var fileName = "B2Test.txt";
 			var bytes = File.ReadAllBytes(Path.Combine(FilePath, fileName));
-			
+
 			string hash = Utilities.GetSHA1Hash(bytes);
 			var hashBytes = Encoding.UTF8.GetBytes(hash);
 
@@ -213,22 +219,24 @@ namespace B2Net.Tests {
 
 			Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
 		}
-		
+
 		[TestMethod]
 		public void FileUploadStreamNoSHATest() {
 			var fileName = "B2Test.txt";
 			var bytes = File.ReadAllBytes(Path.Combine(FilePath, fileName));
-			
+
 			var fileData = new MemoryStream(bytes);
 
 			var uploadUrl = Client.Files.GetUploadUrl(TestBucket.BucketId).Result;
 
-			var file = Client.Files.Upload(fileData, fileName, uploadUrl, "", false, TestBucket.BucketId, null, true).Result;
+			var file = Client.Files.Upload(fileData, fileName, uploadUrl, "", false, TestBucket.BucketId, null, true)
+				.Result;
 
 			// Clean up.
 			FilesToDelete.Add(file);
 
-			Assert.IsTrue(file.ContentSHA1.StartsWith("unverified"), $"File was verified when it should not have been: {file.ContentSHA1}.");
+			Assert.IsTrue(file.ContentSHA1.StartsWith("unverified"),
+				$"File was verified when it should not have been: {file.ContentSHA1}.");
 		}
 
 		[TestMethod]
@@ -256,7 +264,7 @@ namespace B2Net.Tests {
 			string hash = Utilities.GetSHA1Hash(fileData);
 
 			var fileInfo = new Dictionary<string, string>() {
-				{"FileInfoTest", "1234"}
+				{ "FileInfoTest", "1234" }
 			};
 
 			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId, fileInfo).Result;
@@ -381,7 +389,8 @@ namespace B2Net.Tests {
 			FilesToDelete.Add(copied);
 
 			Assert.AreEqual("copy", copied.Action, "Action was not as expected for the copy operation.");
-			Assert.AreEqual(fileData.Length.ToString(), copied.ContentLength, "Length of the two files was not the same.");
+			Assert.AreEqual(fileData.Length.ToString(), copied.ContentLength,
+				"Length of the two files was not the same.");
 		}
 
 		[TestMethod]
@@ -392,18 +401,22 @@ namespace B2Net.Tests {
 			// Clean up.
 			FilesToDelete.Add(file);
 
-			var copied = await Client.Files.Copy(file.FileId, "B2TestCopy.txt", B2MetadataDirective.REPLACE, "text/plain", new Dictionary<string, string>() {
-				{"FileInfoTest", "1234"}
-			});
+			var copied = await Client.Files.Copy(file.FileId, "B2TestCopy.txt", B2MetadataDirective.REPLACE,
+				"text/plain", new Dictionary<string, string>() {
+					{ "FileInfoTest", "1234" }
+				});
 			// Clean up.
 			FilesToDelete.Add(copied);
 
-			Assert.IsTrue(copied.FileInfo.ContainsKey("fileinfotest"), "FileInfo was not as expected for the replace operation.");
-			Assert.AreEqual(fileData.Length.ToString(), copied.ContentLength, "Length of the two files was not the same.");
+			Assert.IsTrue(copied.FileInfo.ContainsKey("fileinfotest"),
+				"FileInfo was not as expected for the replace operation.");
+			Assert.AreEqual(fileData.Length.ToString(), copied.ContentLength,
+				"Length of the two files was not the same.");
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(CopyReplaceSetupException), "Copy did not fail when disallowed fields were provided.")]
+		[ExpectedException(typeof(CopyReplaceSetupException),
+			"Copy did not fail when disallowed fields were provided.")]
 		public async Task CopyFileWithDisallowedFields() {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
@@ -432,6 +445,7 @@ namespace B2Net.Tests {
 			foreach (B2File b2File in FilesToDelete) {
 				var deletedFile = Client.Files.Delete(b2File.FileId, b2File.FileName).Result;
 			}
+
 			var deletedBucket = Client.Buckets.Delete(TestBucket.BucketId).Result;
 		}
 	}

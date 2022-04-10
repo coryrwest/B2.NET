@@ -17,5 +17,9 @@ namespace B2.Net.Tests {
 		public static string BucketId {
 			get { return ""; }
 		}
+
+		public static string KeyId {
+			get { return ""; }
+		}
 	}
 }

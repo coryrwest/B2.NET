@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using System.Threading.Tasks;
+using B2Net.Http;
 
 namespace B2Net.Tests {
 	[TestClass]
@@ -9,13 +10,14 @@ namespace B2Net.Tests {
 		private string BucketName = "";
 
 		[TestMethod]
-		[ExpectedException(typeof(B2Exception), "Unauthorized error when operating on Buckets. Are you sure the key you are using has access? ")]
+		[ExpectedException(typeof(B2Exception),
+			"Unauthorized error when operating on Buckets. Are you sure the key you are using has access? ")]
 		public async Task GetBucketListTest() {
 			// Key that is restricted to a specific bucket name above.
 			var client = new B2Client(B2Client.Authorize(new B2Options() {
 				KeyId = restrictedApplicationKeyId,
 				ApplicationKey = restrictedApplicationKey
-			}));
+			}, Options.StaticHttpClient()), Options.StaticHttpClient());
 			BucketName = $"B2NETTestingBucket-{Path.GetRandomFileName().Replace(".", "").Substring(0, 6)}";
 
 			var bucket = await client.Buckets.Create(BucketName, BucketTypes.allPrivate);
@@ -28,7 +30,7 @@ namespace B2Net.Tests {
 			var auth = await B2Client.AuthorizeAsync(new B2Options() {
 				KeyId = applicationKeyId,
 				ApplicationKey = ""
-			});
+			}, Options.StaticHttpClient());
 		}
 	}
 }

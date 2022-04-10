@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using B2Net.Http;
 
 namespace B2Net.Tests {
 	[TestClass]
@@ -15,12 +16,12 @@ namespace B2Net.Tests {
 #if NETFULL
 		private string FilePath => Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "../../../");
 #else
-        private string FilePath => Path.Combine(System.AppContext.BaseDirectory, "../../../");
+		private string FilePath => Path.Combine(System.AppContext.BaseDirectory, "../../../");
 #endif
 
 		[TestInitialize]
 		public void Initialize() {
-			Client = new B2Client(Options);
+			Client = new B2Client(Options, Options.StaticHttpClient());
 			Options = Client.Authorize().Result;
 
 			var buckets = Client.Buckets.GetList().Result;
@@ -67,6 +68,7 @@ namespace B2Net.Tests {
 			foreach (B2File b2File in FilesToDelete) {
 				var deletedFile = Client.Files.Delete(b2File.FileId, b2File.FileName).Result;
 			}
+
 			var deletedBucket = Client.Buckets.Delete(TestBucket.BucketId).Result;
 		}
 	}

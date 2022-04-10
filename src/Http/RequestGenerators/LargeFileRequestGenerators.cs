@@ -1,5 +1,4 @@
 ﻿using B2Net.Models;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,10 +18,12 @@ namespace B2Net.Http.RequestGenerators {
 			public const string CopyPart = "b2_copy_part";
 		}
 
-		public static HttpRequestMessage Start(B2Options options, string bucketId, string fileName, string contentType, Dictionary<string, string> fileInfo = null) {
+		public static HttpRequestMessage Start(B2Options options, string bucketId, string fileName, string contentType,
+			Dictionary<string, string> fileInfo = null) {
 			var uri = new Uri(options.ApiUrl + "/b2api/" + Constants.Version + "/" + Endpoints.Start);
 			var content = "{\"bucketId\":\"" + bucketId + "\",\"fileName\":\"" + fileName +
-											"\",\"contentType\":\"" + (string.IsNullOrEmpty(contentType) ? "b2/x-auto" : contentType) + "\"}";
+			              "\",\"contentType\":\"" + (string.IsNullOrEmpty(contentType) ? "b2/x-auto" : contentType) +
+			              "\"}";
 			var request = new HttpRequestMessage() {
 				Method = HttpMethod.Post,
 				RequestUri = uri,
@@ -36,6 +37,7 @@ namespace B2Net.Http.RequestGenerators {
 					request.Headers.Add($"X-Bz-Info-{info.Key}", info.Value);
 				}
 			}
+
 			request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 			request.Content.Headers.ContentLength = content.Length;
 
@@ -51,7 +53,8 @@ namespace B2Net.Http.RequestGenerators {
 		/// <param name="fileName"></param>
 		/// <param name="fileInfo"></param>
 		/// <returns></returns>
-		public static HttpRequestMessage Upload(B2Options options, byte[] fileData, int partNumber, B2UploadPartUrl uploadPartUrl) {
+		public static HttpRequestMessage Upload(B2Options options, byte[] fileData, int partNumber,
+			B2UploadPartUrl uploadPartUrl) {
 			if (partNumber < 1 || partNumber > 10000) {
 				throw new Exception("Part number must be between 1 and 10,000");
 			}
@@ -76,47 +79,58 @@ namespace B2Net.Http.RequestGenerators {
 		}
 
 		public static HttpRequestMessage GetUploadPartUrl(B2Options options, string fileId) {
-			return BaseRequestGenerator.PostRequest(Endpoints.GetPartUrl, JsonConvert.SerializeObject(new { fileId }), options);
+			return BaseRequestGenerator.PostRequest(Endpoints.GetPartUrl, Utilities.Serialize(new { fileId }), options);
 		}
 
 		public static HttpRequestMessage Finish(B2Options options, string fileId, string[] partSHA1Array) {
-			var content = JsonConvert.SerializeObject(new { fileId, partSha1Array = partSHA1Array });
+			var content = Utilities.Serialize(new { fileId, partSha1Array = partSHA1Array });
 			var request = BaseRequestGenerator.PostRequestJson(Endpoints.Finish, content, options);
+
 			return request;
 		}
 
-		public static HttpRequestMessage ListParts(B2Options options, string fileId, int startPartNumber, int maxPartCount) {
+		public static HttpRequestMessage ListParts(B2Options options, string fileId, int startPartNumber,
+			int maxPartCount) {
 			if (startPartNumber < 1 || startPartNumber > 10000) {
 				throw new Exception("Start part number must be between 1 and 10,000");
 			}
 
-			var content = JsonConvert.SerializeObject(new { fileId, startPartNumber, maxPartCount });
+			var content = Utilities.Serialize(new { fileId, startPartNumber, maxPartCount });
 			var request = BaseRequestGenerator.PostRequestJson(Endpoints.ListParts, content, options);
+
 			return request;
 		}
 
 		public static HttpRequestMessage Cancel(B2Options options, string fileId) {
-			var content = JsonConvert.SerializeObject(new { fileId });
+			var content = Utilities.Serialize(new { fileId });
 			var request = BaseRequestGenerator.PostRequestJson(Endpoints.Cancel, content, options);
+
 			return request;
 		}
 
-		public static HttpRequestMessage IncompleteFiles(B2Options options, string bucketId, string startFileId = "", string maxFileCount = "") {
-			var body = "{\"bucketId\":\"" + bucketId + "\"";
+		public static HttpRequestMessage IncompleteFiles(B2Options options, string bucketId, string startFileId = "",
+			string maxFileCount = "") {
+			var bodyData = new Dictionary<string, object>() {
+				{ "bucketId", bucketId },
+			};
 			if (!string.IsNullOrEmpty(startFileId)) {
-				body += ", \"startFileId\":" + JsonConvert.ToString(startFileId);
+				bodyData["startFileId"] = startFileId;
 			}
+
 			if (!string.IsNullOrEmpty(maxFileCount)) {
-				body += ", \"maxFileCount\":" + JsonConvert.ToString(maxFileCount);
+				bodyData["maxFileCount"] = maxFileCount;
 			}
-			body += "}";
+
+			var body = Utilities.Serialize(bodyData);
 			var request = BaseRequestGenerator.PostRequestJson(Endpoints.IncompleteFiles, body, options);
+
 			return request;
 		}
 
-		public static HttpRequestMessage CopyPart(B2Options options, string sourceFileId, string destinationLargeFileId, int destinationPartNumber, string range = "") {
+		public static HttpRequestMessage CopyPart(B2Options options, string sourceFileId, string destinationLargeFileId,
+			int destinationPartNumber, string range = "") {
 			var uri = new Uri(options.ApiUrl + "/b2api/" + Constants.Version + "/" + Endpoints.CopyPart);
-			var payload = new Dictionary<string,string>() {
+			var payload = new Dictionary<string, string>() {
 				{ "sourceFileId", sourceFileId },
 				{ "largeFileId", destinationLargeFileId },
 				{ "partNumber", destinationPartNumber.ToString() },
@@ -124,7 +138,8 @@ namespace B2Net.Http.RequestGenerators {
 			if (!string.IsNullOrWhiteSpace(range)) {
 				payload.Add("range", range);
 			}
-			var content = JsonConvert.SerializeObject(payload);
+
+			var content = Utilities.Serialize(payload);
 			var request = new HttpRequestMessage() {
 				Method = HttpMethod.Post,
 				RequestUri = uri,

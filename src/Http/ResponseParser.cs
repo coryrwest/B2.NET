@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace B2Net.Http {
@@ -9,9 +8,8 @@ namespace B2Net.Http {
 
 			await Utilities.CheckForErrors(response, callingApi);
 
-			var obj = JsonConvert.DeserializeObject<T>(jsonResponse, new JsonSerializerSettings() {
-				NullValueHandling = NullValueHandling.Ignore
-			});
+			var obj = Utilities.Deserialize<T>(jsonResponse);
+
 			return obj;
 		}
 	}

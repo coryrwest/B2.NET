@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using B2Net.Http;
 
 namespace B2Net.Tests {
 	[TestClass]
@@ -17,12 +18,12 @@ namespace B2Net.Tests {
 #if NETFULL
 		private string FilePath => Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "../../../");
 #else
-        private string FilePath => Path.Combine(System.AppContext.BaseDirectory, "../../../");
+		private string FilePath => Path.Combine(System.AppContext.BaseDirectory, "../../../");
 #endif
 
 		[TestInitialize]
 		public void Initialize() {
-			Client = new B2Client(Options);
+			Client = new B2Client(Options, Options.StaticHttpClient());
 			BucketName = $"B2NETTestingBucket-{Path.GetRandomFileName().Replace(".", "").Substring(0, 6)}";
 			var buckets = Client.Buckets.GetList().Result;
 			B2Bucket existingBucket = null;
@@ -46,8 +47,8 @@ namespace B2Net.Tests {
 			var fileName = "B2LargeFileTest.txt";
 			FileStream fileStream = File.OpenRead(Path.Combine(FilePath, fileName));
 			byte[] c = null;
-            List<byte[]> parts = new List<byte[]>();
-		    var shas = new List<string>();
+			List<byte[]> parts = new List<byte[]>();
+			var shas = new List<string>();
 			long fileSize = fileStream.Length;
 			long totalBytesParted = 0;
 			long minPartSize = 1024 * (5 * 1024);
@@ -55,11 +56,11 @@ namespace B2Net.Tests {
 			while (totalBytesParted < fileSize) {
 				var partSize = minPartSize;
 				// If last part is less than min part size, get that length
-			    if (fileSize - totalBytesParted < minPartSize) {
-				    partSize = fileSize - totalBytesParted;
-			    }
+				if (fileSize - totalBytesParted < minPartSize) {
+					partSize = fileSize - totalBytesParted;
+				}
 
-			    c = new byte[partSize];
+				c = new byte[partSize];
 				fileStream.Seek(totalBytesParted, SeekOrigin.Begin);
 				fileStream.Read(c, 0, c.Length);
 
@@ -67,28 +68,29 @@ namespace B2Net.Tests {
 				totalBytesParted += partSize;
 			}
 
-		    foreach (var part in parts) {
-		        string hash = Utilities.GetSHA1Hash(part);
-                shas.Add(hash);
-            }
+			foreach (var part in parts) {
+				string hash = Utilities.GetSHA1Hash(part);
+				shas.Add(hash);
+			}
 
-		    B2File start = null;
-		    B2File finish = null;
-            try {
-		        start = Client.LargeFiles.StartLargeFile(fileName, "", TestBucket.BucketId).Result;
+			B2File start = null;
+			B2File finish = null;
+			try {
+				start = Client.LargeFiles.StartLargeFile(fileName, "", TestBucket.BucketId).Result;
 
-		        for (int i = 0; i < parts.Count; i++) {
-		            var uploadUrl = Client.LargeFiles.GetUploadPartUrl(start.FileId).Result;
-		            var part = Client.LargeFiles.UploadPart(parts[i], i + 1, uploadUrl).Result;
-		        }
+				for (int i = 0; i < parts.Count; i++) {
+					var uploadUrl = Client.LargeFiles.GetUploadPartUrl(start.FileId).Result;
+					var part = Client.LargeFiles.UploadPart(parts[i], i + 1, uploadUrl).Result;
+				}
 
-		        finish = Client.LargeFiles.FinishLargeFile(start.FileId, shas.ToArray()).Result;
-		    }
-		    catch (Exception e) {
-			    await Client.LargeFiles.CancelLargeFile(start.FileId);
-		        Console.WriteLine(e);
-		        throw;
-		    }
+				finish = Client.LargeFiles.FinishLargeFile(start.FileId, shas.ToArray()).Result;
+			}
+			catch (Exception e) {
+				await Client.LargeFiles.CancelLargeFile(start.FileId);
+				Console.WriteLine(e);
+
+				throw;
+			}
 
 			// Clean up.
 			FilesToDelete.Add(start);
@@ -135,6 +137,7 @@ namespace B2Net.Tests {
 			}
 			catch (Exception e) {
 				Console.WriteLine(e);
+
 				throw;
 			}
 			finally {
@@ -183,10 +186,12 @@ namespace B2Net.Tests {
 			}
 			catch (Exception e) {
 				Console.WriteLine(e);
+
 				throw;
 			}
 
-			Assert.AreEqual(start.FileId, cancelledFile.FileId, "Started file and Cancelled file do not have the same id.");
+			Assert.AreEqual(start.FileId, cancelledFile.FileId,
+				"Started file and Cancelled file do not have the same id.");
 		}
 
 		[TestMethod]
@@ -227,6 +232,7 @@ namespace B2Net.Tests {
 			}
 			catch (Exception e) {
 				Console.WriteLine(e);
+
 				throw;
 			}
 			finally {
@@ -314,6 +320,7 @@ namespace B2Net.Tests {
 			foreach (B2File b2File in FilesToDelete) {
 				var deletedFile = Client.Files.Delete(b2File.FileId, b2File.FileName).Result;
 			}
+
 			var deletedBucket = Client.Buckets.Delete(TestBucket.BucketId).Result;
 		}
 	}
