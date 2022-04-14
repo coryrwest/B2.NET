@@ -59,8 +59,7 @@ namespace B2Net.Http {
 			var bodyData = new Dictionary<string, object>() {
 				{ "bucketId", bucketId },
 				{ "fileNamePrefix", fileNamePrefix },
-				{ "validDurationInSeconds", validDurationInSeconds },
-				{ "bucketId", bucketId }
+				{ "validDurationInSeconds", validDurationInSeconds }
 			};
 			if (!string.IsNullOrEmpty(b2ContentDisposition)) {
 				bodyData["b2ContentDisposition"] = b2ContentDisposition;

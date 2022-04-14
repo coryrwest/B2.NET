@@ -7,17 +7,17 @@ using B2Net.Models;
 
 namespace B2Net {
 	public class Buckets : IBuckets {
-		private readonly B2Options _options;
+		private readonly B2BaseRequestFactory _requestFactory;
 		private readonly HttpClient _client;
 		private string _api = "Buckets";
 
-		public Buckets(B2Options options, HttpClient client) {
-			_options = options;
+		public Buckets(B2BaseRequestFactory requestFactory, HttpClient client) {
+			_requestFactory = requestFactory;
 			_client = client;
 		}
 
 		public async Task<List<B2Bucket>> GetList(CancellationToken cancelToken = default(CancellationToken)) {
-			var requestMessage = BucketRequestGenerators.GetBucketList(_options);
+			var requestMessage = BucketRequestGenerators.GetBucketList(await _requestFactory.GetOptions());
 			var response = await _client.SendAsync(requestMessage, cancelToken);
 
 			var bucketList = await ResponseParser.ParseResponse<B2BucketListDeserializeModel>(response);
@@ -34,7 +34,8 @@ namespace B2Net {
 		/// <returns></returns>
 		public async Task<B2Bucket> Create(string bucketName, BucketTypes bucketType,
 			CancellationToken cancelToken = default(CancellationToken)) {
-			var requestMessage = BucketRequestGenerators.CreateBucket(_options, bucketName, bucketType.ToString());
+			var requestMessage = BucketRequestGenerators.CreateBucket(await _requestFactory.GetOptions(), bucketName,
+				bucketType.ToString());
 			var response = await _client.SendAsync(requestMessage, cancelToken);
 
 			return await ResponseParser.ParseResponse<B2Bucket>(response, _api);
@@ -50,7 +51,8 @@ namespace B2Net {
 		/// <returns></returns>
 		public async Task<B2Bucket> Create(string bucketName, B2BucketOptions options,
 			CancellationToken cancelToken = default(CancellationToken)) {
-			var requestMessage = BucketRequestGenerators.CreateBucket(_options, bucketName, options);
+			var requestMessage =
+				BucketRequestGenerators.CreateBucket(await _requestFactory.GetOptions(), bucketName, options);
 			var response = await _client.SendAsync(requestMessage, cancelToken);
 
 			return await ResponseParser.ParseResponse<B2Bucket>(response, _api);
@@ -64,9 +66,10 @@ namespace B2Net {
 		/// <returns></returns>
 		public async Task<B2Bucket> Delete(string bucketId = "",
 			CancellationToken cancelToken = default(CancellationToken)) {
-			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
+			var operationalBucketId = _requestFactory.DetermineBucketId(bucketId);
 
-			var requestMessage = BucketRequestGenerators.DeleteBucket(_options, operationalBucketId);
+			var requestMessage =
+				BucketRequestGenerators.DeleteBucket(await _requestFactory.GetOptions(), operationalBucketId);
 			var response = await _client.SendAsync(requestMessage, cancelToken);
 
 			return await ResponseParser.ParseResponse<B2Bucket>(response, _api);
@@ -81,9 +84,10 @@ namespace B2Net {
 		/// <returns></returns>
 		public async Task<B2Bucket> Update(BucketTypes bucketType, string bucketId = "",
 			CancellationToken cancelToken = default(CancellationToken)) {
-			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
+			var operationalBucketId = _requestFactory.DetermineBucketId(bucketId);
 			var requestMessage =
-				BucketRequestGenerators.UpdateBucket(_options, operationalBucketId, bucketType.ToString());
+				BucketRequestGenerators.UpdateBucket(await _requestFactory.GetOptions(), operationalBucketId,
+					bucketType.ToString());
 			var response = await _client.SendAsync(requestMessage, cancelToken);
 
 			return await ResponseParser.ParseResponse<B2Bucket>(response, _api);
@@ -99,9 +103,10 @@ namespace B2Net {
 		/// <returns></returns>
 		public async Task<B2Bucket> Update(B2BucketOptions options, string bucketId = "",
 			CancellationToken cancelToken = default(CancellationToken)) {
-			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
+			var operationalBucketId = _requestFactory.DetermineBucketId(bucketId);
 
-			var requestMessage = BucketRequestGenerators.UpdateBucket(_options, operationalBucketId, options);
+			var requestMessage =
+				BucketRequestGenerators.UpdateBucket(await _requestFactory.GetOptions(), operationalBucketId, options);
 			var response = await _client.SendAsync(requestMessage, cancelToken);
 
 			return await ResponseParser.ParseResponse<B2Bucket>(response, _api);
@@ -117,10 +122,11 @@ namespace B2Net {
 		/// <returns></returns>
 		public async Task<B2Bucket> Update(B2BucketOptions options, int revisionNumber, string bucketId = "",
 			CancellationToken cancelToken = default(CancellationToken)) {
-			var operationalBucketId = Utilities.DetermineBucketId(_options, bucketId);
+			var operationalBucketId = _requestFactory.DetermineBucketId(bucketId);
 
 			var requestMessage =
-				BucketRequestGenerators.UpdateBucket(_options, operationalBucketId, options, revisionNumber);
+				BucketRequestGenerators.UpdateBucket(await _requestFactory.GetOptions(), operationalBucketId, options,
+					revisionNumber);
 			var response = await _client.SendAsync(requestMessage, cancelToken);
 
 			return await ResponseParser.ParseResponse<B2Bucket>(response, _api);

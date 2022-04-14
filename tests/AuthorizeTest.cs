@@ -14,7 +14,7 @@ namespace B2Net.Tests {
 	public class AuthorizeTest : BaseTest {
 		[TestMethod]
 		public void CanWeAuthorize() {
-			var client = new B2Client(Options, Options.StaticHttpClient());
+			var client = CreateB2ClientWithNormalKey();
 
 			var result = client.Authorize().Result;
 
@@ -30,14 +30,14 @@ namespace B2Net.Tests {
 
 		[TestMethod]
 		public void CanWeAuthorizeNonMasterKey() {
-			var result = B2Client.Authorize(applicationKeyId, applicationKey, Options.StaticHttpClient());
+			var result = B2Client.Authorize(Options, Options.StaticHttpClient());
 			Console.WriteLine(Utilities.Serialize(result));
 			Assert.IsFalse(string.IsNullOrEmpty(result.AuthorizationToken));
 		}
 
 		[TestMethod]
 		public void DoWeGetCapabilitiesOnApplicationKey() {
-			var result = B2Client.Authorize(applicationKeyId, applicationKey, Options.StaticHttpClient());
+			var result = B2Client.Authorize(Options, Options.StaticHttpClient());
 
 			Assert.IsFalse(string.IsNullOrEmpty(result.AuthorizationToken));
 
@@ -47,8 +47,7 @@ namespace B2Net.Tests {
 
 		[TestMethod]
 		public void DoWeGetCapabilitiesOnClientWithApplicationKey() {
-			var client = new B2Client(B2Client.Authorize(applicationKeyId, applicationKey, Options.StaticHttpClient()),
-				Options.StaticHttpClient());
+			var client = CreateB2ClientWithNormalKey();
 
 			Assert.IsNotNull(client.Capabilities.Capabilities);
 		}

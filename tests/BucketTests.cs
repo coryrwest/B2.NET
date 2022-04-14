@@ -15,16 +15,16 @@ namespace B2Net.Tests {
 
 		[TestInitialize]
 		public void Initialize() {
-			Client = new B2Client(B2Client.Authorize(Options, Options.StaticHttpClient()), Options.StaticHttpClient());
+			Client = CreateB2ClientWithNormalKey();
 		}
 
 		[TestMethod]
-		public void GetBucketListTest() {
-			var bucket = Client.Buckets.Create(BucketName, BucketTypes.allPrivate).Result;
+		public async Task GetBucketListTest() {
+			var bucket = await Client.Buckets.Create(BucketName, BucketTypes.allPrivate);
 
-			var list = Client.Buckets.GetList().Result;
+			var list = await Client.Buckets.GetList();
 
-			var deletedBucket = Client.Buckets.Delete(bucket.BucketId).Result;
+			var deletedBucket = await Client.Buckets.Delete(bucket.BucketId);
 
 			Assert.AreNotEqual(0, list.Count);
 		}

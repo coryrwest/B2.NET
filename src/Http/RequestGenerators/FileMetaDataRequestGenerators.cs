@@ -2,6 +2,7 @@
 using B2Net.Http.RequestGenerators;
 using B2Net.Models;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace B2Net.Http {
 	public static class FileMetaDataRequestGenerators {
@@ -12,7 +13,8 @@ namespace B2Net.Http {
 			public const string Info = "b2_get_file_info";
 		}
 
-		public static HttpRequestMessage GetList(B2Options options, string bucketId, string startFileName = "",
+		public static async Task<HttpRequestMessage> GetList(B2BaseRequestFactory requestFactory, string bucketId,
+			string startFileName = "",
 			int? maxFileCount = null, string prefix = "", string delimiter = "") {
 			var bodyData = new Dictionary<string, object>() {
 				{ "bucketId", bucketId },
@@ -36,10 +38,11 @@ namespace B2Net.Http {
 			var body = Utilities.Serialize(bodyData);
 
 
-			return BaseRequestGenerator.PostRequest(Endpoints.List, body, options);
+			return await requestFactory.PostRequest(Endpoints.List, body);
 		}
 
-		public static HttpRequestMessage ListVersions(B2Options options, string bucketId, string startFileName = "",
+		public static async Task<HttpRequestMessage> ListVersions(B2BaseRequestFactory requestFactory, string bucketId,
+			string startFileName = "",
 			string startFileId = "", int? maxFileCount = null, string prefix = "", string delimiter = "") {
 			var bodyData = new Dictionary<string, object>() {
 				{ "bucketId", bucketId },
@@ -66,10 +69,11 @@ namespace B2Net.Http {
 
 			var body = Utilities.Serialize(bodyData);
 
-			return BaseRequestGenerator.PostRequest(Endpoints.Versions, body, options);
+			return await requestFactory.PostRequest(Endpoints.Versions, body);
 		}
 
-		public static HttpRequestMessage HideFile(B2Options options, string bucketId, string fileName = "",
+		public static async Task<HttpRequestMessage> HideFile(B2BaseRequestFactory requestFactory, string bucketId,
+			string fileName = "",
 			string fileId = "") {
 			var bodyData = new Dictionary<string, object>() {
 				{ "bucketId", bucketId },
@@ -84,13 +88,13 @@ namespace B2Net.Http {
 
 			var body = Utilities.Serialize(bodyData);
 
-			return BaseRequestGenerator.PostRequest(Endpoints.Hide, body, options);
+			return await requestFactory.PostRequest(Endpoints.Hide, body);
 		}
 
-		public static HttpRequestMessage GetInfo(B2Options options, string fileId) {
+		public static async Task<HttpRequestMessage> GetInfo(B2BaseRequestFactory requestFactory, string fileId) {
 			var json = Utilities.Serialize(new { fileId });
 
-			return BaseRequestGenerator.PostRequest(Endpoints.Info, json, options);
+			return await requestFactory.PostRequest(Endpoints.Info, json);
 		}
 	}
 }

@@ -5,13 +5,16 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace B2Net {
 	public static class Utilities {
 		private static readonly JsonSerializerOptions FormattedJsonSerializerOptions = new JsonSerializerOptions() {
 			WriteIndented = true,
-			PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+			PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+			PropertyNameCaseInsensitive = true,
+			DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
 		};
 
 		public static string Serialize<T>(T obj) {
@@ -26,7 +29,7 @@ namespace B2Net {
 
 		public static T Deserialize<T>(string jsonResponse) {
 			//the branch origin used: JsonConvert (and NullValueHandling.Ignore)
-			return System.Text.Json.JsonSerializer.Deserialize<T>(jsonResponse);
+			return System.Text.Json.JsonSerializer.Deserialize<T>(jsonResponse, FormattedJsonSerializerOptions);
 		}
 
 
@@ -61,7 +64,7 @@ namespace B2Net {
 
 				if (b2Error != null) {
 					// If calling API is supplied, append to the error message
-					if (!string.IsNullOrEmpty(callingApi) && b2Error.Code == "401") {
+					if (!string.IsNullOrEmpty(callingApi) && b2Error.Status == 401) {
 						b2Error.Message =
 							$"Unauthorized error when operating on {callingApi}. Are you sure the key you are using has access? {b2Error.Message}";
 					}
@@ -77,7 +80,7 @@ namespace B2Net {
 			}
 		}
 
-		public static string DetermineBucketId(B2Options options, string bucketId) {
+		public static string DetermineBucketId(B2Config options, string bucketId) {
 			// Check for a persistant bucket
 			if (!options.PersistBucket && string.IsNullOrEmpty(bucketId)) {
 				throw new ArgumentNullException(nameof(bucketId),
@@ -101,7 +104,7 @@ namespace B2Net {
 		internal class B2Error {
 			public string Code { get; set; }
 			public string Message { get; set; }
-			public string Status { get; set; }
+			public int Status { get; set; }
 		}
 	}
 

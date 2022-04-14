@@ -27,5 +27,9 @@ namespace B2Net.Http {
 		public static HttpClient StaticHttpClient(this B2Options options) {
 			return CreateTestHttpClient(options.RequestTimeout);
 		}
+
+		public static HttpClient StaticHttpClient(this B2Config options) {
+			return CreateTestHttpClient(options.RequestTimeout);
+		}
 	}
 }

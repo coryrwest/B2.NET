@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Threading.Tasks;
 using B2Net.Http;
 
 namespace B2Net.Tests {
@@ -21,8 +22,8 @@ namespace B2Net.Tests {
 
 		[TestInitialize]
 		public void Initialize() {
-			Client = new B2Client(Options, Options.StaticHttpClient());
-			Options = Client.Authorize().Result;
+			Client = CreateB2ClientWithNormalKey();
+			Client.Authorize().Wait();
 
 			var buckets = Client.Buckets.GetList().Result;
 			B2Bucket existingBucket = null;
@@ -41,7 +42,7 @@ namespace B2Net.Tests {
 		}
 
 		[TestMethod]
-		public void FileGetFriendlyUrlTest() {
+		public async Task FileGetFriendlyUrlTest() {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
@@ -52,7 +53,7 @@ namespace B2Net.Tests {
 			Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
 
 			// Get url
-			var friendlyUrl = Client.Files.GetFriendlyDownloadUrl(fileName, TestBucket.BucketName);
+			var friendlyUrl = await Client.Files.GetFriendlyDownloadUrl(fileName, TestBucket.BucketName);
 
 			// Test download
 			var client = new HttpClient();

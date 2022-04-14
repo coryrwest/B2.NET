@@ -23,11 +23,11 @@ namespace B2Net.Tests {
 #endif
 
 		[TestInitialize]
-		public void Initialize() {
-			Client = new B2Client(Options, Options.StaticHttpClient());
-			BucketName = $"B2NETTestingBucket-{Path.GetRandomFileName().Replace(".", "").Substring(0, 6)}";
+		public async Task Initialize() {
+			Client = CreateB2ClientWithNormalKey();
+			BucketName = $"B2NETTestingBucket-NonRandom";
 
-			var buckets = Client.Buckets.GetList().Result;
+			var buckets = await Client.Buckets.GetList();
 			B2Bucket existingBucket = null;
 			foreach (B2Bucket b2Bucket in buckets) {
 				if (b2Bucket.BucketName == BucketName) {
@@ -39,19 +39,19 @@ namespace B2Net.Tests {
 				TestBucket = existingBucket;
 			}
 			else {
-				TestBucket = Client.Buckets.Create(BucketName, BucketTypes.allPrivate).Result;
+				TestBucket = await Client.Buckets.Create(BucketName, BucketTypes.allPrivate);
 			}
 		}
 
 		[TestMethod]
-		public void GetListTest() {
+		public async Task GetListTest() {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
-			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			var file = await Client.Files.Upload(fileData, fileName, TestBucket.BucketId);
 			// Clean up.
 			FilesToDelete.Add(file);
 
-			var list = Client.Files.GetList(bucketId: TestBucket.BucketId).Result.Files;
+			var list = (await Client.Files.GetList(bucketId: TestBucket.BucketId)).Files;
 
 			Assert.AreEqual(1, list.Count, list.Count + " files found.");
 		}
@@ -389,7 +389,7 @@ namespace B2Net.Tests {
 			FilesToDelete.Add(copied);
 
 			Assert.AreEqual("copy", copied.Action, "Action was not as expected for the copy operation.");
-			Assert.AreEqual(fileData.Length.ToString(), copied.ContentLength,
+			Assert.AreEqual(fileData.Length, copied.ContentLength,
 				"Length of the two files was not the same.");
 		}
 
@@ -410,7 +410,7 @@ namespace B2Net.Tests {
 
 			Assert.IsTrue(copied.FileInfo.ContainsKey("fileinfotest"),
 				"FileInfo was not as expected for the replace operation.");
-			Assert.AreEqual(fileData.Length.ToString(), copied.ContentLength,
+			Assert.AreEqual(fileData.Length, copied.ContentLength,
 				"Length of the two files was not the same.");
 		}
 

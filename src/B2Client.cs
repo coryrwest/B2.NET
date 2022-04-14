@@ -5,12 +5,15 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 namespace B2Net {
 	public class B2Client : IB2Client {
-		private B2Options _options;
 		private B2Capabilities _capabilities { get; set; }
 		private readonly HttpClient _client;
+		private readonly B2BaseRequestFactory _requestFactory;
+		private B2Options _options;
 
 		public B2Capabilities Capabilities {
 			get {
@@ -27,19 +30,14 @@ namespace B2Net {
 		/// <summary>
 		/// If you specify authorizeOnInitialize = false, you MUST call Initialize() once before you use the client.
 		/// </summary>
-		public B2Client(B2Options options, HttpClient client, bool authorizeOnInitialize = true) {
+		public B2Client(B2BaseRequestFactory requestFactory, HttpClient client, bool authorizeOnInitialize = true) {
 			_client = client;
-			// Should we authorize on the class initialization?
+
+			Buckets = new Buckets(requestFactory, _client);
+			Files = new Files(requestFactory, _client);
+			LargeFiles = new LargeFiles(requestFactory, _client);
 			if (authorizeOnInitialize) {
-				_options = Authorize(options, _client);
-				Buckets = new Buckets(options, _client);
-				Files = new Files(options, _client);
-				LargeFiles = new LargeFiles(options, _client);
-				_capabilities = options.Capabilities;
-			}
-			else {
-				// If not, then the user will have to Initialize() before making any calls.
-				_options = options;
+				Initialize().RunSynchronously();
 			}
 		}
 
@@ -47,21 +45,19 @@ namespace B2Net {
 		/// Simple method for instantiating the B2Client. Does auth for you. See https://www.backblaze.com/b2/docs/application_keys.html for details on application keys.
 		/// This method defaults to not persisting a bucket. Manually build the options object if you wish to do that.
 		/// </summary>
-		public B2Client(string keyId, string applicationkey, HttpClient client, int requestTimeout = 100) {
+		public B2Client(string keyId, string applicationKey, HttpClient client, int requestTimeout = 100) {
 			_client = client;
-			_options = new B2Options() {
-				KeyId = keyId,
-				ApplicationKey = applicationkey,
-				RequestTimeout = requestTimeout
-			};
-			_options = Authorize(_options, _client);
+			var config = new B2Config(keyId: keyId, applicationKey: applicationKey, requestTimeout: requestTimeout);
+			var memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+			var tokenHandler = new B2TokenHandler(Options.Create(config), client,
+				memoryCache);
+			_requestFactory = new B2BaseRequestFactory(tokenHandler, Options.Create(config), client, memoryCache);
 
-			Buckets = new Buckets(_options, _client);
-			Files = new Files(_options, _client);
-			LargeFiles = new LargeFiles(_options, _client);
-			_capabilities = _options.Capabilities;
+			Buckets = new Buckets(_requestFactory, _client);
+			Files = new Files(_requestFactory, _client);
+			LargeFiles = new LargeFiles(_requestFactory, _client);
 		}
-		
+
 
 		public IBuckets Buckets { get; private set; }
 		public IFiles Files { get; private set; }
@@ -72,10 +68,7 @@ namespace B2Net {
 		/// </summary>
 		/// <returns></returns>
 		public async Task Initialize() {
-			_options = Authorize(_options, _client);
-			Buckets = new Buckets(_options, _client);
-			Files = new Files(_options, _client);
-			LargeFiles = new LargeFiles(_options, _client);
+			_options = await _requestFactory.GetOptions();
 			_capabilities = _options.Capabilities;
 		}
 
@@ -104,29 +97,13 @@ namespace B2Net {
 				return options;
 			}
 
-			if (string.IsNullOrWhiteSpace(options.KeyId) || string.IsNullOrWhiteSpace(options.ApplicationKey)) {
-				throw new AuthorizationException("Either KeyId or ApplicationKey were not specified.");
-			}
+			var authRequest =
+				await B2TokenHandler.DoAuthRequest(client, options.KeyId, options.ApplicationKey,
+					CancellationToken.None);
+			var outputOptions = new B2Options();
+			outputOptions.SetState(authRequest);
 
-			var requestMessage = AuthRequestGenerator.Authorize(options);
-			var response = await client.SendAsync(requestMessage);
-
-			var jsonResponse = await response.Content.ReadAsStringAsync();
-			if (response.IsSuccessStatusCode) {
-				var authResponse = Utilities.Deserialize<B2AuthResponse>(jsonResponse);
-
-				options.SetState(authResponse);
-			}
-			else if (response.StatusCode == HttpStatusCode.Unauthorized) {
-				// Return a better exception because of confusing Keys api.
-				throw new AuthorizationException(
-					"If you are using an Application key and not a Master key, make sure that you are supplying the Key ID and Key Value for that Application Key. Do not mix your Account ID with your Application Key.");
-			}
-			else {
-				throw new AuthorizationException(jsonResponse);
-			}
-
-			return options;
+			return outputOptions;
 		}
 
 		/// <summary>
@@ -134,6 +111,10 @@ namespace B2Net {
 		/// </summary>
 		public static B2Options Authorize(B2Options options, HttpClient client) {
 			return AuthorizeAsync(options, client).Result;
+		}
+
+		public static B2Options Authorize(B2Config config, HttpClient client) {
+			return AuthorizeAsync(config.KeyId, config.ApplicationKey, client).Result;
 		}
 	}
 }

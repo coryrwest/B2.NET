@@ -1,22 +1,31 @@
 ﻿using B2.Net.Tests;
+using B2Net.Http;
 using B2Net.Models;
+using B2NET.Tests;
 
 namespace B2Net.Tests {
 	public class BaseTest {
-		public B2Options Options { get; set; }
+		public B2Config Options { get; set; }
 
-		// TODO Change these to valid keys to run tests
-		protected string applicationKey = "K0016q0BcoroQmkADj/Kne4y3ul6AWc";
-		protected string applicationKeyId = "00151189a8b4c7a000000000e";
-
-		protected string restrictedApplicationKey = "K0019m9qz095omc+WsnREy5mWsxNmtQ";
-		protected string restrictedApplicationKeyId = "00151189a8b4c7a000000000d";
+		private B2ConfigMap _configMap;
 
 		public BaseTest() {
-			Options = new B2Options() {
-				KeyId = TestConstants.KeyId,
-				ApplicationKey = TestConstants.ApplicationKey
-			};
+			_configMap = ConfigHelper.GetTestB2Config();
+			Options = _configMap.Configs["RestrictedTestKey"];
+		}
+
+		public B2Client CreateB2ClientWithNormalKey() {
+			//return new B2Client(Options.KeyId, Options.ApplicationKey, Options.StaticHttpClient());
+			var client = new B2Client(_configMap.Configs["UnitTestKey"].KeyId,
+				_configMap.Configs["UnitTestKey"].ApplicationKey, Options.StaticHttpClient());
+			client.Initialize().Wait();
+
+			return client;
+		}
+
+		public B2Client CreateB2ClientWithRestricted() {
+			return new B2Client(_configMap.Configs["RestrictedTestKey"].KeyId,
+				_configMap.Configs["RestrictedTestKey"].ApplicationKey, Options.StaticHttpClient());
 		}
 	}
 }

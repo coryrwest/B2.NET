@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
 
 namespace B2Net.Http.RequestGenerators {
 	public class LargeFileRequestGenerators {
@@ -82,33 +83,38 @@ namespace B2Net.Http.RequestGenerators {
 			return BaseRequestGenerator.PostRequest(Endpoints.GetPartUrl, Utilities.Serialize(new { fileId }), options);
 		}
 
-		public static HttpRequestMessage Finish(B2Options options, string fileId, string[] partSHA1Array) {
+		public static async Task<HttpRequestMessage> Finish(B2BaseRequestFactory requestFactory, string fileId,
+			string[] partSHA1Array) {
 			var content = Utilities.Serialize(new { fileId, partSha1Array = partSHA1Array });
-			var request = BaseRequestGenerator.PostRequestJson(Endpoints.Finish, content, options);
+			var request = await requestFactory.PostRequestJson(Endpoints.Finish, content);
 
 			return request;
 		}
 
-		public static HttpRequestMessage ListParts(B2Options options, string fileId, int startPartNumber,
+		public static async Task<HttpRequestMessage> ListParts(B2BaseRequestFactory requestFactory, string fileId,
+			int startPartNumber,
 			int maxPartCount) {
 			if (startPartNumber < 1 || startPartNumber > 10000) {
 				throw new Exception("Start part number must be between 1 and 10,000");
 			}
 
 			var content = Utilities.Serialize(new { fileId, startPartNumber, maxPartCount });
-			var request = BaseRequestGenerator.PostRequestJson(Endpoints.ListParts, content, options);
+			var request =
+				await requestFactory.PostRequestJson(Endpoints.ListParts, content);
 
 			return request;
 		}
 
-		public static HttpRequestMessage Cancel(B2Options options, string fileId) {
+		public static async Task<HttpRequestMessage> Cancel(B2BaseRequestFactory requestFactory, string fileId) {
 			var content = Utilities.Serialize(new { fileId });
-			var request = BaseRequestGenerator.PostRequestJson(Endpoints.Cancel, content, options);
+			var request = await requestFactory.PostRequestJson(Endpoints.Cancel, content);
 
 			return request;
 		}
 
-		public static HttpRequestMessage IncompleteFiles(B2Options options, string bucketId, string startFileId = "",
+		public static async Task<HttpRequestMessage> IncompleteFiles(B2BaseRequestFactory requestFactory,
+			string bucketId,
+			string startFileId = "",
 			string maxFileCount = "") {
 			var bodyData = new Dictionary<string, object>() {
 				{ "bucketId", bucketId },
@@ -122,7 +128,8 @@ namespace B2Net.Http.RequestGenerators {
 			}
 
 			var body = Utilities.Serialize(bodyData);
-			var request = BaseRequestGenerator.PostRequestJson(Endpoints.IncompleteFiles, body, options);
+			var request =
+				await requestFactory.PostRequestJson(Endpoints.IncompleteFiles, body);
 
 			return request;
 		}
