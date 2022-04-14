@@ -20,13 +20,20 @@ namespace B2Net.Tests {
 
 		[TestMethod]
 		public async Task GetBucketListTest() {
-			var bucket = await Client.Buckets.Create(BucketName, BucketTypes.allPrivate);
+			var list1 = await Client.Buckets.GetList();
+			B2Bucket bucket = null;
+			try {
+				bucket = await Client.Buckets.Create(BucketName, BucketTypes.allPrivate);
 
-			var list = await Client.Buckets.GetList();
+				var list2 = await Client.Buckets.GetList();
 
-			var deletedBucket = await Client.Buckets.Delete(bucket.BucketId);
-
-			Assert.AreNotEqual(0, list.Count);
+				Assert.AreEqual(list1.Count + 1, list2.Count);
+			}
+			finally {
+				if (bucket?.BucketId != null) {
+					var deletedBucket = await Client.Buckets.Delete(bucket.BucketId);
+				}
+			}
 		}
 
 		[TestMethod]

@@ -17,8 +17,6 @@ namespace B2Net.Models {
 		public string KeyName { get; init; }
 		public int RequestTimeout { get; init; }
 
-		public string AccountId { get; init; }
-
 		public string BucketId { get; init; }
 
 		/// <summary>

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace B2Net.Http {
 	public static class BucketRequestGenerators {
@@ -15,10 +16,11 @@ namespace B2Net.Http {
 			public const string Update = "b2_update_bucket";
 		}
 
-		public static HttpRequestMessage GetBucketList(B2Options options) {
-			var json = Utilities.Serialize(new { accountId = options.AccountId });
+		public static async Task<HttpRequestMessage> GetBucketList(B2BaseRequestFactory requestFactory) {
+			var (authInfo, startRequest) = await requestFactory.StartRequest();
+			var json = Utilities.Serialize(new { accountId = authInfo.accountId });
 
-			return BaseRequestGenerator.PostRequest(Endpoints.List, json, options);
+			return startRequest.ToEndpoint(HttpMethod.Post, authInfo.apiUrl, Endpoints.List).WithStringContent(json);
 		}
 
 		public static HttpRequestMessage DeleteBucket(B2Options options, string bucketId) {

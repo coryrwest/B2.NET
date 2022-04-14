@@ -17,7 +17,7 @@ namespace B2Net {
 		}
 
 		public async Task<List<B2Bucket>> GetList(CancellationToken cancelToken = default(CancellationToken)) {
-			var requestMessage = BucketRequestGenerators.GetBucketList(await _requestFactory.GetOptions());
+			var requestMessage = await BucketRequestGenerators.GetBucketList(_requestFactory);
 			var response = await _client.SendAsync(requestMessage, cancelToken);
 
 			var bucketList = await ResponseParser.ParseResponse<B2BucketListDeserializeModel>(response);
