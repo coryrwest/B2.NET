@@ -30,6 +30,10 @@ namespace B2Net {
 		Task<B2FileList> GetList(string startFileName = "", int? maxFileCount = null, string bucketId = "",
 			CancellationToken cancelToken = default(CancellationToken));
 
+		IAsyncEnumerable<B2File> GetLongList(string prefix = "", string delimiter = "",
+			string bucketId = "",
+			CancellationToken cancelToken = default(CancellationToken));
+
 		Task<B2FileList> GetListWithPrefixOrDemiliter(string startFileName = "", string prefix = "",
 			string delimiter = "", int? maxFileCount = null, string bucketId = "",
 			CancellationToken cancelToken = default(CancellationToken));

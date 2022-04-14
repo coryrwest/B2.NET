@@ -57,6 +57,24 @@ namespace B2Net.Tests {
 		}
 
 		[TestMethod]
+		public async Task GetLongListTest() {
+			var fileName = "B2Test.txt";
+			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
+			var file = await Client.Files.Upload(fileData, fileName, TestBucket.BucketId);
+			// Clean up.
+			FilesToDelete.Add(file);
+
+			var list = new List<B2File>();
+			var enumerable = Client.Files.GetLongList(bucketId: TestBucket.BucketId);
+			await foreach (var item in enumerable) {
+				list.Add(item);
+			}
+
+
+			Assert.AreEqual(1, list.Count, list.Count + " files found.");
+		}
+
+		[TestMethod]
 		public void GetListWithPrefixTest() {
 			var fileName = "B2Test.txt";
 			var fileNameWithFolder = "test/B2Test.txt";

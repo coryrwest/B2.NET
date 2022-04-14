@@ -34,6 +34,21 @@ namespace B2Net {
 			return await GetListWithPrefixOrDemiliter(startFileName, "", "", maxFileCount, bucketId, cancelToken);
 		}
 
+		public async IAsyncEnumerable<B2File> GetLongList(string prefix = "", string delimiter = "",
+			string bucketId = "",
+			CancellationToken cancelToken = default(CancellationToken)) {
+			const int maxFileCount = 1000;
+			var fileList = new B2FileList() { NextFileName = "" };
+			while (fileList.NextFileName != null) {
+				fileList = await GetListWithPrefixOrDemiliter(fileList.NextFileName, prefix, delimiter, maxFileCount,
+					bucketId,
+					cancelToken);
+				foreach (var file in fileList.Files) {
+					yield return file;
+				}
+			}
+		}
+
 		/// <summary>
 		/// BETA: Lists the names of all non-hidden files in a bucket, starting at a given name. With an optional file prefix or delimiter.
 		/// See here for more details: https://www.backblaze.com/b2/docs/b2_list_file_names.html
