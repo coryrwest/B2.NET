@@ -59,7 +59,7 @@ namespace B2Net.Tests {
 		[TestMethod]
 		public async Task GetLongListTest() {
 			var fileName = "B2Test.txt";
-			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
+			var fileData = await File.ReadAllBytesAsync(Path.Combine(FilePath, fileName));
 			var file = await Client.Files.Upload(fileData, fileName, TestBucket.BucketId);
 			// Clean up.
 			FilesToDelete.Add(file);

@@ -24,6 +24,7 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>B2 Backblaze Cloud Storage</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <UserSecretsId>59f0f95d-74f2-483d-bf12-29576f33f10e</UserSecretsId>
   
   </PropertyGroup>
 
