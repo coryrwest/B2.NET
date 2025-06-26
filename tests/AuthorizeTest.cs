@@ -63,9 +63,9 @@ namespace B2Net.Tests {
 		public void DoWeGetOptionsBack() {
 			var result = B2Client.Authorize(Options);
 
-			Assert.AreNotEqual("0", result.AbsoluteMinimumPartSize);
-			Assert.AreNotEqual("0", result.MinimumPartSize);
-			Assert.AreNotEqual("0", result.RecommendedPartSize);
+			Assert.AreNotEqual(0, result.AbsoluteMinimumPartSize);
+			Assert.AreNotEqual(0, result.MinimumPartSize);
+			Assert.AreNotEqual(0, result.RecommendedPartSize);
 			Assert.IsFalse(string.IsNullOrEmpty(result.DownloadUrl));
 			Assert.IsFalse(string.IsNullOrEmpty(result.ApiUrl));
 		}

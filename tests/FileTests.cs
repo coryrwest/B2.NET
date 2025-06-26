@@ -49,23 +49,23 @@ namespace B2Net.Tests {
 		}
 
 		[TestMethod]
-		public void GetListTest() {
+		public async Task GetListTest() {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
-			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			var file = await Client.Files.Upload(fileData, fileName, TestBucket.BucketId);
 
-			var list = Client.Files.GetList(bucketId: TestBucket.BucketId).Result.Files;
+			var list = await Client.Files.GetList(bucketId: TestBucket.BucketId);
 
-			Assert.AreEqual(1, list.Count, list.Count + " files found.");
+			Assert.AreEqual(1, list.Files.Count, list.Files.Count + " files found.");
 		}
 
 		[TestMethod]
-		public void GetListWithPrefixTest() {
+		public async Task GetListWithPrefixTest() {
 			var fileName = "B2Test.txt";
 			var fileNameWithFolder = "test/B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
-			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
-			var fileFolder = Client.Files.Upload(fileData, fileNameWithFolder, TestBucket.BucketId).Result;
+			var file = await Client.Files.Upload(fileData, fileName, TestBucket.BucketId);
+			var fileFolder = await Client.Files.Upload(fileData, fileNameWithFolder, TestBucket.BucketId);
 			
 			var list = Client.Files.GetListWithPrefixOrDemiliter(bucketId: TestBucket.BucketId, prefix: "test").Result.Files;
 
@@ -73,12 +73,12 @@ namespace B2Net.Tests {
 		}
 
 		[TestMethod]
-		public void GetListWithPrefixAndDelimiterTest() {
+		public async Task GetListWithPrefixAndDelimiterTest() {
 			var fileName = "B2Test.txt";
 			var fileNameWithFolder = "test/B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
-			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
-			var fileFolder = Client.Files.Upload(fileData, fileNameWithFolder, TestBucket.BucketId).Result;
+			var file = await Client.Files.Upload(fileData, fileName, TestBucket.BucketId);
+			var fileFolder =	await Client.Files.Upload(fileData, fileNameWithFolder, TestBucket.BucketId);
 			
 			var list = Client.Files.GetListWithPrefixOrDemiliter(bucketId: TestBucket.BucketId, prefix: "test", delimiter: "/").Result.Files;
 
@@ -87,13 +87,13 @@ namespace B2Net.Tests {
 		}
 
 		[TestMethod]
-		public void GetListWithDelimiterTest() {
+		public async Task GetListWithDelimiterTest() {
 			var fileName = "B2Test.txt";
 			var fileNameWithFolder = "test/B2Test.txt";
 			var fileNameWithFolder2 = "test2/B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
-			var file = Client.Files.Upload(fileData, fileNameWithFolder2, TestBucket.BucketId).Result;
-			var fileFolder = Client.Files.Upload(fileData, fileNameWithFolder, TestBucket.BucketId).Result;
+			var file = await Client.Files.Upload(fileData, fileNameWithFolder2, TestBucket.BucketId);
+			var fileFolder = await Client.Files.Upload(fileData, fileNameWithFolder, TestBucket.BucketId);
 			
 			var list = Client.Files.GetListWithPrefixOrDemiliter(bucketId: TestBucket.BucketId, delimiter: "/").Result.Files;
 
@@ -130,25 +130,25 @@ namespace B2Net.Tests {
 		//      }
 
 		[TestMethod]
-		public void FileUploadTest() {
+		public async Task FileUploadTest() {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
-			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			var file = await Client.Files.Upload(fileData, fileName, TestBucket.BucketId);
 			
 			// Since we did not pass a sha, hash will be prepended with unverified:
 			Assert.AreEqual($"unverified:{hash}", file.ContentSHA1, "File hashes did not match.");
 		}
 
 		[TestMethod]
-		public void FileUploadUsingUploadUrlTest() {
+		public async Task FileUploadUsingUploadUrlTest() {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
 
-			var uploadUrl = Client.Files.GetUploadUrl(TestBucket.BucketId).Result;
+			var uploadUrl = await Client.Files.GetUploadUrl(TestBucket.BucketId);
 
-			var file = Client.Files.Upload(fileData, fileName, uploadUrl, true, TestBucket.BucketId).Result;
+			var file = await Client.Files.Upload(fileData, fileName, uploadUrl, true, TestBucket.BucketId);
 
 			// Since we did not pass a sha, hash will be prepended with unverified:
 			Assert.AreEqual($"unverified:{hash}", file.ContentSHA1, "File hashes did not match.");
@@ -168,7 +168,7 @@ namespace B2Net.Tests {
 		//}
 
 		[TestMethod]
-		public void FileUploadWithInfoTest() {
+		public async Task FileUploadWithInfoTest() {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
@@ -177,7 +177,7 @@ namespace B2Net.Tests {
 				{"FileInfoTest", "1234"}
 			};
 
-			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId, fileInfo).Result;
+			var file = await Client.Files.Upload(fileData, fileName, TestBucket.BucketId, fileInfo);
 			
 			// Since we did not pass a sha, hash will be prepended with unverified:
 			Assert.AreEqual($"unverified:{hash}", file.ContentSHA1, "File hashes did not match.");
@@ -185,7 +185,7 @@ namespace B2Net.Tests {
 		}
 
 		[TestMethod]
-		public void FileUploadStreamTest() {
+		public async Task FileUploadStreamTest() {
 			var fileName = "B2Test.txt";
 			var bytes = File.ReadAllBytes(Path.Combine(FilePath, fileName));
 
@@ -194,23 +194,23 @@ namespace B2Net.Tests {
 
 			var fileData = new MemoryStream(bytes.Concat(hashBytes).ToArray());
 
-			var uploadUrl = Client.Files.GetUploadUrl(TestBucket.BucketId).Result;
+			var uploadUrl = await Client.Files.GetUploadUrl(TestBucket.BucketId);
 
-			var file = Client.Files.Upload(fileData, fileName, uploadUrl, "", false, TestBucket.BucketId).Result;
+			var file = await Client.Files.Upload(fileData, fileName, uploadUrl, "", false, TestBucket.BucketId);
 			
 			Assert.AreEqual(hash, file.ContentSHA1, "File hashes did not match.");
 		}
 
 		[TestMethod]
-		public void FileUploadStreamNoSHATest() {
+		public async Task FileUploadStreamNoSHATest() {
 			var fileName = "B2Test.txt";
 			var bytes = File.ReadAllBytes(Path.Combine(FilePath, fileName));
 
 			var fileData = new MemoryStream(bytes);
 
-			var uploadUrl = Client.Files.GetUploadUrl(TestBucket.BucketId).Result;
+			var uploadUrl = await Client.Files.GetUploadUrl(TestBucket.BucketId);
 
-			var file = Client.Files.Upload(fileData, fileName, uploadUrl, "", false, TestBucket.BucketId, null, true).Result;
+			var file = await Client.Files.Upload(fileData, fileName, uploadUrl, "", false, TestBucket.BucketId, null, true);
 
 			Assert.IsTrue(file.ContentSHA1.StartsWith("unverified"), $"File was verified when it should not have been: {file.ContentSHA1}.");
 		}
@@ -225,14 +225,14 @@ namespace B2Net.Tests {
 
 			var fileData = new MemoryStream(bytes.Concat(hashBytes).ToArray());
 
-			var uploadUrl = Client.Files.GetUploadUrl(TestBucket.BucketId).Result;
+			var uploadUrl = await Client.Files.GetUploadUrl(TestBucket.BucketId);
 
-			var file = Client.Files.Upload(fileData, new B2FileUploadContext() {
+			var file = await Client.Files.Upload(fileData, new B2FileUploadContext() {
 				FileName = fileName,
 				B2UploadUrl = uploadUrl,
 				ContentLanguage = "en-US",
 				AdditionalFileInfo = new Dictionary<string, string>() { { "test-info", "1234" } }
-			}, false).Result;
+			}, false);
 
 			// Get file response for new headers
 			var request = FileDownloadRequestGenerators.DownloadById(Options, file.FileId);
@@ -244,24 +244,24 @@ namespace B2Net.Tests {
 		}
 
 		[TestMethod]
-		public void FileDownloadNameTest() {
+		public async Task FileDownloadNameTest() {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
-			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			var file = await Client.Files.Upload(fileData, fileName, TestBucket.BucketId);
 			
 			// Since we did not pass a sha, hash will be prepended with unverified:
 			Assert.AreEqual($"unverified:{hash}", file.ContentSHA1, "File hashes did not match.");
 
 			// Test download
-			var download = Client.Files.DownloadByName(file.FileName, TestBucket.BucketName).Result;
+			var download = await Client.Files.DownloadByName(file.FileName, TestBucket.BucketName);
 			var downloadHash = Utilities.GetSHA1Hash(download.FileData);
 
 			Assert.AreEqual(hash, downloadHash);
 		}
 
 		[TestMethod]
-		public void FileDownloadWithInfoTest() {
+		public async Task FileDownloadWithInfoTest() {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
@@ -270,13 +270,13 @@ namespace B2Net.Tests {
 				{"FileInfoTest", "1234"}
 			};
 
-			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId, fileInfo).Result;
+			var file = await Client.Files.Upload(fileData, fileName, TestBucket.BucketId, fileInfo);
 
 			// Since we did not pass a sha, hash will be prepended with unverified:
 			Assert.AreEqual($"unverified:{hash}", file.ContentSHA1, "File hashes did not match.");
 
 			// Test download
-			var download = Client.Files.DownloadById(file.FileId).Result;
+			var download = await Client.Files.DownloadById(file.FileId);
 			var downloadHash = Utilities.GetSHA1Hash(download.FileData);
 
 			Assert.AreEqual(hash, downloadHash);
@@ -284,73 +284,73 @@ namespace B2Net.Tests {
 		}
 
 		[TestMethod]
-		public void FileDownloadIdTest() {
+		public async Task FileDownloadIdTest() {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
-			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			var file = await Client.Files.Upload(fileData, fileName, TestBucket.BucketId);
 
 			// Since we did not pass a sha, hash will be prepended with unverified:
 			Assert.AreEqual($"unverified:{hash}", file.ContentSHA1, "File hashes did not match.");
 
 			// Test download
-			var download = Client.Files.DownloadById(file.FileId).Result;
+			var download = await Client.Files.DownloadById(file.FileId);
 			var downloadHash = Utilities.GetSHA1Hash(download.FileData);
 
 			Assert.AreEqual(hash, downloadHash);
 		}
 
 		[TestMethod]
-		public void FileDownloadFolderTest() {
+		public async Task FileDownloadFolderTest() {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
-			var file = Client.Files.Upload(fileData, "B2Folder/Test/File.txt", TestBucket.BucketId).Result;
+			var file = await Client.Files.Upload(fileData, "B2Folder/Test/File.txt", TestBucket.BucketId);
 
 			// Since we did not pass a sha, hash will be prepended with unverified:
 			Assert.AreEqual($"unverified:{hash}", file.ContentSHA1, "File hashes did not match.");
 
 			// Test download
-			var download = Client.Files.DownloadById(file.FileId).Result;
+			var download = await Client.Files.DownloadById(file.FileId);
 			var downloadHash = Utilities.GetSHA1Hash(download.FileData);
 
 			Assert.AreEqual(hash, downloadHash);
 		}
 
 		[TestMethod]
-		public void FileDeleteTest() {
+		public async Task FileDeleteTest() {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
-			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			var file = await Client.Files.Upload(fileData, fileName, TestBucket.BucketId);
 
 			// Since we did not pass a sha, hash will be prepended with unverified:
 			Assert.AreEqual($"unverified:{hash}", file.ContentSHA1, "File hashes did not match.");
 
 			// Clean up. We have to delete the file before we can delete the bucket
-			var deletedFile = Client.Files.Delete(file.FileId, file.FileName).Result;
+			var deletedFile = await Client.Files.Delete(file.FileId, file.FileName);
 
 			Assert.AreEqual(file.FileId, deletedFile.FileId, "The deleted file id did not match.");
 		}
 
 		[TestMethod]
-		public void ListVersionsTest() {
+		public async Task ListVersionsTest() {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
-			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			var file = await Client.Files.Upload(fileData, fileName, TestBucket.BucketId);
 
 
 			// Since we did not pass a sha, hash will be prepended with unverified:
 			Assert.AreEqual($"unverified:{hash}", file.ContentSHA1, "File hashes did not match.");
 
-			var versions = Client.Files.GetVersions(file.FileName, file.FileId, bucketId: TestBucket.BucketId).Result;
+			var versions = await Client.Files.GetVersions(file.FileName, file.FileId, bucketId: TestBucket.BucketId);
 
 			Assert.AreEqual(1, versions.Files.Count);
 		}
 
 		[TestMethod]
-		public void GetInfoTest() {
+		public async Task GetInfoTest() {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
 			string hash = Utilities.GetSHA1Hash(fileData);
@@ -358,20 +358,20 @@ namespace B2Net.Tests {
 			var fileInfo = new Dictionary<string, string>();
 			fileInfo.Add("FileInfoTest", "1234");
 
-			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId, fileInfo).Result;
+			var file = await Client.Files.Upload(fileData, fileName, TestBucket.BucketId, fileInfo);
 			
 			// Since we did not pass a sha, hash will be prepended with unverified:
 			Assert.AreEqual($"unverified:{hash}", file.ContentSHA1, "File hashes did not match.");
 
-			var info = Client.Files.GetInfo(file.FileId).Result;
+			var info = await Client.Files.GetInfo(file.FileId);
 
 			Assert.AreEqual(file.UploadTimestamp, info.UploadTimestamp);
 			Assert.AreEqual(1, info.FileInfo.Count);
 		}
 
 		[TestMethod]
-		public void GetDownloadAuthorizationTest() {
-			var downloadAuth = Client.Files.GetDownloadAuthorization("Test", 120, TestBucket.BucketId).Result;
+		public async Task GetDownloadAuthorizationTest() {
+			var downloadAuth = await Client.Files.GetDownloadAuthorization("Test", 120, TestBucket.BucketId);
 
 			Assert.AreEqual("Test", downloadAuth.FileNamePrefix, "File prefixes were not the same.");
 		}
@@ -380,7 +380,7 @@ namespace B2Net.Tests {
 		public async Task CopyFile() {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
-			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			var file = await Client.Files.Upload(fileData, fileName, TestBucket.BucketId);
 			
 			var copied = await Client.Files.Copy(file.FileId, "B2TestCopy.txt");
 
@@ -392,7 +392,7 @@ namespace B2Net.Tests {
 		public async Task ReplaceFile() {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
-			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			var file = await Client.Files.Upload(fileData, fileName, TestBucket.BucketId);
 
 			var copied = await Client.Files.Copy(file.FileId, "B2TestCopy.txt", B2MetadataDirective.REPLACE, "text/plain", new Dictionary<string, string>() {
 				{"FileInfoTest", "1234"}
@@ -407,7 +407,7 @@ namespace B2Net.Tests {
 		public async Task CopyFileWithDisallowedFields() {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
-			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			var file = await Client.Files.Upload(fileData, fileName, TestBucket.BucketId);
 			
 			var copied = await Client.Files.Copy(file.FileId, "B2TestCopy.txt", contentType: "b2/x-auto");
 		}
@@ -417,7 +417,7 @@ namespace B2Net.Tests {
 		public async Task ReplaceFileWithMissingFields() {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
-			var file = Client.Files.Upload(fileData, fileName, TestBucket.BucketId).Result;
+			var file = await Client.Files.Upload(fileData, fileName, TestBucket.BucketId);
 			
 			var copied = await Client.Files.Copy(file.FileId, "B2TestCopy.txt", B2MetadataDirective.REPLACE);
 		}
@@ -426,7 +426,7 @@ namespace B2Net.Tests {
 		public async Task UpdateFileRetentionTest() {
 			var fileName = "B2Test.txt";
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
-			var uploadUrl = Client.Files.GetUploadUrl(TestBucket.BucketId).Result;
+			var uploadUrl = await Client.Files.GetUploadUrl(TestBucket.BucketId);
 			// Get timestamp
 			DateTimeOffset now = DateTimeOffset.UtcNow.AddDays(1);
 #if NETFULL
@@ -436,30 +436,30 @@ namespace B2Net.Tests {
 			long unixTimeMilliseconds = now.ToUnixTimeMilliseconds();
 #endif
 			// Upload test file
-			var file = Client.Files.Upload(fileData, new B2FileUploadContext() {
+			var file = await Client.Files.Upload(fileData, new B2FileUploadContext() {
 				FileName = fileName,
 				B2UploadUrl = uploadUrl,
 				BucketId = TestBucket.BucketId,
 				RetentionMode = RetentionMode.governance,
 				RetainUntilTimestamp = unixTimeMilliseconds
-			}).Result;
+			});
 			
-			var response = Client.Files.UpdateFileRetention(fileName, file.FileId, new B2DefaultRetention() {
+			var response = await Client.Files.UpdateFileRetention(fileName, file.FileId, new B2DefaultRetention() {
 				Mode = RetentionMode.governance,
 				Period = new Period() {
 					Duration = 2,
 					Unit = RetentionUnit.days
 				}
-			}).Result;
+			});
 
-			var fileInfo = Client.Files.GetInfo(response.fileId).Result;
+			var fileInfo = await Client.Files.GetInfo(response.fileId);
 
-			Assert.AreEqual(RetentionMode.governance, fileInfo.FileRetention.Value.Mode, "Retention mode on the update did not match.");
+			Assert.AreEqual(RetentionMode.governance.ToString(), fileInfo.FileRetention.Value.Mode, "Retention mode on the update did not match.");
 			Assert.IsTrue(fileInfo.FileRetention.Value.RetainUntilTimestamp > unixTimeMilliseconds, "Retention timestamp was not updated.");
 		}
 
 		[ClassCleanup]
-		public static void Cleanup() {
+		public static async Task Cleanup() {
 			// Recreate the client for static cleanup
 			var options = new B2Options() {
 				KeyId = TestConstants.KeyId,
@@ -469,17 +469,17 @@ namespace B2Net.Tests {
 			var http = HttpClientFactory.CreateHttpClient(200);
 			http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", options.AuthorizationToken);
 
-			var buckets = client.Buckets.GetList().Result;
+			var buckets = await client.Buckets.GetList();
 			var testingBuckets = buckets.Where(x => x.BucketName.Contains(BucketPrefix));
 
 			// Loop all testing buckets and cleanup
 			foreach (var testingBucket in testingBuckets) {
 				// Loop the files and delete
-				var list = client.Files.GetList(bucketId: testingBucket.BucketId).Result.Files;
-				foreach (B2File b2File in list) {
-					var deletedFile = client.Files.Delete(b2File.FileId, b2File.FileName).Result;
+				var list = await client.Files.GetList(bucketId: testingBucket.BucketId);
+				foreach (B2File b2File in list.Files) {
+					var deletedFile = await client.Files.Delete(b2File.FileId, b2File.FileName);
 				}
-				var deletedBucket = client.Buckets.Delete(testingBucket.BucketId).Result;
+				var deletedBucket = await client.Buckets.Delete(testingBucket.BucketId);
 			}
 
 		}
