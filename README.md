@@ -18,6 +18,10 @@ While the core of B2.NET is mature you should still consider this library in Bet
 *  Targets .NET 4.5 and .NET Standard 1.5
 *  You cannot manage keys with this library, just use already existing ones.
 
+
+> [!WARNING]
+> This library is not thread-safe currently. There is a global state object that is passed around to hold various configuration values.
+
 ## Install
 [nuget package](https://www.nuget.org/packages/B2Net/)
 
@@ -43,6 +47,18 @@ var options = new B2Options() {
 };
 var client = new B2Client(options);
 ```
+
+> [!NOTE]  
+> If you are experiencing an SSL error when initialting requests try adding the below snippet just before client creation. (thanks
+@JM63)
+> Error: "The request was aborted: Could not create SSL/TLS secure channel"
+> Code Snippet:
+> -------------
+> ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls
+> | SecurityProtocolType.Tls11
+> | SecurityProtocolType.Tls12
+> | SecurityProtocolType.Ssl3;
+
 
 ### Authorize
 The `options` object returned from the Authorize method will contain the authorizationToken necessary for subsequent
