@@ -430,7 +430,7 @@ namespace B2Net.Tests {
 			// Get timestamp
 #if NETFULL
 			var UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-			long unixTimeMilliseconds = (long) (DateTime.UtcNow.AddDays(1) - UnixEpoch).TotalMilliseconds;
+			long unixTimeMilliseconds = (long) (DateTime.UtcNow - UnixEpoch).TotalMilliseconds;
 #else
 			DateTimeOffset now = DateTimeOffset.UtcNow.AddDays(1);
 			long unixTimeMilliseconds = now.ToUnixTimeMilliseconds();
@@ -477,7 +477,10 @@ namespace B2Net.Tests {
 				// Loop the files and delete
 				var list = await client.Files.GetList(bucketId: testingBucket.BucketId);
 				foreach (B2File b2File in list.Files) {
-					var deletedFile = await client.Files.Delete(b2File.FileId, b2File.FileName);
+					var allVersions = await client.Files.GetVersions(startFileName: b2File.FileName, bucketId: testingBucket.BucketId);
+					foreach(var version in allVersions.Files) {
+						var deletedFile = await client.Files.Delete(version.FileId, version.FileName);
+					}
 				}
 				var deletedBucket = await client.Buckets.Delete(testingBucket.BucketId);
 			}

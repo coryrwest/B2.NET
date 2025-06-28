@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
-using B2Net.Tests;
-using B2Net;
 using B2Net.Models;
-using B2Net.Tests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
@@ -14,10 +10,10 @@ namespace B2Net.Tests {
 		private string NonMasterKey = "K001LarMmmWDIveFaZz3yvB4uattO+Q";
 
 		[TestMethod]
-		public void CanWeAuthorize() {
+		public async Task CanWeAuthorize() {
 			var client = new B2Client(Options);
 
-			var result = client.Authorize().Result;
+			var result = await client.Authorize();
 
 			Assert.IsFalse(string.IsNullOrEmpty(result.AuthorizationToken));
 		}

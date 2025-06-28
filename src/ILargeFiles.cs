@@ -78,6 +78,16 @@ namespace B2Net {
 		/// <param name="cancelToken"></param>
 		/// <returns></returns>
 		Task<B2UploadPart> UploadPart(byte[] fileData, int partNumber, B2UploadPartUrl uploadPartUrl, CancellationToken cancelToken = default(CancellationToken));
-		//Task<B2LargeFilePart> CopyPart(string sourceFileId, string destinationLargeFileId, int destinationPartNumber, string range = "", CancellationToken cancelToken = default(CancellationToken));
+		
+		/// <summary>
+		/// Copy a part from an existing file to a large file that is being uploaded
+		/// </summary>
+		/// <param name="sourceFileId">The ID of the source file to copy from</param>
+		/// <param name="destinationLargeFileId">The ID of the large file that is being uploaded</param>
+		/// <param name="destinationPartNumber">The part number to copy to (between 1 and 10000)</param>
+		/// <param name="range">Optional byte range within the source file, formatted as "bytes=startByte-endByte"</param>
+		/// <param name="cancelToken">Cancellation token</param>
+		/// <returns>The part that was copied</returns>
+		Task<B2LargeFilePart> CopyPart(string sourceFileId, string destinationLargeFileId, int destinationPartNumber, string range = "", CancellationToken cancelToken = default(CancellationToken));
 	}
 }

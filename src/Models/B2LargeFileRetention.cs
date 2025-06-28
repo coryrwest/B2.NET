@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace B2Net.Models {
+﻿namespace B2Net.Models {
 
 	public class B2LargeFileRetention {
 		public RetentionMode Mode { get; set; }

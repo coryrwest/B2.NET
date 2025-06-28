@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace B2Net.Tests {
 	[TestClass]
@@ -21,10 +22,10 @@ namespace B2Net.Tests {
 #endif
 
 		[TestInitialize]
-		public void Initialize() {
+		public async Task Initialize() {
 			Client = new B2Client(Options);
 			BucketName = $"B2NETTestingBucket-{Path.GetRandomFileName().Replace(".", "").Substring(0, 6)}";
-			var buckets = Client.Buckets.GetList().Result;
+			var buckets = await Client.Buckets.GetList();
 			B2Bucket existingBucket = null;
 			foreach (B2Bucket b2Bucket in buckets) {
 				if (b2Bucket.BucketName == BucketName) {
@@ -36,7 +37,7 @@ namespace B2Net.Tests {
 				TestBucket = existingBucket;
 			}
 			else {
-				TestBucket = Client.Buckets.Create(BucketName, new B2BucketOptions() {FileLockEnabled = true, BucketType = Models.BucketTypes.allPrivate }).Result;
+				TestBucket = await Client.Buckets.Create(BucketName, new B2BucketOptions() {FileLockEnabled = true, BucketType = Models.BucketTypes.allPrivate });
 			}
 		}
 
@@ -75,14 +76,14 @@ namespace B2Net.Tests {
 		    B2File start = null;
 		    B2File finish = null;
             try {
-		        start = Client.LargeFiles.StartLargeFile(fileName, "", TestBucket.BucketId).Result;
+		        start = await Client.LargeFiles.StartLargeFile(fileName, "", TestBucket.BucketId);
 
 		        for (int i = 0; i < parts.Count; i++) {
-		            var uploadUrl = Client.LargeFiles.GetUploadPartUrl(start.FileId).Result;
-		            var part = Client.LargeFiles.UploadPart(parts[i], i + 1, uploadUrl).Result;
+		            var uploadUrl = await Client.LargeFiles.GetUploadPartUrl(start.FileId);
+		            var part = await Client.LargeFiles.UploadPart(parts[i], i + 1, uploadUrl);
 		        }
 
-		        finish = Client.LargeFiles.FinishLargeFile(start.FileId, shas.ToArray()).Result;
+		        finish = await Client.LargeFiles.FinishLargeFile(start.FileId, shas.ToArray());
 		    }
 		    catch (Exception e) {
 			    await Client.LargeFiles.CancelLargeFile(start.FileId);
@@ -142,17 +143,17 @@ namespace B2Net.Tests {
 #endif
 
 			try {
-				start = Client.LargeFiles.StartLargeFile(fileName, new B2LargeFileRetention() {
+				start = await Client.LargeFiles.StartLargeFile(fileName, new B2LargeFileRetention() {
 					Mode = RetentionMode.governance,
 					RetainUntilTimestamp = unixTimeMilliseconds
-				}, "", TestBucket.BucketId).Result;
+				}, "", TestBucket.BucketId);
 
 				for (int i = 0; i < parts.Count; i++) {
-					var uploadUrl = Client.LargeFiles.GetUploadPartUrl(start.FileId).Result;
-					var part = Client.LargeFiles.UploadPart(parts[i], i + 1, uploadUrl).Result;
+					var uploadUrl = await Client.LargeFiles.GetUploadPartUrl(start.FileId);
+					var part = await Client.LargeFiles.UploadPart(parts[i], i + 1, uploadUrl);
 				}
 
-				finish = Client.LargeFiles.FinishLargeFile(start.FileId, shas.ToArray()).Result;
+				finish = await Client.LargeFiles.FinishLargeFile(start.FileId, shas.ToArray());
 			}
 			catch (Exception e) {
 				await Client.LargeFiles.CancelLargeFile(start.FileId);
@@ -171,7 +172,7 @@ namespace B2Net.Tests {
 
 
 		[TestMethod]
-		public void LargeFileUploadIncompleteGetPartsTest() {
+		public async Task LargeFileUploadIncompleteGetPartsTest() {
 			var fileName = "B2LargeFileTest.txt";
 			FileStream fileStream = File.OpenRead(Path.Combine(FilePath, fileName));
 			var stream = new StreamReader(fileStream);
@@ -196,15 +197,15 @@ namespace B2Net.Tests {
 			B2File start = null;
 			B2File finish = null;
 			try {
-				start = Client.LargeFiles.StartLargeFile(fileName, "", TestBucket.BucketId).Result;
+				start = await Client.LargeFiles.StartLargeFile(fileName, "", TestBucket.BucketId);
 
 				for (int i = 0; i < 2; i++) {
-					var uploadUrl = Client.LargeFiles.GetUploadPartUrl(start.FileId).Result;
-					var part = Client.LargeFiles.UploadPart(parts[i], i + 1, uploadUrl).Result;
+					var uploadUrl = await Client.LargeFiles.GetUploadPartUrl(start.FileId);
+					var part = await Client.LargeFiles.UploadPart(parts[i], i + 1, uploadUrl);
 				}
 
 				// Now we can list parts and get a result
-				listParts = Client.LargeFiles.ListPartsForIncompleteFile(start.FileId, 1, 100).Result;
+				listParts = await Client.LargeFiles.ListPartsForIncompleteFile(start.FileId, 1, 100);
 			}
 			catch (Exception e) {
 				Console.WriteLine(e);
@@ -219,7 +220,7 @@ namespace B2Net.Tests {
 		}
 
 		[TestMethod]
-		public void LargeFileCancelTest() {
+		public async Task LargeFileCancelTest() {
 			var fileName = "B2LargeFileTest.txt";
 			FileStream fileStream = File.OpenRead(Path.Combine(FilePath, fileName));
 			var stream = new StreamReader(fileStream);
@@ -244,15 +245,15 @@ namespace B2Net.Tests {
 			B2File start = null;
 			B2File finish = null;
 			try {
-				start = Client.LargeFiles.StartLargeFile(fileName, "", TestBucket.BucketId).Result;
+				start = await Client.LargeFiles.StartLargeFile(fileName, "", TestBucket.BucketId);
 
 				for (int i = 0; i < 2; i++) {
-					var uploadUrl = Client.LargeFiles.GetUploadPartUrl(start.FileId).Result;
-					var part = Client.LargeFiles.UploadPart(parts[i], i + 1, uploadUrl).Result;
+					var uploadUrl = await Client.LargeFiles.GetUploadPartUrl(start.FileId);
+					var part = await Client.LargeFiles.UploadPart(parts[i], i + 1, uploadUrl);
 				}
 
 				// Now we can list parts and get a result
-				cancelledFile = Client.LargeFiles.CancelLargeFile(start.FileId).Result;
+				cancelledFile = await Client.LargeFiles.CancelLargeFile(start.FileId);
 			}
 			catch (Exception e) {
 				Console.WriteLine(e);
@@ -263,7 +264,7 @@ namespace B2Net.Tests {
 		}
 
 		[TestMethod]
-		public void LargeFileIncompleteListTest() {
+		public async Task LargeFileIncompleteListTest() {
 			var fileName = "B2LargeFileTest.txt";
 			FileStream fileStream = File.OpenRead(Path.Combine(FilePath, fileName));
 			var stream = new StreamReader(fileStream);
@@ -288,22 +289,22 @@ namespace B2Net.Tests {
 			B2File start = null;
 			B2File finish = null;
 			try {
-				start = Client.LargeFiles.StartLargeFile(fileName, "", TestBucket.BucketId).Result;
+				start = await Client.LargeFiles.StartLargeFile(fileName, "", TestBucket.BucketId);
 
 				for (int i = 0; i < 2; i++) {
-					var uploadUrl = Client.LargeFiles.GetUploadPartUrl(start.FileId).Result;
-					var part = Client.LargeFiles.UploadPart(parts[i], i + 1, uploadUrl).Result;
+					var uploadUrl = await Client.LargeFiles.GetUploadPartUrl(start.FileId);
+					var part = await Client.LargeFiles.UploadPart(parts[i], i + 1, uploadUrl);
 				}
 
 				// Now we can list parts and get a result
-				fileList = Client.LargeFiles.ListIncompleteFiles(TestBucket.BucketId).Result;
+				fileList = await Client.LargeFiles.ListIncompleteFiles(TestBucket.BucketId);
 			}
 			catch (Exception e) {
 				Console.WriteLine(e);
 				throw;
 			}
 			finally {
-				var cancelledFile = Client.LargeFiles.CancelLargeFile(start.FileId).Result;
+				var cancelledFile = await Client.LargeFiles.CancelLargeFile(start.FileId);
 			}
 
 			Assert.AreEqual(1, fileList.Files.Count, "Incomplete file list count does not match what we expected.");
@@ -344,14 +345,14 @@ namespace B2Net.Tests {
 			B2File finish = null;
 			var uploadedParts = new List<B2UploadPart>();
 			try {
-				start = Client.LargeFiles.StartLargeFile(fileName, "", TestBucket.BucketId).Result;
+				start = await Client.LargeFiles.StartLargeFile(fileName, "", TestBucket.BucketId);
 
 				for (int i = 0; i < parts.Count; i++) {
-					var uploadUrl = Client.LargeFiles.GetUploadPartUrl(start.FileId).Result;
-					uploadedParts.Add(Client.LargeFiles.UploadPart(parts[i], i + 1, uploadUrl).Result);
+					var uploadUrl = await Client.LargeFiles.GetUploadPartUrl(start.FileId);
+					uploadedParts.Add(await Client.LargeFiles.UploadPart(parts[i], i + 1, uploadUrl));
 				}
 
-				finish = Client.LargeFiles.FinishLargeFile(start.FileId, shas.ToArray()).Result;
+				finish = await Client.LargeFiles.FinishLargeFile(start.FileId, shas.ToArray());
 			} catch (Exception e) {
 				await Client.LargeFiles.CancelLargeFile(start.FileId);
 				Console.WriteLine(e);
@@ -391,11 +392,11 @@ namespace B2Net.Tests {
 		}
 
 		[TestCleanup]
-		public void Cleanup() {
+		public async Task Cleanup() {
 			foreach (B2File b2File in FilesToDelete) {
-				var deletedFile = Client.Files.Delete(b2File.FileId, b2File.FileName).Result;
+				var deletedFile = await Client.Files.Delete(b2File.FileId, b2File.FileName);
 			}
-			var deletedBucket = Client.Buckets.Delete(TestBucket.BucketId).Result;
+			var deletedBucket = await Client.Buckets.Delete(TestBucket.BucketId);
 		}
 	}
 }

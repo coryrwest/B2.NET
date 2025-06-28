@@ -111,23 +111,24 @@ namespace B2Net {
 		}
 
 		/// <summary>
-		/// Copy a source file into part of a large file
+		/// Copy a part from an existing file to a large file that is being uploaded
 		/// </summary>
-		/// <param name="fileName"></param>
-		/// <param name="contentType"></param>
-		/// <param name="bucketId"></param>
-		/// <param name="fileInfo"></param>
-		/// <param name="cancelToken"></param>
-		/// <returns></returns>
-		//public async Task<B2LargeFilePart> CopyPart(string sourceFileId, string destinationLargeFileId, int destinationPartNumber, string range = "", CancellationToken cancelToken = default(CancellationToken)) {
-		//	var request = LargeFileRequestGenerators.CopyPart(_options, sourceFileId, destinationLargeFileId, destinationPartNumber, range);
+		/// <param name="sourceFileId">The ID of the source file to copy from</param>
+		/// <param name="destinationLargeFileId">The ID of the large file that is being uploaded</param>
+		/// <param name="destinationPartNumber">The part number to copy to (between 1 and 10000)</param>
+		/// <param name="range">Optional byte range within the source file</param>
+		/// <param name="cancelToken">Cancellation token</param>
+		/// <returns>The part that was copied</returns>
+		public async Task<B2LargeFilePart> CopyPart(string sourceFileId, string destinationLargeFileId, int destinationPartNumber, string range = "", CancellationToken cancelToken = default(CancellationToken)) {
+			RefreshAuthorization(_options, _authorize);
+			var request = LargeFileRequestGenerators.CopyPart(_options, sourceFileId, destinationLargeFileId, destinationPartNumber, range);
 
-		//	// Send the download request
-		//	var response = await _client.SendAsync(request, cancelToken);
+			// Send the request
+			var response = await _client.SendAsync(request, cancelToken);
 
-		//	// Create B2File from response
-		//	return await ResponseParser.ParseResponse<B2LargeFilePart>(response, _api);
-		//}
+			// Create B2LargeFilePart from response
+			return await ResponseParser.ParseResponse<B2LargeFilePart>(response, _api);
+		}
 
 		/// <summary>
 		/// Check that the options has a valid authorization token and if it does not, get one.

@@ -1,6 +1,6 @@
 ﻿using B2Net.Http.RequestGenerators;
 using B2Net.Models;
-using Newtonsoft.Json;
+using System.Text.Json;
 using System.Net.Http;
 
 namespace B2Net.Http {
@@ -16,16 +16,16 @@ namespace B2Net.Http {
 		public static HttpRequestMessage GetList(B2Options options, string bucketId, string startFileName = "", int? maxFileCount = null, string prefix = "", string delimiter = "") {
 			var body = "{\"bucketId\":\"" + bucketId + "\"";
 			if (!string.IsNullOrEmpty(startFileName)) {
-				body += ", \"startFileName\":" + JsonConvert.ToString(startFileName);
+				body += ", \"startFileName\":" + JsonSerializer.Serialize(startFileName);
 			}
 			if (maxFileCount.HasValue) {
 				body += ", \"maxFileCount\":" + maxFileCount.Value.ToString();
 			}
 			if (!string.IsNullOrEmpty(prefix)) {
-				body += ", \"prefix\":" + JsonConvert.ToString(prefix);
+				body += ", \"prefix\":" + JsonSerializer.Serialize(prefix);
 			}
 			if (!string.IsNullOrEmpty(delimiter)) {
-				body += ", \"delimiter\":" + JsonConvert.ToString(delimiter);
+				body += ", \"delimiter\":" + JsonSerializer.Serialize(delimiter);
 			}
 			body += "}";
 			return BaseRequestGenerator.PostRequest(Endpoints.List, body, options);
@@ -34,7 +34,7 @@ namespace B2Net.Http {
 		public static HttpRequestMessage ListVersions(B2Options options, string bucketId, string startFileName = "", string startFileId = "", int? maxFileCount = null, string prefix = "", string delimiter = "") {
 			var body = "{\"bucketId\":\"" + bucketId + "\"";
 			if (!string.IsNullOrEmpty(startFileName)) {
-				body += ", \"startFileName\":" + JsonConvert.ToString(startFileName);
+				body += ", \"startFileName\":" + JsonSerializer.Serialize(startFileName);
 			}
 			if (!string.IsNullOrEmpty(startFileId)) {
 				body += ", \"startFileId\":\"" + startFileId + "\"";
@@ -43,10 +43,10 @@ namespace B2Net.Http {
 				body += ", \"maxFileCount\":" + maxFileCount.Value.ToString();
 			}
 			if (!string.IsNullOrEmpty(prefix)) {
-				body += ", \"prefix\":" + JsonConvert.ToString(prefix);
+				body += ", \"prefix\":" + JsonSerializer.Serialize(prefix);
 			}
 			if (!string.IsNullOrEmpty(delimiter)) {
-				body += ", \"delimiter\":" + JsonConvert.ToString(delimiter);
+				body += ", \"delimiter\":" + JsonSerializer.Serialize(delimiter);
 			}
 			body += "}";
 			return BaseRequestGenerator.PostRequest(Endpoints.Versions, body, options);
@@ -55,7 +55,7 @@ namespace B2Net.Http {
 		public static HttpRequestMessage HideFile(B2Options options, string bucketId, string fileName = "", string fileId = "") {
 			var body = "{\"bucketId\":\"" + bucketId + "\"";
 			if (!string.IsNullOrEmpty(fileName) && string.IsNullOrEmpty(fileId)) {
-				body += ", \"fileName\":" + JsonConvert.ToString(fileName);
+				body += ", \"fileName\":" + JsonSerializer.Serialize(fileName);
 			}
 			if (!string.IsNullOrEmpty(fileId)) {
 				body += ", \"fileId\":\"" + fileId + "\"";
@@ -65,12 +65,12 @@ namespace B2Net.Http {
 		}
 
 		public static HttpRequestMessage GetInfo(B2Options options, string fileId) {
-			var json = JsonConvert.SerializeObject(new { fileId });
+			var json = JsonSerializer.Serialize(new { fileId });
 			return BaseRequestGenerator.PostRequest(Endpoints.Info, json, options);
 		}
 
 		public static HttpRequestMessage UpdateFileRetention(B2Options options, string fileName, string fileId, B2DefaultRetention fileRetention, bool bypassGovernance = false) {
-			var json = JsonConvert.SerializeObject(new {
+			var json = JsonSerializer.Serialize(new {
 				fileName,
 				fileId,
 				fileRetention,

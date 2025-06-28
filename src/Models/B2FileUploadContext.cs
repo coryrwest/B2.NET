@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace B2Net.Models {
 	public class B2FileUploadContext {

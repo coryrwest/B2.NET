@@ -6,8 +6,7 @@ using B2Net.Models;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace B2Net.Http {
 	public static class FileUploadRequestGenerators {
@@ -144,11 +143,11 @@ namespace B2Net.Http {
 			}
 			// If retention is set and there is no timestamp, fail. 
 			if (uploadContext.RetainUntilTimestamp == 0 && retentionSet) {
-				throw new ArgumentException("IF you specify a RetentionMode, you must also set the RetainUntilTimestamp");
+				throw new ArgumentException("If you specify a RetentionMode, you must also set the RetainUntilTimestamp");
 			}
 
 			if (uploadContext.RetainUntilTimestamp != 0) {
-				request.Headers.Add("X-Bz-File-Retain-Until-Timestamp", uploadContext.RetainUntilTimestamp.ToString());
+				request.Headers.Add("X-Bz-File-Retention-Retain-Until-Timestamp", uploadContext.RetainUntilTimestamp.ToString());
 			}
 
 			request.Content.Headers.ContentType = new MediaTypeHeaderValue(string.IsNullOrWhiteSpace(uploadContext.ContentType) ? "b2/x-auto" : uploadContext.ContentType);
@@ -159,7 +158,7 @@ namespace B2Net.Http {
 		}
 
 		public static HttpRequestMessage GetUploadUrl(B2Options options, string bucketId) {
-			var json = JsonConvert.SerializeObject(new { bucketId });
+			var json = JsonSerializer.Serialize(new { bucketId });
 			return BaseRequestGenerator.PostRequest(Endpoints.GetUploadUrl, json, options);
 		}
 	}

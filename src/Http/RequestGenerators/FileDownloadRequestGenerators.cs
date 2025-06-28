@@ -1,5 +1,6 @@
 ﻿using B2Net.Models;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System;
 using System.ComponentModel;
 using System.Net.Http;
@@ -18,7 +19,7 @@ namespace B2Net.Http {
 		public static HttpRequestMessage DownloadById(B2Options options, string fileId, string byteRange = "") {
 			var uri = new Uri(options.DownloadUrl + "/b2api/" + Constants.Version + "/" + Endpoints.DownloadById);
 
-			var json = JsonConvert.SerializeObject(new { fileId });
+			var json = JsonSerializer.Serialize(new { fileId });
 			var request = new HttpRequestMessage() {
 				Method = HttpMethod.Post,
 				RequestUri = uri,
@@ -55,19 +56,24 @@ namespace B2Net.Http {
 		public class DownloadAuthorizationContext {
 			public string bucketId { get; set; }
 			public string fileNamePrefix { get; set; }
-			[DefaultValue("")]
 			public int validDurationInSeconds { get; set; }
-			[DefaultValue("")]
+			
+			[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 			public string b2ContentDisposition { get; set; }
-			[DefaultValue("")]
+			
+			[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 			public string b2ContentLanguage { get; set; }
-			[DefaultValue("")]
+			
+			[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 			public string b2Expires { get; set; }
-			[DefaultValue("")]
+			
+			[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 			public string b2CacheControl { get; set; }
-			[DefaultValue("")]
+			
+			[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 			public string b2ContentEncoding { get; set; }
-			[DefaultValue("")]
+			
+			[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 			public string b2ContentType { get; set; }
 		}
 
@@ -75,22 +81,28 @@ namespace B2Net.Http {
 			, string b2ContentDisposition = "", string b2ContentLanguage = "", string b2Expires = "", string b2CacheControl = "", string b2ContentEncoding = "", string b2ContentType = "") {
 			var uri = new Uri(options.ApiUrl + "/b2api/" + Constants.Version + "/" + Endpoints.GetDownloadAuthorization);
 
+			// This grossness is required because JsonSerializer was including the properties no matter what setting or attribute was set for default values.
 			var body = new DownloadAuthorizationContext {
-				bucketId = bucketId, fileNamePrefix = fileNamePrefix, validDurationInSeconds = validDurationInSeconds,
-				b2ContentDisposition = b2ContentDisposition,
-				b2ContentLanguage = b2ContentLanguage,
-				b2Expires = b2Expires,
-				b2CacheControl = b2CacheControl,
-				b2ContentEncoding = b2ContentEncoding,
-				b2ContentType = b2ContentType
+				bucketId = bucketId, 
+				fileNamePrefix = fileNamePrefix, 
+				validDurationInSeconds = validDurationInSeconds,
+				b2ContentDisposition = string.IsNullOrEmpty(b2ContentDisposition) ? null : b2ContentDisposition,
+				b2ContentLanguage = string.IsNullOrEmpty(b2ContentLanguage) ? null : b2ContentLanguage,
+				b2Expires = string.IsNullOrEmpty(b2Expires) ? null : b2Expires,
+				b2CacheControl = string.IsNullOrEmpty(b2CacheControl) ? null : b2CacheControl,
+				b2ContentEncoding = string.IsNullOrEmpty(b2ContentEncoding) ? null : b2ContentEncoding,
+				b2ContentType = string.IsNullOrEmpty(b2ContentType) ? null : b2ContentType
+			};
+
+			var jsonOptions = new JsonSerializerOptions {
+				DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+				IgnoreReadOnlyProperties = true
 			};
 
 			var request = new HttpRequestMessage() {
 				Method = HttpMethod.Post,
 				RequestUri = uri,
-				Content = new StringContent(JsonConvert.SerializeObject(body, new JsonSerializerSettings {
-					NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore
-				}))
+				Content = new StringContent(JsonSerializer.Serialize(body, jsonOptions))
 			};
 
 			request.Headers.TryAddWithoutValidation("Authorization", options.AuthorizationToken);

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace B2Net.Models {
+﻿namespace B2Net.Models {
 	public class B2CORSRule {
 		public string CorsRuleName { get; set; }
 		public string[] AllowedOrigins { get; set; }

@@ -10,12 +10,9 @@ The following features from the Backblaze B2 Native API are **not implemented** 
 2. **Bucket Notification Rules**
    - Endpoints: `b2_get_bucket_notification_rules`, `b2_set_bucket_notification_rules`
    - No support for retrieving or setting bucket event notification rules.
-3. **Missing Large File Operations**
-   - Endpoint: `b2_copy_part` (commented out in the code but not implemented)
-   - No support for copying parts from existing files to a large file being uploaded.
-4. **Standalone Lifecycle Rule APIs**
+3. **Standalone Lifecycle Rule APIs**
    - If the API provides endpoints for lifecycle rules outside of bucket create/update, these are not implemented.
-5. **Other Advanced/Administrative Endpoints**
+4. **Other Advanced/Administrative Endpoints**
    - No support for billing, user management, or advanced account settings if present in the API.
 
 ### Feature Coverage Table
@@ -25,7 +22,7 @@ The following features from the Backblaze B2 Native API are **not implemented** 
 | Authentication             | Implemented   | Full support                                               |
 | Bucket Management          | Implemented   | Full support                                               |
 | File Management            | Implemented   | Full support                                               |
-| Large File Management      | Partial       | Missing b2_copy_part implementation                        |
+| Large File Management      | Implemented   | Full support                                               |
 | Lifecycle Rules            | Implemented   | Only via bucket create/update                              |
 | CORS Rules                 | Implemented   | Only via bucket create/update                              |
 | Application Key Management | **Missing**   | No support for list/create/delete/update keys              |

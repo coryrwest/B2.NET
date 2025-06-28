@@ -1,8 +1,7 @@
 ﻿using B2Net.Models;
-using Newtonsoft.Json;
+using System.Text.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 
 namespace B2Net.Http {
@@ -37,7 +36,7 @@ namespace B2Net.Http {
 			if (metadataDirective == B2MetadataDirective.REPLACE && fileInfo != null && fileInfo.Count > 0) {
 				payload.Add("fileInfo", fileInfo);
 			}
-			var json = JsonConvert.SerializeObject(payload);
+			var json = JsonSerializer.Serialize(payload);
 
 			var request = new HttpRequestMessage() {
 				Method = HttpMethod.Post,
