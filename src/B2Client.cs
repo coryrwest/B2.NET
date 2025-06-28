@@ -1,8 +1,8 @@
 ﻿using System;
 using B2Net.Http;
 using B2Net.Models;
-using Newtonsoft.Json;
 using System.Net;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,7 +13,7 @@ namespace B2Net {
 
 		public B2Capabilities Capabilities {
 			get {
-				if (_options.Authenticated) {
+				if (_options.AuthTokenNotExpired) {
 					return _capabilities;
 				}
 				else {
@@ -114,7 +114,7 @@ namespace B2Net {
 		/// <returns></returns>
 		public static async Task<B2Options> AuthorizeAsync(B2Options options) {
 			// Return if already authenticated.
-			if (options.Authenticated) {
+			if (options.AuthTokenNotExpired) {
 				return options;
 			}
 
@@ -129,7 +129,7 @@ namespace B2Net {
 
 			var jsonResponse = await response.Content.ReadAsStringAsync();
 			if (response.IsSuccessStatusCode) {
-				var authResponse = JsonConvert.DeserializeObject<B2AuthResponse>(jsonResponse);
+				var authResponse = JsonSerializer.Deserialize<B2AuthResponse>(jsonResponse);
 
 				options.SetState(authResponse);
 			} else if (response.StatusCode == HttpStatusCode.Unauthorized) {

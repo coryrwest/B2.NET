@@ -135,7 +135,7 @@ namespace B2Net {
 		/// <param name="authorize"></param>
 		/// <returns></returns>
 		private void RefreshAuthorization(B2Options options, Func<B2Options, B2Options> authorize) {
-			if (!options.Authenticated && !options.NoTokenRefresh) {
+			if (!options.AuthTokenNotExpired && !options.NoTokenRefresh) {
 				options = authorize(options);
 			}
 		}

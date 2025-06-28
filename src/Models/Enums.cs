@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿using System.Text.Json.Serialization;
 
 namespace B2Net.Models {
 	public enum ContentEncoding {
@@ -9,13 +8,13 @@ namespace B2Net.Models {
 		identity
 	}
 
-	[JsonConverter(typeof(StringEnumConverter))]
+	[JsonConverter(typeof(JsonStringEnumConverter))]
 	public enum RetentionMode {
 		governance,
 		compliance
 	}
 
-	[JsonConverter(typeof(StringEnumConverter))]
+	[JsonConverter(typeof(JsonStringEnumConverter))]
 	public enum RetentionUnit {
 		days,
 		years

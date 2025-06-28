@@ -41,11 +41,10 @@
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Net.Http" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Text.Json" Version="9.0.6" />
+    <PackageReference Include="System.Text.Json" Version="7.0.3" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net462'">
     <DefineConstants>NET462;NETFULL</DefineConstants>

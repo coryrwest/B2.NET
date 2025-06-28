@@ -1,5 +1,5 @@
 ﻿using B2Net.Models;
-using Newtonsoft.Json;
+using System.Text.Json;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -29,7 +29,7 @@ namespace B2Net {
 
 				B2Error b2Error;
 				try {
-					b2Error = JsonConvert.DeserializeObject<B2Error>(content);
+					b2Error = JsonSerializer.Deserialize<B2Error>(content);
 				} catch (Exception ex) {
 					throw new Exception("Seralization of the response failed. See inner exception for response contents and serialization error.", ex);
 				}

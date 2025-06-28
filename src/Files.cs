@@ -1,7 +1,7 @@
 ﻿using System;
 using B2Net.Http;
 using B2Net.Models;
-using Newtonsoft.Json;
+using System.Text.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -88,7 +88,7 @@ namespace B2Net {
 			var uploadUrlRequest = FileUploadRequestGenerators.GetUploadUrl(_options, operationalBucketId);
 			var uploadUrlResponse = await _client.SendAsync(uploadUrlRequest, cancelToken);
 			var uploadUrlData = await uploadUrlResponse.Content.ReadAsStringAsync();
-			var uploadUrlObject = JsonConvert.DeserializeObject<B2UploadUrl>(uploadUrlData);
+			var uploadUrlObject = JsonSerializer.Deserialize<B2UploadUrl>(uploadUrlData);
 			// Set the upload auth token
 			_options.UploadAuthorizationToken = uploadUrlObject.AuthorizationToken;
 
@@ -347,7 +347,7 @@ namespace B2Net {
 			// File Lock Headers
 			if (response.Headers.TryGetValues("X-Bz-File-Retention-Mode", out values)) {
 				try {
-					file.FileRetention = JsonConvert.DeserializeObject<FileRetentionReturn>(values.First());
+					file.FileRetention = JsonSerializer.Deserialize<FileRetentionReturn>(values.First());
 				}
 				catch (Exception e) {
 					throw new Exception("Could not deserialize the FileRetention Headers from the download response. See inner exception for details.", e);
@@ -392,7 +392,7 @@ namespace B2Net {
 		/// <param name="authorize"></param>
 		/// <returns></returns>
 		private void RefreshAuthorization(B2Options options, Func<B2Options, B2Options> authorize) {
-			if (!options.Authenticated && !options.NoTokenRefresh) {
+			if (!options.AuthTokenNotExpired && !options.NoTokenRefresh) {
 				options = authorize(options);
 			}
 		}

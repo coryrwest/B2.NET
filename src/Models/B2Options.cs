@@ -11,13 +11,13 @@ namespace B2Net.Models {
 		/// api calls made from this client. Useful if your app will
 		/// only ever use one bucket. Default: false.
 		/// </summary>
-		public bool PersistBucket { get; set; }
+		public bool PersistBucket { get; set; } = false;
 
 		/// <summary>
 		/// Specify true if you want to disable the library automatically updating your Authorization Token.
 		/// This is only required if you have a long-lived B2Client instance and want to manage the token yourself.
 		/// </summary>
-		public bool NoTokenRefresh { get; set; }
+		public bool NoTokenRefresh { get; set; } = false;
 
 		// State
 		public string ApiUrl { get; set; }
@@ -39,7 +39,7 @@ namespace B2Net.Models {
 
 		public int RequestTimeout { get; set; }
 
-		public bool Authenticated => AuthTokenExpiration > DateTime.Now;
+		public bool AuthTokenNotExpired => AuthTokenExpiration > DateTime.UtcNow;
 
 		public DateTime AuthTokenExpiration { get; private set; }
 
@@ -57,8 +57,8 @@ namespace B2Net.Models {
 			AbsoluteMinimumPartSize = response.absoluteMinimumPartSize;
 			AccountId = response.accountId;
 			Capabilities = new B2Capabilities(response.allowed);
-			// Set auth token expiration to 23 hours from now. Max is 24, make sure we don't accidentally use an expired token because our timing was off.
-			AuthTokenExpiration = DateTime.Now.AddHours(23);
+			// Set auth token expiration to 22 hours from now. Max is 24, make sure we don't accidentally use an expired token because our timing was off.
+			AuthTokenExpiration = DateTime.UtcNow.AddHours(22);
 		}
 	}
 }

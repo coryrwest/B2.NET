@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using B2Net.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace B2Net.Tests {
 	[TestClass]
@@ -21,14 +21,14 @@ namespace B2Net.Tests {
 		[TestMethod]
 		public void CanWeAuthorizeStatic() {
 			var result = B2Client.Authorize(Options);
-			Console.WriteLine(JsonConvert.SerializeObject(result));
+			Console.WriteLine(JsonSerializer.Serialize(result));
 			Assert.IsFalse(string.IsNullOrEmpty(result.AuthorizationToken));
 		}
 
 		[TestMethod]
 		public void CanWeAuthorizeNonMasterKey() {
 			var result = B2Client.Authorize(Options.KeyId, Options.ApplicationKey);
-			Console.WriteLine(JsonConvert.SerializeObject(result));
+			Console.WriteLine(JsonSerializer.Serialize(result));
 			Assert.IsFalse(string.IsNullOrEmpty(result.AuthorizationToken));
 		}
 
