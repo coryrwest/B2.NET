@@ -11,6 +11,8 @@ using Newtonsoft.Json;
 namespace B2Net.Tests {
 	[TestClass]
 	public class AuthorizeTest : BaseTest {
+		private string NonMasterKey = "K001LarMmmWDIveFaZz3yvB4uattO+Q";
+
 		[TestMethod]
 		public void CanWeAuthorize() {
 			var client = new B2Client(Options);
@@ -54,9 +56,7 @@ namespace B2Net.Tests {
 		[TestMethod]
 		[ExpectedException(typeof(AuthorizationException))]
 		public async Task ErrorAuthorizeNonMasterKeyWithMissingKeyID() {
-			var key = "K001LarMmmWDIveFaZz3yvB4uattO+Q";
-
-			var result = await B2Client.AuthorizeAsync("", key);
+			var result = await B2Client.AuthorizeAsync("", NonMasterKey);
 		}
 
 		[TestMethod]

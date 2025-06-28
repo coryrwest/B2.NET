@@ -428,11 +428,11 @@ namespace B2Net.Tests {
 			var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
 			var uploadUrl = await Client.Files.GetUploadUrl(TestBucket.BucketId);
 			// Get timestamp
-			DateTimeOffset now = DateTimeOffset.UtcNow.AddDays(1);
 #if NETFULL
 			var UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-			long unixTimeMilliseconds = (long) (DateTime.UtcNow - UnixEpoch).TotalMilliseconds;
+			long unixTimeMilliseconds = (long) (DateTime.UtcNow.AddDays(1) - UnixEpoch).TotalMilliseconds;
 #else
+			DateTimeOffset now = DateTimeOffset.UtcNow.AddDays(1);
 			long unixTimeMilliseconds = now.ToUnixTimeMilliseconds();
 #endif
 			// Upload test file

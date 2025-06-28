@@ -11,12 +11,13 @@ namespace B2Net.Tests {
 		private B2Bucket TestBucket = new B2Bucket();
 		private B2Client Client = null;
 		private List<B2File> FilesToDelete = new List<B2File>();
-		private string BucketName = "B2NETTestingBucketPublic";
+		private static string BucketPrefix = "B2NETTestingBucketPublic";
+		private static string BucketName = $"{BucketPrefix}-{Path.GetRandomFileName().Replace(".", "").Substring(0, 6)}";
 
 #if NETFULL
 		private string FilePath => Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "../../../");
 #else
-        private string FilePath => Path.Combine(System.AppContext.BaseDirectory, "../../../");
+		private string FilePath => Path.Combine(System.AppContext.BaseDirectory, "../../../");
 #endif
 
 		[TestInitialize]

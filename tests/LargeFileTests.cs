@@ -309,78 +309,86 @@ namespace B2Net.Tests {
 			Assert.AreEqual(1, fileList.Files.Count, "Incomplete file list count does not match what we expected.");
 		}
 
-		//[TestMethod]
-		//public async System.Threading.Tasks.Task LargeFileCopyPartTest() {
-		//	var fileName = "B2LargeFileTest.txt";
-		//	FileStream fileStream = File.OpenRead(Path.Combine(FilePath, fileName));
-		//	byte[] c = null;
-		//	List<byte[]> parts = new List<byte[]>();
-		//	var shas = new List<string>();
-		//	long fileSize = fileStream.Length;
-		//	long totalBytesParted = 0;
-		//	long minPartSize = 1024 * (5 * 1024);
+		[TestMethod]
+		public async System.Threading.Tasks.Task LargeFileCopyPartTest() {
+			var fileName = "B2LargeFileTest.txt";
+			FileStream fileStream = File.OpenRead(Path.Combine(FilePath, fileName));
+			byte[] c = null;
+			List<byte[]> parts = new List<byte[]>();
+			var shas = new List<string>();
+			long fileSize = fileStream.Length;
+			long totalBytesParted = 0;
+			long minPartSize = 1024 * (5 * 1024);
 
-		//	while (totalBytesParted < fileSize) {
-		//		var partSize = minPartSize;
-		//		// If last part is less than min part size, get that length
-		//		if (fileSize - totalBytesParted < minPartSize) {
-		//			partSize = fileSize - totalBytesParted;
-		//		}
+			while (totalBytesParted < fileSize) {
+				var partSize = minPartSize;
+				// If last part is less than min part size, get that length
+				if (fileSize - totalBytesParted < minPartSize) {
+					partSize = fileSize - totalBytesParted;
+				}
 
-		//		c = new byte[partSize];
-		//		fileStream.Seek(totalBytesParted, SeekOrigin.Begin);
-		//		fileStream.Read(c, 0, c.Length);
+				c = new byte[partSize];
+				fileStream.Seek(totalBytesParted, SeekOrigin.Begin);
+				fileStream.Read(c, 0, c.Length);
 
-		//		parts.Add(c);
-		//		totalBytesParted += partSize;
-		//	}
+				parts.Add(c);
+				totalBytesParted += partSize;
+			}
 
-		//	foreach (var part in parts) {
-		//		string hash = Utilities.GetSHA1Hash(part);
-		//		shas.Add(hash);
-		//	}
+			foreach (var part in parts) {
+				string hash = Utilities.GetSHA1Hash(part);
+				shas.Add(hash);
+			}
 
-		//	B2File start = null;
-		//	B2File finish = null;
-		//	var uploadedParts = new List<B2UploadPart>();
-		//	try {
-		//		start = Client.LargeFiles.StartLargeFile(fileName, "", TestBucket.BucketId).Result;
+			B2File start = null;
+			B2File finish = null;
+			var uploadedParts = new List<B2UploadPart>();
+			try {
+				start = Client.LargeFiles.StartLargeFile(fileName, "", TestBucket.BucketId).Result;
 
-		//		for (int i = 0; i < parts.Count; i++) {
-		//			var uploadUrl = Client.LargeFiles.GetUploadPartUrl(start.FileId).Result;
-		//			uploadedParts.Add(Client.LargeFiles.UploadPart(parts[i], i + 1, uploadUrl).Result);
-		//		}
+				for (int i = 0; i < parts.Count; i++) {
+					var uploadUrl = Client.LargeFiles.GetUploadPartUrl(start.FileId).Result;
+					uploadedParts.Add(Client.LargeFiles.UploadPart(parts[i], i + 1, uploadUrl).Result);
+				}
 
-		//		finish = Client.LargeFiles.FinishLargeFile(start.FileId, shas.ToArray()).Result;
-		//	} catch (Exception e) {
-		//		await Client.LargeFiles.CancelLargeFile(start.FileId);
-		//		Console.WriteLine(e);
-		//		throw;
-		//	}
+				finish = Client.LargeFiles.FinishLargeFile(start.FileId, shas.ToArray()).Result;
+			} catch (Exception e) {
+				await Client.LargeFiles.CancelLargeFile(start.FileId);
+				Console.WriteLine(e);
+				throw;
+			}
 
-		//	// Clean up.
-		//	FilesToDelete.Add(start);
+			// Clean up at the end
+			FilesToDelete.Add(finish);
 
-		//	// Now we can copy the parts
-		//	var copyFileName = "B2LargeFileCopyTest.txt";
-		//	var startCopy = Client.LargeFiles.StartLargeFile(copyFileName, "", TestBucket.BucketId).Result;
+			// Now we can copy the parts
+			var copyFileName = "B2LargeFileCopyTest.txt";
+			var startCopy = await Client.LargeFiles.StartLargeFile(copyFileName, "", TestBucket.BucketId);
+			var copyParts = new List<B2LargeFilePart>();
+			
+			try {
+				// Copy each part with proper range
+				for (int i = 0; i < parts.Count; i++) {
+					long startByte = i * minPartSize;
+					long endByte = Math.Min((i + 1) * minPartSize - 1, fileSize - 1);
+					string range = $"bytes={startByte}-{endByte}";
+					var response = await Client.LargeFiles.CopyPart(finish.FileId, startCopy.FileId, i + 1, range);
+					copyParts.Add(response);
+				}
+				
+				// Get the SHA1s of the copied parts
+				var copyShas = copyParts.Select(p => p.ContentSha1).ToArray();
+				var finishedCopy = await Client.LargeFiles.FinishLargeFile(startCopy.FileId, copyShas);
 
-		//	try {
-		//		foreach (var uploadedPart in uploadedParts) {
-		//			var response = await Client.LargeFiles.CopyPart(finish.FileId, startCopy.FileId, 1, $"0-minPartSize.ToString()");
-		//		}
+				FilesToDelete.Add(finishedCopy);
 
-		//		var finishedCopy = await Client.LargeFiles.FinishLargeFile(startCopy.FileId, shas.ToArray());
-
-		//		FilesToDelete.Add(startCopy);
-
-		//		Assert.AreEqual(fileSize, finishedCopy.ContentLength, "File sizes did not match.");
-		//	} catch (Exception e) {
-		//		await Client.LargeFiles.CancelLargeFile(startCopy.FileId);
-		//		Console.WriteLine(e);
-		//		throw;
-		//	}
-		//}
+				Assert.AreEqual(finish.ContentLength, finishedCopy.ContentLength, "File sizes did not match.");
+			} catch (Exception e) {
+				await Client.LargeFiles.CancelLargeFile(startCopy.FileId);
+				Console.WriteLine(e);
+				throw;
+			}
+		}
 
 		[TestCleanup]
 		public void Cleanup() {
