@@ -27,12 +27,12 @@ namespace B2Net.Tests {
 
 		// Initialize cannot be static so we have to use Test instead of ClassInitialize
 		[TestInitialize]
-		public void Initialize() {
+		public async Task Initialize() {
 			Client = new B2Client(Options);
 			HttpClient = HttpClientFactory.CreateHttpClient(200);
 			HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Options.AuthorizationToken);
 
-			var buckets = Client.Buckets.GetList().Result;
+			var buckets = await Client.Buckets.GetList();
 			B2Bucket existingBucket = null;
 			foreach (B2Bucket b2Bucket in buckets) {
 				if (b2Bucket.BucketName == BucketName) {
@@ -44,7 +44,7 @@ namespace B2Net.Tests {
 				TestBucket = existingBucket;
 			}
 			else {
-				TestBucket = Client.Buckets.Create(BucketName, BucketTypes.allPrivate).Result;
+				TestBucket = await Client.Buckets.Create(BucketName, BucketTypes.allPrivate);
 			}
 		}
 
@@ -456,6 +456,31 @@ namespace B2Net.Tests {
 
 			Assert.AreEqual(RetentionMode.governance.ToString(), fileInfo.FileRetention.Value.Mode, "Retention mode on the update did not match.");
 			Assert.IsTrue(fileInfo.FileRetention.Value.RetainUntilTimestamp > unixTimeMilliseconds, "Retention timestamp was not updated.");
+		}
+
+		[TestMethod]
+		public async Task MANUAL_FileDownloadExpiredTokenTest() {
+			//var fileName = "B2Test.txt";
+			//var fileData = File.ReadAllBytes(Path.Combine(FilePath, fileName));
+			//string hash = Utilities.GetSHA1Hash(fileData);
+
+			//var uploadUrl = await Client.Files.GetUploadUrl(TestBucket.BucketId);
+			//var file = await Client.Files.Upload(fileData, new B2FileUploadContext() {
+			//	FileName = fileName,
+			//	B2UploadUrl = uploadUrl,
+			//	BucketId = TestBucket.BucketId
+			//});
+
+			//await Task.Delay(10000);
+
+			//// Since we did not pass a sha, hash will be prepended with unverified:
+			//Assert.AreEqual($"unverified:{hash}", file.ContentSHA1, "File hashes did not match.");
+
+			//// Test download
+			//var download = await Client.Files.DownloadByName(file.FileName, TestBucket.BucketName);
+			//var downloadHash = Utilities.GetSHA1Hash(download.FileData);
+
+			//Assert.AreEqual(hash, downloadHash);
 		}
 
 		[ClassCleanup]

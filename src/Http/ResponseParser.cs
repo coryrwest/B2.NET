@@ -9,10 +9,7 @@ namespace B2Net.Http {
 
 			await Utilities.CheckForErrors(response, callingApi);
 
-			var options = new JsonSerializerOptions {
-				DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-			};
-			var obj = JsonSerializer.Deserialize<T>(jsonResponse, options);
+			var obj = JsonSerializer.Deserialize<T>(jsonResponse, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 			return obj;
 		}
 	}

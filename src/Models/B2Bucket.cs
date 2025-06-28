@@ -9,6 +9,7 @@ namespace B2Net.Models {
 		public List<B2BucketLifecycleRule> LifecycleRules { get; set; }
 		public List<B2CORSRule> CORSRules { get; set; }
 		public int Revision { get; set; }
+		public string[] Options { get; set; }
 		public FileLockConfiguration FileLockConfiguration { get; set; }
 	}
 
