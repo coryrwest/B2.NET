@@ -2,6 +2,7 @@
 using B2Net.Models;
 using System.Text.Json;
 using System.Net.Http;
+using System.Collections.Generic;
 
 namespace B2Net.Http {
 	public static class FileMetaDataRequestGenerators {
@@ -14,54 +15,70 @@ namespace B2Net.Http {
 		}
 
 		public static HttpRequestMessage GetList(B2Options options, string bucketId, string startFileName = "", int? maxFileCount = null, string prefix = "", string delimiter = "") {
-			var body = "{\"bucketId\":\"" + bucketId + "\"";
+			var requestObj = new {
+				bucketId
+			};
+			
+			var properties = new Dictionary<string, object> {
+				{ "bucketId", bucketId }
+			};
+			
 			if (!string.IsNullOrEmpty(startFileName)) {
-				body += ", \"startFileName\":" + JsonSerializer.Serialize(startFileName);
+				properties.Add("startFileName", startFileName);
 			}
 			if (maxFileCount.HasValue) {
-				body += ", \"maxFileCount\":" + maxFileCount.Value.ToString();
+				properties.Add("maxFileCount", maxFileCount.Value);
 			}
 			if (!string.IsNullOrEmpty(prefix)) {
-				body += ", \"prefix\":" + JsonSerializer.Serialize(prefix);
+				properties.Add("prefix", prefix);
 			}
 			if (!string.IsNullOrEmpty(delimiter)) {
-				body += ", \"delimiter\":" + JsonSerializer.Serialize(delimiter);
+				properties.Add("delimiter", delimiter);
 			}
-			body += "}";
-			return BaseRequestGenerator.PostRequest(Endpoints.List, body, options);
+			
+			var json = JsonSerializer.Serialize(properties);
+			return BaseRequestGenerator.PostRequest(Endpoints.List, json, options);
 		}
 
 		public static HttpRequestMessage ListVersions(B2Options options, string bucketId, string startFileName = "", string startFileId = "", int? maxFileCount = null, string prefix = "", string delimiter = "") {
-			var body = "{\"bucketId\":\"" + bucketId + "\"";
+			var properties = new Dictionary<string, object> {
+				{ "bucketId", bucketId }
+			};
+			
 			if (!string.IsNullOrEmpty(startFileName)) {
-				body += ", \"startFileName\":" + JsonSerializer.Serialize(startFileName);
+				properties.Add("startFileName", startFileName);
 			}
 			if (!string.IsNullOrEmpty(startFileId)) {
-				body += ", \"startFileId\":\"" + startFileId + "\"";
+				properties.Add("startFileId", startFileId);
 			}
 			if (maxFileCount.HasValue) {
-				body += ", \"maxFileCount\":" + maxFileCount.Value.ToString();
+				properties.Add("maxFileCount", maxFileCount.Value);
 			}
 			if (!string.IsNullOrEmpty(prefix)) {
-				body += ", \"prefix\":" + JsonSerializer.Serialize(prefix);
+				properties.Add("prefix", prefix);
 			}
 			if (!string.IsNullOrEmpty(delimiter)) {
-				body += ", \"delimiter\":" + JsonSerializer.Serialize(delimiter);
+				properties.Add("delimiter", delimiter);
 			}
-			body += "}";
-			return BaseRequestGenerator.PostRequest(Endpoints.Versions, body, options);
+			
+			var json = JsonSerializer.Serialize(properties);
+			return BaseRequestGenerator.PostRequest(Endpoints.Versions, json, options);
 		}
 
 		public static HttpRequestMessage HideFile(B2Options options, string bucketId, string fileName = "", string fileId = "") {
-			var body = "{\"bucketId\":\"" + bucketId + "\"";
+			var properties = new Dictionary<string, object> {
+				{ "bucketId", bucketId }
+			};
+			
 			if (!string.IsNullOrEmpty(fileName) && string.IsNullOrEmpty(fileId)) {
-				body += ", \"fileName\":" + JsonSerializer.Serialize(fileName);
+				properties.Add("fileName", fileName);
 			}
 			if (!string.IsNullOrEmpty(fileId)) {
-				body += ", \"fileId\":\"" + fileId + "\"";
+				properties.Add("fileId", fileId);
 			}
-			body += "}";
-			return BaseRequestGenerator.PostRequest(Endpoints.Hide, body, options);
+			
+			var json = JsonSerializer.Serialize(properties);
+			return BaseRequestGenerator.PostRequest(Endpoints.Hide, json, options);
 		}
 
 		public static HttpRequestMessage GetInfo(B2Options options, string fileId) {

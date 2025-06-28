@@ -112,15 +112,19 @@ namespace B2Net.Http.RequestGenerators {
 		}
 
 		public static HttpRequestMessage IncompleteFiles(B2Options options, string bucketId, string startFileId = "", string maxFileCount = "") {
-			var body = "{\"bucketId\":\"" + bucketId + "\"";
+			var properties = new Dictionary<string, object> {
+				{ "bucketId", bucketId }
+			};
+			
 			if (!string.IsNullOrEmpty(startFileId)) {
-				body += ", \"startFileId\":" + JsonSerializer.Serialize(startFileId);
+				properties.Add("startFileId", startFileId);
 			}
 			if (!string.IsNullOrEmpty(maxFileCount)) {
-				body += ", \"maxFileCount\":" + JsonSerializer.Serialize(maxFileCount);
+				properties.Add("maxFileCount", maxFileCount);
 			}
-			body += "}";
-			var request = BaseRequestGenerator.PostRequestJson(Endpoints.IncompleteFiles, body, options);
+			
+			var json = JsonSerializer.Serialize(properties);
+			var request = BaseRequestGenerator.PostRequestJson(Endpoints.IncompleteFiles, json, options);
 			return request;
 		}
 
