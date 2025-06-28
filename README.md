@@ -15,9 +15,8 @@ While the core of B2.NET is mature you should still consider this library in Bet
 *  UFT-8 and Url Encoding support
 *  Fully Async
 *  Full test coverage
-*  Targets .NET 4.5 and .NET Standard 1.5
+*  Targets .NET 4.6 and .NET Standard 2.0
 *  You cannot manage keys with this library, just use already existing ones.
-
 
 > [!WARNING]
 > This library is not thread-safe currently. There is a global state object that is passed around to hold various configuration values.
@@ -473,6 +472,7 @@ should retry the request if you are so inclined.
 
 ## Release Notes
 
+*  0.8.0  Major refactoring. Dropped support for .NET 4.5 and Standard 1.6. Removed Netwonsoft in favor of System.Text.Json. Attempted to clean up some of the gross code.
 *  0.7.5  Stream uploading.
 *  0.7.4  Content-Type setting on Upload.
 *  0.7.3  Thread-safeish HttpClient.
