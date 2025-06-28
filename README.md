@@ -48,16 +48,14 @@ var client = new B2Client(options);
 ```
 
 > [!NOTE]  
-> If you are experiencing an SSL error when initialting requests try adding the below snippet just before client creation. (thanks
+> If you are experiencing an SSL error (Error: "The request was aborted: Could not create SSL/TLS secure channel") when initiating requests try adding the below snippet just before client creation. (thanks
 @JM63)
-> Error: "The request was aborted: Could not create SSL/TLS secure channel"
-> Code Snippet:
-> -------------
-> ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls
-> | SecurityProtocolType.Tls11
-> | SecurityProtocolType.Tls12
-> | SecurityProtocolType.Ssl3;
-
+```
+ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls
+| SecurityProtocolType.Tls11
+| SecurityProtocolType.Tls12
+| SecurityProtocolType.Ssl3;
+```
 
 ### Authorize
 The `options` object returned from the Authorize method will contain the authorizationToken necessary for subsequent
